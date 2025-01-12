@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-  gtag('config', 'G-21G1BS7S3S');
-</script>
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSL Calculations</title>
@@ -18,20 +18,18 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom, #e6f2ff, #004080); /* Dual-tone background */
-            color: #00264d; /* Dark blue text */
+            background: linear-gradient(to bottom, #e6f2ff, #004080, #00264d);
+            color: #00264d;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
         header {
-            background-color: #99ccff; /* Light blue background */
             text-align: center;
-            padding: 20px 10px 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            padding: 20px 10px 0;
         }
         header img {
-            height: 60px; /* Logo size */
+            height: 60px;
             margin-bottom: 10px;
         }
         header h1 {
@@ -39,36 +37,42 @@
             font-size: 2rem;
             font-style: italic;
             font-weight: bold;
-            color: #fff;
+            color: #00264d;
             margin: 0;
-            line-height: 1.2;
         }
         header p {
-            font-size: 0.9rem;
-            color: #e0f7ff; /* Light white-blue for tagline */
-            margin: 5px 0 0;
+            font-size: 1rem;
+            color: #ffffff;
+            font-weight: bold;
+            margin: 0;
         }
         nav {
             display: flex;
             justify-content: center;
-            background-color: #007bff;
             padding: 10px;
+            background: none;
         }
         nav a {
             background: linear-gradient(to right, #0056b3, #007bff);
             color: #fff;
             text-decoration: none;
-            margin: 0 10px;
+            margin: 0 5px;
             padding: 10px 20px;
-            border: 2px solid #004080;
+            border: none;
             border-radius: 10px;
             font-weight: bold;
             font-size: 1rem;
+            text-align: center;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         nav a:hover {
             background: linear-gradient(to left, #004080, #0056b3);
             color: #e6f7ff;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
         }
         section {
             flex: 1;
@@ -77,12 +81,32 @@
         }
         section h1 {
             font-size: 1.8em;
-            color: #00264d;
+            color: #ffff00;
             font-weight: bold;
         }
         section p, section h2 {
-            color: #00264d;
+            color: #ffffff;
+            font-family: "Courier New", Courier, monospace;
             font-weight: bold;
+        }
+        section p.gap {
+            margin-bottom: 30px; /* Increased gap */
+        }
+        .other-features {
+            background-color: #004080;
+            color: white;
+            padding: 20px 30px; /* Increased box width */
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left; /* Align text to the left */
+        }
+        .other-features h2 {
+            color: yellow;
+            font-family: Georgia, serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
         }
         footer {
             text-align: center;
@@ -90,6 +114,15 @@
             background: linear-gradient(to top, #00264d, #004080);
             color: #fff;
             margin-top: auto;
+        }
+        .about-link {
+            font-size: 1rem;
+            color: #ffebcd; /* Warm white */
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .about-link:hover {
+            text-decoration: underline;
         }
         /* Pop-up window styles */
         #popup {
@@ -123,22 +156,6 @@
         #popup button:hover {
             background-color: #004080;
         }
-        /* New Features Box */
-        .new-features {
-            background-color: #004080; /* Dark blue background */
-            color: white; /* White text */
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .new-features p {
-            color: white; /* All points in white */
-        }
-        .about-link {
-            font-size: 1rem; /* Larger font size */
-            color: yellow; /* Yellow text color */
-            font-weight: bold; /* Bold font */
-        }
     </style>
 </head>
 <body>
@@ -150,11 +167,11 @@
     <nav>
         <a href="csl.html">Salary Calculator</a>
         <a href="tax.html">Tax Calculator</a>
-        <a href="emi.html">EMI Calculator</a> <!-- EMI Calculator tab -->
+        <a href="emi.html">EMI Calculator</a>
     </nav>
     <section id="main">
         <h1>Welcome to CSL Calculations</h1>
-        <p>
+        <p class="gap">
             This platform provides easy-to-use calculators for your salary and income tax. 
             Navigate through the buttons above to access the tools.
         </p>
@@ -164,21 +181,18 @@
             Discover which option saves you the most!
         </p>
 
-        <div class="new-features">
-            <h2 style="color: white; font-weight: bold;">New Features</h2>
+        <!-- Other Features Section -->
+        <div class="other-features">
+            <h2>Other Features</h2>
             <p>
-                ✔ Calculate your overtime (employees only) amount with ease.  
-                <br>
-                ✔ Know how far you are from your next grade promotion.  
-                <br>
-                ✔ EMI Calculator to help you calculate your Equated Monthly Installments effectively.
+                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively.
             </p>
         </div>
     </section>
     <footer>
         &copy; 2025 CSL Calculations | All Rights Reserved
         <br>
-        <a href="#" id="aboutBtn" class="about-link">About</a> <!-- About link -->
+        <a href="#" id="aboutBtn" class="about-link">About</a>
     </footer>
 
     <!-- Pop-up Window -->
