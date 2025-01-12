@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cochin Shipyard Limited - Salary Calculation</title>
+    <style>
+        body {
+            background-color: darkblue;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            border: 2px solid white;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .spacer {
+            margin: 20px 0;
+        }
+        button {
+            background-color: green;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        .result {
+            margin-top: 20px;
+            position: relative;
+        }
+        .result:after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 1mm;
+            background-color: white;
+            margin-top: 20px;
+        }
+        .disclaimer {
+            font-size: 0.8em;
+            font-style: italic;
+            color: #cccccc;
+            margin-top: 10px;
+        }
+        .link {
+            color: red;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        .blink {
+            animation: blink 1s step-start infinite;
+            font-size: 0.8em;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cochin Shipyard Limited</h1>
+        <h2>Salary Calculation</h2>
+
+        <form id="overtimeForm">
+            <label for="basicSalary">Basic Salary:</label>
+            <input type="number" id="basicSalary" name="basicSalary" required>
+
+            <label for="da">DA Percentage:</label>
+            <input type="number" id="da" name="da" value="49.6" required>
+
+            <label for="hours">Overtime Hours:</label>
+            <input type="number" id="hours" name="hours" value="0" required>
+
+            <div class="spacer"></div>
+
+            <button type="button" onclick="calculateOvertime()">Calculate</button>
+        </form>
+
+        <div class="result" id="result"></div>
+
+        <footer>
+            Created By Vishnu Puthoor<br>
+            &copy; 2025<br>
+<br>
+            Version 2.0.1<br>
+            <span class="link" onclick="checkForUpdates()">Check for Updates</span><br>
+        </footer>
+    </div>
+
+    <script>
+        function roundToNearestTen(num) {
+            return Math.ceil(num / 10) * 10;
+        }
+
+        function calculateOvertime() {
+            let basicSalary = parseFloat(document.getElementById('basicSalary').value);
+            let daPercentage = parseFloat(document.getElementById('da').value);
+            let hours = parseFloat(document.getElementById('hours').value);
+
+            let daAmount = (basicSalary * daPercentage) / 100;
+            let totalSalary = basicSalary + daAmount;
+            let overtimeRate = ((totalSalary * 2) / 198);
+            let overtimePay = overtimeRate * hours;
+            let perDaySalary = totalSalary / 30;
+
+            let hraPercentage = daPercentage > 50 ? 0.20 : 0.18;
+            let hra = basicSalary * hraPercentage;
+
+            let pf = (totalSalary + 1000) * 0.12;
+
+            let nextBasicPay = roundToNearestTen(basicSalary * 1.03);
+            let nextBasicPayWithGradeChange = roundToNearestTen(nextBasicPay * 1.03);
+
+            document.getElementById('result').innerHTML = `
+                <p>Overtime Rate Per Hour: ₹${overtimeRate.toFixed(2)}</p>
+                <p>Overtime Pay: ₹${overtimePay.toFixed(2)}</p>
+                <p>DA Amount: ₹${daAmount.toFixed(2)}</p>
+                <p> E/L Encashment Amount: ₹${perDaySalary.toFixed(2)}</p>
+                <p>HRA: ₹${hra.toFixed(2)}</p>
+                <p>PF Cutting: ₹${pf.toFixed(2)}</p>
+                <p>Next Basic Pay: ₹${nextBasicPay.toFixed(2)}</p>
+                <p>If Grade Changes: ₹${nextBasicPayWithGradeChange.toFixed(2)}</p>
+                <p class="disclaimer">Due to late punching, loss of pay, and some other reasons, there might be slight variations in the above amount.</p>
+            `;
+        }
+
+        function checkForUpdates() {
+            const whatsappNumber = '9037383927';
+            const versionNumber = '2.0.1';
+            const message = `Version number: ${versionNumber}`;
+
+            const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

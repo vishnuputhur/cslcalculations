@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSL Calculations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #e6f2ff, #004080); /* Dual-tone background */
+            color: #00264d; /* Dark blue text */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #99ccff; /* Light blue background */
+            text-align: center;
+            padding: 20px 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        header img {
+            height: 60px; /* Logo size */
+            margin-bottom: 10px;
+        }
+        header h1 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 2rem;
+            font-style: italic;
+            font-weight: bold;
+            color: #fff;
+            margin: 0;
+            line-height: 1.2;
+        }
+        header p {
+            font-size: 0.9rem;
+            color: #e0f7ff; /* Light white-blue for tagline */
+            margin: 5px 0 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #007bff;
+            padding: 10px;
+        }
+        nav a {
+            background: linear-gradient(to right, #0056b3, #007bff);
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: 2px solid #004080;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        nav a:hover {
+            background: linear-gradient(to left, #004080, #0056b3);
+            color: #e6f7ff;
+        }
+        section {
+            flex: 1;
+            padding: 30px;
+            text-align: center;
+        }
+        section h1 {
+            font-size: 1.8em;
+            color: #00264d;
+            font-weight: bold;
+        }
+        section p, section h2 {
+            color: #00264d;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(to top, #00264d, #004080);
+            color: #fff;
+            margin-top: auto;
+        }
+        /* Pop-up window styles */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #fff;
+            border: 2px solid #0056b3;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+        #popup h2 {
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+        #popup button {
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #popup button:hover {
+            background-color: #004080;
+        }
+        /* New Features Box */
+        .new-features {
+            background-color: #004080; /* Dark blue background */
+            color: white; /* White text */
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .new-features p {
+            color: white; /* All points in white */
+        }
+        .about-link {
+            font-size: 1rem; /* Larger font size */
+            color: yellow; /* Yellow text color */
+            font-weight: bold; /* Bold font */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://i.ibb.co/y4XNSJ7/Cochin-Shipyard-Recruitment-2021-1.png" alt="CSL Logo">
+        <h1>CSL Calculations</h1>
+        <p>Efficient Tools for Financial Planning</p>
+    </header>
+    <nav>
+        <a href="csl.html">Salary Calculator</a>
+        <a href="tax.html">Tax Calculator</a>
+        <a href="emi.html">EMI Calculator</a> <!-- EMI Calculator tab -->
+    </nav>
+    <section id="main">
+        <h1>Welcome to CSL Calculations</h1>
+        <p>
+            This platform provides easy-to-use calculators for your salary and income tax. 
+            Navigate through the buttons above to access the tools.
+        </p>
+        <h2>Income Tax Comparison Feature</h2>
+        <p>
+            Compare the benefits of the <b>New Regime</b> vs the <b>Old Regime</b> using our advanced calculators. 
+            Discover which option saves you the most!
+        </p>
+
+        <div class="new-features">
+            <h2 style="color: white; font-weight: bold;">New Features</h2>
+            <p>
+                ✔ Calculate your overtime amount with ease.  
+                <br>
+                ✔ Know how far you are from your next grade promotion.  
+                <br>
+                ✔ EMI Calculator to help you calculate your Equated Monthly Installments effectively.
+            </p>
+        </div>
+    </section>
+    <footer>
+        &copy; 2025 CSL Calculations | All Rights Reserved
+        <br>
+        <a href="#" id="aboutBtn" class="about-link">About</a> <!-- About link -->
+    </footer>
+
+    <!-- Pop-up Window -->
+    <div id="popup">
+        <h2>CSL Calculator</h2>
+        <p>Version 1.0</p>
+        <p>Created by Vishnu Puthoor</p>
+        <button id="closePopup">Close</button>
+    </div>
+
+    <script>
+        const aboutBtn = document.getElementById('aboutBtn');
+        const popup = document.getElementById('popup');
+        const closePopup = document.getElementById('closePopup');
+
+        aboutBtn.addEventListener('click', () => {
+            popup.style.display = 'block';
+        });
+
+        closePopup.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

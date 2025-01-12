@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Tax Calculator</title>
+    <style>
+        body {
+            background-color: #004400; /* Dark Green */
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .header-box {
+            background-color: #F5F5DC; /* Warm White */
+            color: #00008b; /* Dark Blue */
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .header-box h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header-box .byline {
+            font-size: 12px;
+            color: #00008b; /* Dark Blue */
+            font-weight: bold; /* Bold font */
+            display: block;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .subheading {
+            font-size: 14px;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #F5F5DC; /* Warm White */
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .field {
+            margin: 15px 0;
+        }
+        input {
+            padding: 10px;
+            width: 90%;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkgreen;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid yellow;
+            border-radius: 10px;
+        }
+        .taxableIncome {
+            font-size: 14px;
+            color: #cccccc;
+            margin-bottom: 5px;
+        }
+        .totalTax {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .difference {
+            font-size: 20px;
+            font-weight: bold;
+            color: limegreen; /* Green font for Difference */
+        }
+        .recommendation {
+            color: red; /* Red font for Recommendation */
+            font-size: 22px;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #cccccc;
+        }
+        #popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #popupContent {
+            background-color: #F5F5DC; /* Warm White */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+        #popupContent p {
+            color: #00008b; /* Dark Blue */
+            font-weight: bold; /* Bold font */
+        }
+    </style>
+</head>
+<body>
+    <div id="popup">
+        <div id="popupContent">
+            <p>സാലറി സ്ലിപ് ന്റെ വലതു വശത്തുള്ള Gross Salary enter ചെയ്യുമ്പോൾ  മാർച്ച് വരെ നമുക്ക് ലഭിക്കാൻ സാധ്യത ഉള്ള ഓവർടൈം ന്റെ തുക കൂടി കൂട്ടി ചേർക്കണം. നിങ്ങൾ നിലവിൽ new സ്‌കിമിൽ ആണ് എങ്കിൽ സ്ലിപ്പിൽ chapter 6 ന്റെ കട്ടിങ് ഉണ്ടാവില്ല, അതു കണക്കു കൂട്ടി എടുക്കാൻ കഴിഞ്ഞില്ല എങ്കിൽ കഴിഞ്ഞ വർഷത്തെ സ്ലിപ് ൽ ഉള്ള തുക ചേർത്താൽ മതിയാവും. 
+<br>
+<br>
+NB: Standard deduction, Professional tax തുടങ്ങി കോമൺ ആയി വരുന്ന dedutions എല്ലാം ആപ്പിൽ ചെർത്തിട്ടുണ്ട്. അതു വീണ്ടും ചേർക്കരുത്.!</p>
+            <p>Click "OK" to start .</p>
+            <button onclick="closePopup()">OK</button>
+        </div>
+    </div>
+    <div class="header-box">
+        <h1>Income Tax Calculator</h1>
+    </div>
+    <h2>Compare Your Tax (2024-25)</h2>
+    <p class="subheading">Calculate and compare your tax liabilities under Old and New Tax Regimes</p>
+    <div class="container">
+        <div class="field">
+            <label for="grossSalary">Gross Salary <small>(സാലറി സ്ലിപ്പിൽ തന്നിരിക്കുന്നത്)</small>:</label><br>
+            <input type="number" id="grossSalary" placeholder="Enter your Gross Salary" required>
+        </div>
+        <div class="field">
+            <label for="deduction80c">AGG Chapter VI <small>(Max ₹1,50,000)</small>:</label><br>
+            <input type="number" id="deduction80c" placeholder="Enter 80C Deductions">
+        </div>
+        <div class="field">
+            <label for="homeLoan">Home Loan Interest <small>(Max ₹2,00,000)</small>:</label><br>
+            <input type="number" id="homeLoan" placeholder="Enter Home Loan Interest">
+        </div>
+        <div class="field">
+            <label for="nps">NPS Contributions <small>(Max ₹50,000)</small>:</label><br>
+            <input type="number" id="nps" placeholder="Enter NPS Contributions">
+        </div>
+        <div class="field">
+            <label for="otherDeductions">Other Deductions (HRA, Medical, etc):</label><br>
+            <input type="number" id="otherDeductions" placeholder="Enter Other Deductions">
+        </div>
+        <button onclick="calculateTax()">Compare My Tax</button>
+        <div id="result" class="result"></div>
+        <small>Disclaimer: Calculations are approximations and may vary slightly.</small>
+    </div>
+    <footer>
+        <p>Created by: Vishnu Puthoor</p>
+        <p>Copyright © 2025 | Version 1.0</p>
+    </footer>
+
+    <script>
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function calculateTax() {
+            const grossSalary = parseFloat(document.getElementById('grossSalary').value);
+            const deduction80c = Math.min(parseFloat(document.getElementById('deduction80c').value || 0), 150000);
+            const homeLoan = Math.min(parseFloat(document.getElementById('homeLoan').value || 0), 200000);
+            const nps = Math.min(parseFloat(document.getElementById('nps').value || 0), 50000);
+            const otherDeductions = parseFloat(document.getElementById('otherDeductions').value || 0);
+
+            const standardDeductionOld = 57250;
+            const standardDeductionNew = 75000;
+
+            const totalDeductionsOld = standardDeductionOld + deduction80c + homeLoan + nps + otherDeductions;
+            const taxableIncomeOld = grossSalary - totalDeductionsOld;
+            const totalDeductionsNew = standardDeductionNew;
+            const taxableIncomeNew = grossSalary - totalDeductionsNew;
+
+            let oldTax = 0;
+            let newTax = 0;
+
+            if (taxableIncomeOld > 250000) {
+                if (taxableIncomeOld <= 500000) {
+                    oldTax = 0;
+                } else if (taxableIncomeOld <= 1000000) {
+                    oldTax = 12500 + (taxableIncomeOld - 500000) * 0.2;
+                } else {
+                    oldTax = 112500 + (taxableIncomeOld - 1000000) * 0.3;
+                }
+            }
+
+            if (taxableIncomeNew > 300000) {
+                if (taxableIncomeNew <= 700000) {
+                    newTax = 0;
+                } else if (taxableIncomeNew <= 1000000) {
+                    newTax = 20000 + (taxableIncomeNew - 700000) * 0.1;
+                } else {
+                    newTax = 80000 + (taxableIncomeNew - 1200000) * 0.2;
+                }
+            }
+
+            const cessOld = oldTax > 0 ? oldTax * 0.04 : 0;
+            const cessNew = newTax > 0 ? newTax * 0.04 : 0;
+
+            const totalTaxOld = oldTax + cessOld;
+            const totalTaxNew = newTax + cessNew;
+
+            const difference = Math.abs(totalTaxOld - totalTaxNew);
+            const betterRegime = totalTaxOld < totalTaxNew ? "Old Regime" : "New Regime";
+
+            document.getElementById('result').innerHTML = `
+                <p class="taxableIncome">Taxable Income (Old): ₹${taxableIncomeOld.toFixed(2)}</p>
+                <p class="taxableIncome">Taxable Income (New): ₹${taxableIncomeNew.toFixed(2)}</p>
+                <p class="totalTax">Total Old Tax: ₹${totalTaxOld.toFixed(2)}</p>
+                <p class="totalTax">Total New Tax: ₹${totalTaxNew.toFixed(2)}</p>
+                <p class="difference">Difference: ₹${difference.toFixed(2)}</p>
+                <p class="recommendation">${betterRegime} is Better!</p>
+            `;
+        }
+    </script>
+</body>
+</html>

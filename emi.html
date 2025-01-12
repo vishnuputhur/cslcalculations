@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #4a90e2, #50e3c2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #ffffff;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #333; /* Dark border */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #50e3c2;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+        button:hover {
+            background-color: #4ac1b5;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.5rem; /* Larger font size */
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            color: #ffffff; /* White color */
+            font-weight: bold; /* Bold text */
+            border: 1px solid #ffffff; /* White border */
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>EMI Calculator</h1>
+    <div class="calculator">
+        <input type="number" id="principal" placeholder="Principal Amount (₹)" required>
+        <input type="number" id="interest" placeholder="Interest Rate (%)" required>
+
+        <label for="tenureType">Select Tenure Type:</label>
+        <select id="tenureType">
+            <option value="months">Months</option>
+            <option value="years">Years</option>
+        </select>
+
+        <input type="number" id="tenure" placeholder="Enter Tenure (Months/Years)" required>
+        
+        <button onclick="calculateEMI()">Calculate EMI</button>
+        <div id="result" class="result"></div>
+        
+        <button onclick="location.href='index.html'">Home</button>
+    </div>
+
+    <div class="footer">Vishnu T | ©2025</div>
+
+    <script>
+        function calculateEMI() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const interestRate = parseFloat(document.getElementById('interest').value) / 100 / 12;
+            const tenureValue = parseInt(document.getElementById('tenure').value);
+            const tenureType = document.getElementById('tenureType').value;
+
+            // Convert years to months if tenure type is years
+            const months = tenureType === "years" ? tenureValue * 12 : tenureValue;
+
+            const emi = (principal * interestRate * Math.pow(1 + interestRate, months)) / (Math.pow(1 + interestRate, months) - 1);
+            const totalPayment = emi * months;
+            const totalInterest = totalPayment - principal;
+
+            document.getElementById('result').innerHTML = `
+                <strong>EMI: ₹${emi.toFixed(2)}</strong><br>
+                Total Payment: ₹${totalPayment.toFixed(2)}<br>
+                Total Interest: ₹${totalInterest.toFixed(2)}
+            `;
+        }
+    </script>
+    
+</body>
+</html>
