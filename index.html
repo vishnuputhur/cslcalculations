@@ -89,7 +89,7 @@
             font-family: "Courier New", Courier, monospace;
             font-weight: bold;
         }
-        section p.gap {
+        .gap {
             margin-bottom: 30px; /* Increased gap */
         }
         .other-features {
@@ -115,16 +115,11 @@
             color: #fff;
             margin-top: auto;
         }
-        .about-link {
-            font-size: 1rem;
-            color: #ffebcd; /* Warm white */
-            font-weight: bold;
-            text-decoration: none;
+        footer .disclaimer {
+            color: red;
+            font-size: 0.8rem;
+            margin-top: 10px;
         }
-        .about-link:hover {
-            text-decoration: underline;
-        }
-        /* Pop-up window styles */
         #popup {
             display: none;
             position: fixed;
@@ -143,6 +138,9 @@
         #popup h2 {
             color: #0056b3;
             margin-bottom: 10px;
+        }
+        #popup p {
+            color: #000;
         }
         #popup button {
             background-color: #0056b3;
@@ -192,27 +190,27 @@
     <footer>
         &copy; 2025 CSL Calculations | All Rights Reserved
         <br>
-        <a href="#" id="aboutBtn" class="about-link">About</a>
+        <span class="disclaimer">This is not the official app of CSL.</span>
     </footer>
 
     <!-- Pop-up Window -->
     <div id="popup">
-        <h2>CSL Calculator</h2>
-        <p>Version 1.0</p>
-        <p>Created by Vishnu Puthoor</p>
+        <h2>Important Notice</h2>
+        <p>This is not the official app of CSL.</p>
         <button id="closePopup">Close</button>
     </div>
 
     <script>
-        const aboutBtn = document.getElementById('aboutBtn');
-        const popup = document.getElementById('popup');
-        const closePopup = document.getElementById('closePopup');
-
-        aboutBtn.addEventListener('click', () => {
+        // Display the pop-up on page load
+        window.onload = function() {
+            const popup = document.getElementById('popup');
             popup.style.display = 'block';
-        });
+        };
 
+        // Close button functionality
+        const closePopup = document.getElementById('closePopup');
         closePopup.addEventListener('click', () => {
+            const popup = document.getElementById('popup');
             popup.style.display = 'none';
         });
     </script>
