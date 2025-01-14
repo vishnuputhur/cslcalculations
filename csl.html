@@ -1,19 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-21G1BS7S3S');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cochin Shipyard Limited - Salary Calculation</title>
+    <title>Salary Calculation</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+
     <style>
         body {
             background-color: darkblue;
@@ -76,11 +77,6 @@
             color: #cccccc;
             margin-top: 10px;
         }
-        .link {
-            color: red;
-            text-decoration: underline;
-            cursor: pointer;
-        }
         footer {
             margin-top: 20px;
             font-size: 0.8em;
@@ -99,7 +95,6 @@
 </head>
 <body>
     <div class="container">
-        <h1>Cochin Shipyard Limited</h1>
         <h2>Salary Calculation</h2>
 
         <form id="overtimeForm">
@@ -122,9 +117,8 @@
         <footer>
             Created By Vishnu Puthoor<br>
             &copy; 2025<br>
-<br>
-            Version 2.0.1<br>
-            <span class="link" onclick="checkForUpdates()">Check for Updates</span><br>
+            <br>
+            Version 2.2.0<br>
         </footer>
     </div>
 
@@ -163,15 +157,6 @@
                 <p>If Grade Changes: ₹${nextBasicPayWithGradeChange.toFixed(2)}</p>
                 <p class="disclaimer">Due to late punching, loss of pay, and some other reasons, there might be slight variations in the above amount.</p>
             `;
-        }
-
-        function checkForUpdates() {
-            const whatsappNumber = '9037383927';
-            const versionNumber = '2.0.1';
-            const message = `Version number: ${versionNumber}`;
-
-            const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
         }
     </script>
 </body>
