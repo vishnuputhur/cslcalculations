@@ -4,47 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMI Calculator</title>
-    <!-- Google tag (gtag.js) -->
+    <!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-21G1BS7S3S');
     </script>
     <style>
+        /* General Styling */
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #121212, #1e1e1e);
+            background: linear-gradient(to right, #1c3b57, #224466);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Start below the status bar */
             height: 100vh;
             margin: 0;
-            color: #e0e0e0;
+            color: #ffffff;
+            padding-top: 40px; /* Space for status bar */
         }
+
         h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
+
         .explanation {
             font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
-            color: #cccccc;
+            color: #e0e0e0;
         }
+
         .calculator {
-            background-color: #2c2c2c;
-            padding: 20px;
+            background-color: #2b3e52;
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             width: 320px;
             text-align: center;
         }
+
         .label {
             text-align: left;
             font-size: 0.85rem;
@@ -52,48 +58,55 @@
             color: #ffffff;
             margin-bottom: 5px;
         }
+
         input, select {
             width: calc(100% - 20px);
-            padding: 8px;
+            padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #555;
+            border: 1px solid #56789a;
             border-radius: 5px;
-            background: #1e1e1e;
-            color: #e0e0e0;
+            background: #1e2f3d;
+            color: #ffffff;
             font-size: 0.9rem;
             outline: none;
         }
+
         input::placeholder {
-            color: #888;
+            color: #aaa;
         }
+
         button {
             padding: 10px;
             border: none;
             border-radius: 5px;
-            background-color: #3f51b5;
+            background-color: #3b82d1;
             color: #ffffff;
             font-size: 1rem;
             cursor: pointer;
             margin-top: 10px;
             transition: background 0.3s;
         }
+
         button:hover {
-            background-color: #283593;
+            background-color: #295b8f;
         }
+
         .result {
             margin-top: 15px;
             font-size: 1.2rem;
-            color: #e0e0e0;
+            color: #ffffff;
             font-weight: bold;
             line-height: 1.8; /* Increased line spacing */
         }
+
+        canvas {
+            margin-top: 15px;
+        }
+
         .footer {
             margin-top: 20px;
             font-size: 0.8rem;
-            color: #888;
-        }
-        canvas {
-            margin-top: 15px;
+            color: #cccccc;
         }
     </style>
 </head>
@@ -167,10 +180,8 @@
             const centerY = canvas.height / 2;
             const radius = 100;
 
-            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw pie chart
             data.forEach((value, index) => {
                 const sliceAngle = (value / total) * 2 * Math.PI;
                 const endAngle = startAngle + sliceAngle;
@@ -185,13 +196,11 @@
                 startAngle = endAngle;
             });
 
-            // Draw center circle (donut effect)
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#121212';
+            ctx.fillStyle = '#1c3b57';
             ctx.fill();
 
-            // Add legend
             labels.forEach((label, index) => {
                 ctx.fillStyle = colors[index];
                 ctx.fillRect(20, canvas.height - 60 + index * 20, 10, 10);
@@ -201,6 +210,5 @@
             });
         }
     </script>
-    
 </body>
 </html>
