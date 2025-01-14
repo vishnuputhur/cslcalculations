@@ -13,40 +13,50 @@
         gtag('config', 'G-21G1BS7S3S');
     </script>
     <style>
-        /* General Styling */
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #1c3b57, #224466);
+            background: linear-gradient(to bottom, #160c57, #3316c7); /* Dual-tone background */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Start below the status bar */
+            justify-content: flex-start;
             height: 100vh;
             margin: 0;
             color: #ffffff;
-            padding-top: 40px; /* Space for status bar */
+            padding-top: 30px; /* Reduced top padding */
+        }
+
+        .logo {
+            margin-bottom: 10px; /* Slight gap reduction */
         }
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 10px;
+            margin: 0;
             text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+            margin-top: 10px;
         }
 
         .explanation {
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin: 10px 0;
             text-align: center;
             color: #e0e0e0;
         }
 
+        hr {
+            width: 80%;
+            border: 0.5px solid #e0e0e0; /* Horizontal line below description */
+            margin: 5px 0 15px;
+        }
+
         .calculator {
-            background-color: #2b3e52;
+            background-color: #160c57; /* Updated background color */
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             width: 320px;
             text-align: center;
         }
@@ -65,7 +75,7 @@
             margin-bottom: 15px;
             border: 1px solid #56789a;
             border-radius: 5px;
-            background: #1e2f3d;
+            background: #3316c7;
             color: #ffffff;
             font-size: 0.9rem;
             outline: none;
@@ -84,11 +94,12 @@
             font-size: 1rem;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
 
         button:hover {
             background-color: #295b8f;
+            transform: translateY(-2px);
         }
 
         .result {
@@ -96,11 +107,7 @@
             font-size: 1.2rem;
             color: #ffffff;
             font-weight: bold;
-            line-height: 1.8; /* Increased line spacing */
-        }
-
-        canvas {
-            margin-top: 15px;
+            line-height: 1.5;
         }
 
         .footer {
@@ -108,12 +115,21 @@
             font-size: 0.8rem;
             color: #cccccc;
         }
+
+        .version {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #cccccc;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
+    <img src="https://i.ibb.co/LZtyrFn/icon.png" alt="icon" border="0" class="logo" style="width: 50px; height: auto;">
     <h1>EMI Calculator</h1>
-    <p class="explanation">Enter the loan amount, interest rate, and tenure to calculate your monthly EMI.</p>
+    <p class="explanation">Your home loan principal, interest, tenure, etc. <br>can be calculated graphically.</p>
+    <hr>
     <div class="calculator">
         <label for="principal" class="label">Loan Amount (₹)</label>
         <input type="number" id="principal" placeholder="Enter Loan Amount" required>
@@ -139,6 +155,7 @@
     </div>
 
     <div class="footer">Vishnu T | ©2025</div>
+    <div class="version">Version: 1.4</div>
 
     <script>
         function calculateEMI() {
@@ -161,6 +178,9 @@
                 `;
 
                 drawDonutChart(principal, totalInterest);
+
+                // Scroll to the bottom of the page
+                window.scrollTo(0, document.body.scrollHeight);
             } else {
                 document.getElementById('result').innerHTML = `<span style="color: #f44336;">Please fill out all fields!</span>`;
             }
@@ -198,7 +218,7 @@
 
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#1c3b57';
+            ctx.fillStyle = '#160c57'; // Updated inner circle color
             ctx.fill();
 
             labels.forEach((label, index) => {
