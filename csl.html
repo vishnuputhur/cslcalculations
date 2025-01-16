@@ -32,6 +32,7 @@
             padding: 20px;
             width: 80%;
             max-width: 600px;
+            position: relative; /* Added to position the result at the end */
         }
         h1 {
             font-size: 2em;
@@ -62,6 +63,7 @@
         .result {
             margin-top: 20px;
             position: relative;
+            display: none; /* Hide result by default */
         }
         .result:after {
             content: "";
@@ -95,6 +97,7 @@
 </head>
 <body>
     <div class="container">
+        <img src="https://i.ibb.co/S77PHNV/transparent-saving-and-investment-icon-finances-icon-business-5df0b44189bf17-2741476215760558735642.png" alt="Logo" style="max-width: 25%; height: auto; margin-bottom: 20px;">
         <h2>Salary Calculation</h2>
 
         <form id="overtimeForm">
@@ -146,7 +149,11 @@
             let nextBasicPay = roundToNearestTen(basicSalary * 1.03);
             let nextBasicPayWithGradeChange = roundToNearestTen(nextBasicPay * 1.03);
 
-            document.getElementById('result').innerHTML = `
+            // Show the result div
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block'; // Make it visible
+
+            resultDiv.innerHTML = `
                 <p>Overtime Rate Per Hour: ₹${overtimeRate.toFixed(2)}</p>
                 <p>Overtime Pay: ₹${overtimePay.toFixed(2)}</p>
                 <p>DA Amount: ₹${daAmount.toFixed(2)}</p>
@@ -157,6 +164,9 @@
                 <p>If Grade Changes: ₹${nextBasicPayWithGradeChange.toFixed(2)}</p>
                 <p class="disclaimer">Due to late punching, loss of pay, and some other reasons, there might be slight variations in the above amount.</p>
             `;
+
+            // Scroll to the result div
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
