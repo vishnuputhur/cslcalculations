@@ -58,15 +58,15 @@
             font-weight: bold;
             font-family: "Times New Roman", Times, serif;
             text-align: center;
-            margin-bottom: 0; /* Title-ന് താഴേക്ക് ഗ്യാപ്പ് ഇല്ല */
+            margin-bottom: 0;
         }
         .header-subtitle {
             font-size: 0.8rem;
             color: #87CEEB;
             font-weight: bold;
             text-align: center;
-            margin-top: 0; /* Title-ന് മുകളിലേക്ക് ഗ്യാപ്പ് ഇല്ല */
-            margin-bottom: 0; /* Sub-title-ന് താഴേക്ക് ഗ്യാപ്പ് ഇല്ല */
+            margin-top: 0;
+            margin-bottom: 0;
         }
         .menu-drawer {
             position: fixed;
@@ -85,7 +85,6 @@
         }
         .menu-drawer.open {
             left: 0;
-            transform: perspective(600px) rotateY(0deg);
         }
         .menu-drawer a {
             margin: 10px 20px;
@@ -96,33 +95,12 @@
             border-radius: 5px;
             text-align: center;
             font-weight: bold;
-            opacity: 0;
-            animation: fadeInSlide 0.5s ease-in-out forwards;
             box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s, box-shadow 0.3s;
         }
         .menu-drawer a:hover {
             transform: translateY(-5px);
             box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.7);
-        }
-        .menu-drawer a:nth-child(1) {
-            animation-delay: 0.3s;
-        }
-        .menu-drawer a:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-        .menu-drawer a:nth-child(3) {
-            animation-delay: 0.7s;
-        }
-        @keyframes fadeInSlide {
-            from {
-                transform: translateX(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
         }
         section {
             flex: 1;
@@ -149,7 +127,7 @@
             margin: 20px auto;
             width: 90%;
             max-width: 800px;
-            color: #00264d; /* Dark blue text */
+            color: #00264d;
         }
         .content-box h2, .content-box p {
             font-family: "Times New Roman", Times, serif;
@@ -188,12 +166,13 @@
         <a href="csl.html">Salary Calculator</a>
         <a href="tax.html">Tax Calculator</a>
         <a href="emi.html">EMI Calculator</a>
+        <a href="contact.html">Contact Us</a> <!-- Contact Us ചേർത്തത് -->
     </div>
     <section>
         <div class="welcome-note">Welcome to CSL Calculations</div>
         <div class="welcome-subtext">
-            This platform provides easy-to-use calculators for your salary and income tax.
-            Navigate through the buttons above to access the tools.
+            This platform provides easy-to-use calculators for your salary, Loan and income tax.
+            Navigate through the Menu button above to access the tools.
         </div>
         <div class="content-box">
             <h2>Income Tax Comparison Feature</h2>
@@ -202,10 +181,10 @@
                 Discover which option saves you the most!
             </p>
         </div>
-        <div class="content-box">
+        <div class="content-box"> <!-- Other Features ബോക്സ് -->
             <h2>Other Features</h2>
             <p>
-                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively.
+                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively and graphically 
             </p>
         </div>
     </section>
