@@ -57,18 +57,6 @@
             margin-bottom: 0.5em;
         }
 
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .feedback-form {
-            margin-top: 2em;
-        }
-
         footer {
             text-align: center;
             background: #004aad;
@@ -81,6 +69,31 @@
             color: white;
             text-decoration: none;
             font-weight: bold;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        textarea, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 1em;
+            padding: 0.5em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #004aad;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #00327a;
         }
     </style>
 </head>
@@ -96,43 +109,23 @@
             <p>WhatsApp No: <a href="https://wa.me/919037383927" target="_blank">9037383927</a></p>
         </div>
         
-        <!-- Feedback Form Section -->
-        <div class="feedback-form">
-            <h2>Feedback</h2>
-            <form name="feedback_form" id="feedback_form" method="post" action="send_feedback.php">
-                <label>How do you rate your overall experience?</label>
-                <div class="mb-3 d-flex flex-row py-1">
-                    <div class="form-check mr-3">
-                        <input class="form-check-input" type="radio" name="rating" id="rating_bad" value="bad">
-                        <label class="form-check-label" for="rating_bad">Bad</label>
-                    </div>
-                    <div class="form-check mx-3">
-                        <input class="form-check-input" type="radio" name="rating" id="rating_good" value="good">
-                        <label class="form-check-label" for="rating_good">Good</label>
-                    </div>
-                    <div class="form-check mx-3">
-                        <input class="form-check-input" type="radio" name="rating" id="rating_excellent" value="excellent">
-                        <label class="form-check-label" for="rating_excellent">Excellent!</label>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label" for="feedback_comments">Comments:</label>
-                    <textarea class="form-control" required rows="6" name="comments" id="feedback_comments"></textarea>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label class="form-label" for="feedback_name">Your Name:</label>
-                        <input type="text" required name="name" class="form-control" id="feedback_name"/>
-                    </div>
-                    <div class="col mb-4">
-                        <label class="form-label" for="feedback_email">Email:</label>
-                        <input type="email" name="email" required class="form-control" id="feedback_email"/>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-success btn-lg">Post</button>
-            </form>
-        </div>
-        <!-- End of Feedback Form -->
+        <!-- Feedback Form -->
+        <form action="https://formsubmit.co/vishnuputhur@yahoo.com" method="POST">
+            <label for="name">Your Name:</label>
+            <input type="text" name="name" id="name" required placeholder="Enter your name">
+            
+            <label for="email">Your Email:</label>
+            <input type="email" name="email" id="email" required placeholder="Enter your email">
+            
+            <label for="feedback">Your Feedback:</label>
+            <textarea name="feedback" id="feedback" rows="5" required placeholder="Enter your feedback"></textarea>
+            
+            <!-- Hidden Inputs -->
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_subject" value="New Feedback Received!">
+            
+            <button type="submit">Submit Feedback</button>
+        </form>
     </div>
     <footer>
         <p>&copy; 2025 CSL Calculations | Designed with ❤️</p>
