@@ -65,6 +65,10 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .feedback-form {
+            margin-top: 2em;
+        }
+
         footer {
             text-align: center;
             background: #004aad;
@@ -91,9 +95,44 @@
             <p>Mobile No: <a href="tel:+919037383927">9037383927</a></p>
             <p>WhatsApp No: <a href="https://wa.me/919037383927" target="_blank">9037383927</a></p>
         </div>
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdjLydqsU05HyzgpE3yH-wxcBY2PngNjpG8RjudUX5fvIzogg/viewform?embedded=true">
-            Loading…
-        </iframe>
+        
+        <!-- Feedback Form Section -->
+        <div class="feedback-form">
+            <h2>Feedback</h2>
+            <form name="feedback_form" id="feedback_form" method="post" action="send_feedback.php">
+                <label>How do you rate your overall experience?</label>
+                <div class="mb-3 d-flex flex-row py-1">
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="radio" name="rating" id="rating_bad" value="bad">
+                        <label class="form-check-label" for="rating_bad">Bad</label>
+                    </div>
+                    <div class="form-check mx-3">
+                        <input class="form-check-input" type="radio" name="rating" id="rating_good" value="good">
+                        <label class="form-check-label" for="rating_good">Good</label>
+                    </div>
+                    <div class="form-check mx-3">
+                        <input class="form-check-input" type="radio" name="rating" id="rating_excellent" value="excellent">
+                        <label class="form-check-label" for="rating_excellent">Excellent!</label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="feedback_comments">Comments:</label>
+                    <textarea class="form-control" required rows="6" name="comments" id="feedback_comments"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label" for="feedback_name">Your Name:</label>
+                        <input type="text" required name="name" class="form-control" id="feedback_name"/>
+                    </div>
+                    <div class="col mb-4">
+                        <label class="form-label" for="feedback_email">Email:</label>
+                        <input type="email" name="email" required class="form-control" id="feedback_email"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success btn-lg">Post</button>
+            </form>
+        </div>
+        <!-- End of Feedback Form -->
     </div>
     <footer>
         <p>&copy; 2025 CSL Calculations | Designed with ❤️</p>
