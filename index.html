@@ -22,6 +22,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         header {
             display: flex;
@@ -30,7 +31,10 @@
             padding: 10px;
             background: #001a33;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            position: relative;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
         .menu-icon {
             position: absolute;
@@ -41,7 +45,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            z-index: 1001;
         }
         .menu-icon div {
             width: 100%;
@@ -70,18 +73,18 @@
         }
         .menu-drawer {
             position: fixed;
-            top: 0;
+            top: 60px;
             left: -250px;
             width: 250px;
-            height: 100%;
+            height: calc(100% - 60px);
             background: linear-gradient(to bottom, #00264d, #004080);
             box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
             border-right: 2px solid #ffffff;
             display: flex;
             flex-direction: column;
-            padding-top: 60px;
+            padding-top: 20px;
             transition: 0.5s ease-in-out;
-            z-index: 1000;
+            z-index: 999;
         }
         .menu-drawer.open {
             left: 0;
@@ -104,7 +107,7 @@
         }
         section {
             flex: 1;
-            padding: 30px;
+            padding: 90px 30px 30px;
             text-align: center;
         }
         .welcome-note {
@@ -129,15 +132,14 @@
             max-width: 800px;
             color: #00264d;
         }
-        .content-box h2, .content-box p {
-            font-family: "Times New Roman", Times, serif;
-        }
         footer {
             text-align: center;
             padding: 15px;
             background: linear-gradient(to top, #00264d, #004080);
             color: #fff;
-            margin-top: auto;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
         .disclaimer {
             color: yellow;
@@ -145,8 +147,6 @@
         }
         .version {
             font-size: 0.8rem;
-            color: #ffffff;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -166,11 +166,13 @@
         <a href="csl.html">Salary Calculator</a>
         <a href="tax.html">Tax Calculator</a>
         <a href="emi.html">EMI Calculator</a>
-        <a href="contact.html">Contact Us</a> <!-- Contact Us ചേർത്തത് -->
+        <a href="contact.html">Contact Us</a>
     </div>
     <section>
-        <div class="welcome-note">Welcome to CSL Calculations</div>
+<br>
+        <div class="welcome-note">Welcome</div>
         <div class="welcome-subtext">
+<br>
             This platform provides easy-to-use calculators for your salary, Loan and income tax.
             Navigate through the Menu button above to access the tools.
         </div>
@@ -181,10 +183,10 @@
                 Discover which option saves you the most!
             </p>
         </div>
-        <div class="content-box"> <!-- Other Features ബോക്സ് -->
+        <div class="content-box">
             <h2>Other Features</h2>
             <p>
-                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively and graphically 
+                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively and graphically.
             </p>
         </div>
     </section>
