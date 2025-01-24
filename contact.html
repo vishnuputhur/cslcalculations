@@ -57,13 +57,6 @@
             margin-bottom: 0.5em;
         }
 
-        .contact-info p {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #00327a;
-            margin: 0.5em 0;
-        }
-
         footer {
             text-align: center;
             background: #004aad;
@@ -74,12 +67,6 @@
 
         footer p {
             margin: 0.2em 0;
-        }
-
-        footer a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
         }
 
         footer .brand {
@@ -128,7 +115,7 @@
         <form action="https://formsubmit.co/vishnuputhur@yahoo.com" method="POST">
             <h2>Feedback</h2>
             <label for="name">Your Name:</label>
-            <input type="text" name="name" id="name" placeholder="Enter your name">
+            <input type="text" name="name" id="name" required placeholder="Enter your name">
             
             <label for="email">Your Email:</label>
             <input type="email" name="email" id="email" placeholder="Enter your email (optional)">
@@ -139,7 +126,7 @@
             <!-- Hidden Inputs -->
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_subject" value="New Feedback Received!">
-            <input type="hidden" name="_next" value="thank-you.html">
+            <input type="hidden" name="_next" value="https://vishnuputhur.github.io/cslcalculations//thank-you.html">
             
             <button type="submit">Submit Feedback</button>
         </form>
