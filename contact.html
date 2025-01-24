@@ -72,10 +72,18 @@
             margin-top: 2em;
         }
 
+        footer p {
+            margin: 0.2em 0;
+        }
+
         footer a {
             color: white;
             text-decoration: none;
             font-weight: bold;
+        }
+
+        footer .brand {
+            font-size: 0.8em;
         }
 
         label {
@@ -118,6 +126,7 @@
         
         <!-- Feedback Form -->
         <form action="https://formsubmit.co/vishnuputhur@yahoo.com" method="POST">
+            <h2>Feedback</h2>
             <label for="name">Your Name:</label>
             <input type="text" name="name" id="name" placeholder="Enter your name">
             
@@ -130,12 +139,14 @@
             <!-- Hidden Inputs -->
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_subject" value="New Feedback Received!">
+            <input type="hidden" name="_next" value="thank-you.html">
             
             <button type="submit">Submit Feedback</button>
         </form>
     </div>
     <footer>
-        <p>&copy; 2025 CSL Calculations | VT@Soft ❤️</p>
+        <p>&copy; 2025 CSL Calculations | Designed with ❤️</p>
+        <p class="brand">Powered by VT@Soft</p>
     </footer>
 </body>
 </html>
