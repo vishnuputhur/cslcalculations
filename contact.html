@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSL Calculations</title>
-    <!-- Google Analytics Tag -->
+    <title>Contact Form</title>
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -66,11 +66,8 @@
         }
 
         footer p {
-            margin: 0.2em 0;
-        }
-
-        footer .brand {
             font-size: 0.8em;
+            color: white;
         }
 
         label {
@@ -101,39 +98,31 @@
 </head>
 <body>
     <header>
-        <h1>CSL Calculations</h1>
+        <h1>Contact Form</h1>
     </header>
     <div class="contact-container">
         <div class="contact-info">
-            <h2>Contact Us</h2>
-            <p>Email: vishnuputhur@yahoo.com</p>
-            <p>Mobile No: 9037383927</p>
-            <p>WhatsApp No: 9037383927</p>
+            <h2>Feedback</h2>
         </div>
         
         <!-- Feedback Form -->
         <form action="https://formsubmit.co/vishnuputhur@yahoo.com" method="POST">
-            <h2>Feedback</h2>
             <label for="name">Your Name:</label>
             <input type="text" name="name" id="name" required placeholder="Enter your name">
-            
-            <label for="email">Your Email:</label>
-            <input type="email" name="email" id="email" placeholder="Enter your email (optional)">
             
             <label for="feedback">Your Feedback:</label>
             <textarea name="feedback" id="feedback" rows="5" required placeholder="Enter your feedback"></textarea>
             
             <!-- Hidden Inputs -->
             <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://vishnuputhur.github.io/cslcalculations/thank-you.html">
             <input type="hidden" name="_subject" value="New Feedback Received!">
-            <input type="hidden" name="_next" value="https://vishnuputhur.github.io/cslcalculations//thank-you.html">
             
             <button type="submit">Submit Feedback</button>
         </form>
     </div>
     <footer>
-        <p>&copy; 2025 CSL Calculations | Designed with ❤️</p>
-        <p class="brand">Powered by VT@Soft</p>
+        <p>Powered by VT@Soft</p>
     </footer>
 </body>
 </html>
