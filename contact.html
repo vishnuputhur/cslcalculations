@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSL Calculations</title>
+    <!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -9,201 +12,130 @@
         gtag('js', new Date());
         gtag('config', 'G-21G1BS7S3S');
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSL Calculations</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom, #001a33, #004080);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
         }
+
         header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            background: #001a33;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        .menu-icon {
-            position: absolute;
-            left: 10px;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-        }
-        .menu-icon div {
-            width: 100%;
-            height: 4px;
-            background-color: white;
-            transition: 0.3s;
-        }
-        .menu-icon:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 8px white);
-        }
-        .header-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            font-family: "Times New Roman", Times, serif;
-            text-align: center;
-            margin-bottom: 0;
-        }
-        .header-subtitle {
-            font-size: 0.8rem;
-            color: #87CEEB;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-        .menu-drawer {
-            position: fixed;
-            top: 60px;
-            left: -250px;
-            width: 250px;
-            height: calc(100% - 60px);
-            background: linear-gradient(to bottom, #00264d, #004080);
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            border-right: 2px solid #ffffff;
-            display: flex;
-            flex-direction: column;
-            padding-top: 20px;
-            transition: 0.5s ease-in-out;
-            z-index: 999;
-        }
-        .menu-drawer.open {
-            left: 0;
-        }
-        .menu-drawer a {
-            margin: 10px 20px;
-            padding: 10px;
-            text-decoration: none;
+            background: #004aad;
             color: white;
-            background: linear-gradient(to right, #004080, #0056b3);
-            border-radius: 5px;
             text-align: center;
-            font-weight: bold;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            padding: 1em 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .contact-container {
+            max-width: 900px;
+            margin: 2em auto;
+            background: #faf8e3;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
         }
-        .menu-drawer a:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.7);
+
+        .contact-container:hover {
+            transform: scale(1.03);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
         }
-        section {
-            flex: 1;
-            padding: 90px 30px 30px;
+
+        .contact-info {
             text-align: center;
+            margin-bottom: 2em;
         }
-        .welcome-note {
-            color: #ffffff;
+
+        .contact-info h2 {
+            color: #004aad;
+            margin-bottom: 0.5em;
+        }
+
+        .contact-info p {
+            font-size: 1.1em;
             font-weight: bold;
-            font-size: 1.8em;
-            margin: 10px 0;
+            color: #00327a;
+            margin: 0.5em 0;
         }
-        .welcome-subtext {
-            color: #ffffff;
-            font-weight: bold;
-            font-size: 1em;
-            margin: 5px 0;
-        }
-        .content-box {
-            background-color: #faf8e3;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            margin: 20px auto;
-            width: 90%;
-            max-width: 800px;
-            color: #00264d;
-        }
+
         footer {
             text-align: center;
-            padding: 15px;
-            background: linear-gradient(to top, #00264d, #004080);
-            color: #fff;
-            position: fixed;
+            background: #004aad;
+            color: white;
+            padding: 1em 0;
+            margin-top: 2em;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        textarea, input, button {
+            display: block;
             width: 100%;
-            bottom: 0;
+            margin-bottom: 1em;
+            padding: 0.5em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
-        .disclaimer {
-            color: yellow;
-            font-size: 0.7rem;
+
+        button {
+            background: #004aad;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
         }
-        .version {
-            font-size: 0.8rem;
+
+        button:hover {
+            background: #00327a;
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="menu-icon" id="menu-icon">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <div>
-            <h1 class="header-title">CSL Calculations</h1>
-            <p class="header-subtitle">Efficient Tools for Financial Planning</p>
-        </div>
+        <h1>CSL Calculations</h1>
     </header>
-    <div class="menu-drawer" id="menu-drawer">
-        <a href="csl.html">Salary Calculator</a>
-        <a href="tax.html">Tax Calculator</a>
-        <a href="emi.html">EMI Calculator</a>
-        <a href="contact.html">Contact Us</a>
+    <div class="contact-container">
+        <div class="contact-info">
+            <h2>Contact Us</h2>
+            <p>Email: vishnuputhur@yahoo.com</p>
+            <p>Mobile No: 9037383927</p>
+            <p>WhatsApp No: 9037383927</p>
+        </div>
+        
+        <!-- Feedback Form -->
+        <form action="https://formsubmit.co/vishnuputhur@yahoo.com" method="POST">
+            <label for="name">Your Name:</label>
+            <input type="text" name="name" id="name" placeholder="Enter your name">
+            
+            <label for="email">Your Email:</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email (optional)">
+            
+            <label for="feedback">Your Feedback:</label>
+            <textarea name="feedback" id="feedback" rows="5" required placeholder="Enter your feedback"></textarea>
+            
+            <!-- Hidden Inputs -->
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_subject" value="New Feedback Received!">
+            
+            <button type="submit">Submit Feedback</button>
+        </form>
     </div>
-    <section>
-<br>
-        <div class="welcome-note">Welcome</div>
-        <div class="welcome-subtext">
-<br>
-            This platform provides easy-to-use calculators for your salary, Loan and income tax.
-            Navigate through the Menu button above to access the tools.
-        </div>
-        <div class="content-box">
-            <h2>Income Tax Comparison Feature</h2>
-            <p>
-                Compare the benefits of the <b>New Regime</b> vs the <b>Old Regime</b> using our advanced calculators.
-                Discover which option saves you the most!
-            </p>
-        </div>
-        <div class="content-box">
-            <h2>Other Features</h2>
-            <p>
-                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively and graphically.
-            </p>
-        </div>
-    </section>
     <footer>
-        &copy; 2025 CSL Calculations | All Rights Reserved
-        <br>
-        <span class="disclaimer">This is not the official app of CSL.</span>
-        <br>
-        <span class="version">Version 1.3</span>
+        <p>&copy; 2025 CSL Calculations | VT@Soft ❤️</p>
     </footer>
-    <script>
-        const menuIcon = document.getElementById('menu-icon');
-        const menuDrawer = document.getElementById('menu-drawer');
-
-        menuIcon.addEventListener('click', () => {
-            menuDrawer.classList.toggle('open');
-        });
-    </script>
 </body>
 </html>
