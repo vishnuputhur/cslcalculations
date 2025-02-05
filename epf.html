@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PF Calculator</title>
+  <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #faf8e3;
+      text-align: center;
+      margin: 20px;
+    }
+    h2 {
+      font-size: 24px;
+    }
+    .container {
+      display: inline-block;
+      background-color: #001f3f;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 450px;
+    }
+    .input-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    label {
+      text-align: left;
+      width: 45%;
+    }
+    input {
+      width: 50%;
+      padding: 5px;
+      text-align: right;
+      font-size: 14px;
+    }
+    .calc-btn {
+      background: linear-gradient(to bottom, #ffcc00, #ff9900);
+      color: black;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+      border: none;
+      margin-top: 10px;
+    }
+    .result-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    .result-box {
+      background: #faf8e3;
+      color: black;
+      padding: 15px;
+      border-radius: 10px;
+      width: 45%;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+    }
+    .difference {
+      color: green;
+      font-weight: bold;
+      font-size: 18px;
+      background: #faf8e3;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: gray;
+    }
+    a {
+      color: yellow;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>PF Calculator</h2>
+    
+    <div class="input-group">
+      <label>Basic Pay:</label>
+      <input type="number" id="basicPay" placeholder="Enter Basic Pay">
+    </div>
+    <div class="input-group">
+      <label>Joining Year:</label>
+      <input type="number" id="joiningYear" placeholder="Enter Joining Year">
+    </div>
+    <div class="input-group">
+      <label>Retirement Year:</label>
+      <input type="number" id="retirementYear" placeholder="Enter Retirement Year">
+    </div>
+    <div class="input-group">
+      <label>Current PF Balance:</label>
+      <input type="number" id="pfBalance" placeholder="₹">
+    </div>
+    
+    <button class="calc-btn" onclick="calculatePF()">Calculate</button>
+    
+    <div class="result-container">
+      <div class="result-box">
+        <h4>Higher Pension</h4>
+        <p id="higherPfBalance">PF Balance: -</p>
+        <p id="higherPension">Pension: -</p>
+      </div>
+      <div class="result-box">
+        <h4>Normal Pension</h4>
+        <p id="normalPfBalance">PF Balance: -</p>
+        <p id="normalPension">Pension: -</p>
+      </div>
+    </div>
+    
+    <div class="difference">
+      <p id="difference">Difference: -</p>
+    </div>
+    
+    <p><a href="#" onclick="toggleDetails()">More Details</a></p>
+  </div>
+  
+  <div id="details" style="display:none; background: white; color: black; padding: 10px; margin: 20px auto; border-radius: 5px; text-align: left; max-width:450px;">
+    <h4>Calculation Details</h4>
+    <p>
+      1. EPF Contribution Calculation:<br>
+      &nbsp;&nbsp;- Total Salary = Basic Pay + (49.6% of Basic Pay) = Basic Pay × 1.496<br>
+      &nbsp;&nbsp;- Employee Contribution = 12% × (Basic+DA)<br>
+      &nbsp;&nbsp;- Employer Contribution = 12% × (Basic+DA)<br>
+      &nbsp;&nbsp;- Total Contribution = 24% × (Basic+DA)<br>
+      &nbsp;&nbsp;- EPS Contribution:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• For Higher Pension: 8.33% × (Basic+DA)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• For Normal Pension: 8.33% × min(15000, Basic+DA)<br>
+      &nbsp;&nbsp;- Employer PF Share = (12% × (Basic+DA)) - EPS Contribution<br><br>
+      2. PF Balance Calculation Over Years:<br>
+      &nbsp;&nbsp;- Current PF Balance is as of 2025.<br>
+      &nbsp;&nbsp;- For each year from 2025 to Retirement Year:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• Calculate monthly contributions using above formulas<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• Annual Contribution = (Sum of monthly deposits) × 12<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• PF Balance = (Previous PF Balance + Annual Contribution) compounded at 8.15% annually<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• Basic+DA increases by 10% each year<br><br>
+      3. Pension Calculation:<br>
+      &nbsp;&nbsp;- Service Years = (Retirement Year - Joining Year) (if ≥20, add bonus 2 years)<br>
+      &nbsp;&nbsp;- Pensionable Salary for Normal Pension = min(15000, Average of last 60 months Basic+DA)<br>
+      &nbsp;&nbsp;- Pensionable Salary for Higher Pension = Average of last 60 months Basic+DA<br>
+      &nbsp;&nbsp;- Monthly Pension = (Pensionable Salary × Service Years) / 70<br>
+      &nbsp;&nbsp;- For joining year from 2015 onward, only Normal Pension applies.<br><br>
+      4. Final PF Balance at Retirement = Sum of (Annual Contributions + Interest Earned)
+    </p>
+    <p>Service Years for Pension Calculation: from Joining Year to Retirement Year.</p>
+    <p><a href="#" onclick="toggleDetails()">Close Details</a></p>
+  </div>
+  
+  <p class="footer">
+    VT@Soft © 2025 | Version 1.0<br>
+    Disclaimer: Calculations assume an average annual 10% increase. Actual amounts may vary based on DA hikes, fitment, promotions, etc. This calculator helps understand the financial impact of PF withdrawals and pension differences.
+  </p>
+  
+  <script>
+    function toggleDetails() {
+      var detailsDiv = document.getElementById("details");
+      if(detailsDiv.style.display === "none") {
+        detailsDiv.style.display = "block";
+      } else {
+        detailsDiv.style.display = "none";
+      }
+    }
+    
+    function calculatePF() {
+      // Get input values
+      var basicPay = parseFloat(document.getElementById("basicPay").value);
+      var joiningYear = parseInt(document.getElementById("joiningYear").value);
+      var retirementYear = parseInt(document.getElementById("retirementYear").value);
+      var currentPF = parseFloat(document.getElementById("pfBalance").value);
+      
+      if(isNaN(basicPay) || isNaN(joiningYear) || isNaN(retirementYear) || isNaN(currentPF)) {
+        alert("Please enter all required fields correctly.");
+        return;
+      }
+      
+      // Constants
+      var DA_factor = 1.496; // Basic + 49.6%
+      var empRate = 0.12; // Employee PF rate
+      var employerRate = 0.12; // Employer PF rate
+      var epsRate = 0.0833; // EPS rate 8.33%
+      var pfInterest = 0.0815; // Annual interest 8.15%
+      var annualIncrement = 1.10; // 10% increase per year
+      var currentYear = 2025; // PF balance is as of 2025
+      
+      // Service years for pension calculation (full period)
+      var serviceYears = retirementYear - joiningYear;
+      if(serviceYears >= 20) {
+        serviceYears += 2; // bonus 2 years if 20+ years service
+      }
+      
+      // Additional years from 2025 to Retirement Year
+      var additionalYears = retirementYear - currentYear;
+      if(additionalYears < 0) additionalYears = 0;
+      
+      // Initialize PF balances for Normal and Higher scenarios
+      var pfNormal = currentPF;
+      var pfHigher = currentPF;
+      
+      // For pension calculation, record monthly salaries for the last 60 months
+      var monthlySalaries = [];
+      
+      // Set current basic as of 2025 from input basicPay
+      var currentBasic = basicPay;
+      
+      // Loop through each additional year (from 2025 to Retirement)
+      for(var year = 1; year <= additionalYears; year++){
+        var annualContributionNormal = 0;
+        var annualContributionHigher = 0;
+        // Process 12 months for the year
+        for(var month = 1; month <= 12; month++){
+          // Calculate current month's salary (Basic+DA)
+          var salary = currentBasic * DA_factor;
+          
+          // Employee contribution (same in both cases)
+          var employeePF = salary * empRate;
+          // Employer contribution (base)
+          var employerPF = salary * employerRate;
+          
+          // EPS contribution:
+          // For Normal Pension: use min(15000, salary)
+          var epsNormal = Math.min(15000, salary) * epsRate;
+          // For Higher Pension: applicable only if joiningYear < 2015, else same as normal
+          var epsHigher = (joiningYear < 2015) ? (salary * epsRate) : (Math.min(15000, salary) * epsRate);
+          
+          // Employer PF share = employer contribution - EPS contribution
+          var employerPFNormal = employerPF - epsNormal;
+          var employerPFHigher = employerPF - epsHigher;
+          
+          // Total monthly deposit into PF = Employee contribution + Employer PF share
+          var monthlyDepositNormal = employeePF + employerPFNormal;
+          var monthlyDepositHigher = employeePF + employerPFHigher;
+          
+          annualContributionNormal += monthlyDepositNormal;
+          annualContributionHigher += monthlyDepositHigher;
+          
+          // Record monthly salary for pension calculation (keep only last 60 months)
+          monthlySalaries.push(salary);
+          if(monthlySalaries.length > 60) {
+            monthlySalaries.shift();
+          }
+        }
+        // After each year, add the annual contributions and compound interest
+        pfNormal = (pfNormal + annualContributionNormal) * (1 + pfInterest);
+        pfHigher = (pfHigher + annualContributionHigher) * (1 + pfInterest);
+        
+        // Increase basic pay by 10% for next year
+        currentBasic *= annualIncrement;
+      }
+      
+      // Average salary over the last 60 months for pension calculation
+      var avgLast60Salary = 0;
+      if(monthlySalaries.length > 0) {
+        var sum = monthlySalaries.reduce((a, b) => a + b, 0);
+        avgLast60Salary = sum / monthlySalaries.length;
+      }
+      
+      // Determine pensionable salary for each option:
+      var pensionableNormal = Math.min(15000, avgLast60Salary);
+      var pensionableHigher = (joiningYear < 2015) ? avgLast60Salary : pensionableNormal;
+      
+      // Calculate monthly pension as per formula:
+      var normalPension = (pensionableNormal * serviceYears) / 70;
+      var higherPension = (pensionableHigher * serviceYears) / 70;
+      
+      // Update UI with results:
+      document.getElementById("normalPfBalance").innerHTML = "PF Balance: ₹" + pfNormal.toFixed(2);
+      document.getElementById("normalPension").innerHTML = "Pension: ₹" + normalPension.toFixed(2);
+      
+      document.getElementById("higherPfBalance").innerHTML = "PF Balance: ₹" + pfHigher.toFixed(2);
+      document.getElementById("higherPension").innerHTML = "Pension: ₹" + higherPension.toFixed(2);
+      
+      var pfDiff = pfHigher - pfNormal;
+      var pensionDiff = higherPension - normalPension;
+      document.getElementById("difference").innerHTML = "Difference: PF ₹" + pfDiff.toFixed(2) + ", Pension ₹" + pensionDiff.toFixed(2);
+    }
+  </script>
+</body>
+</html>
