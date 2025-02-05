@@ -132,6 +132,15 @@
             max-width: 800px;
             color: #00264d;
         }
+        .blink {
+            color: red;
+            font-size: 12px;
+            font-weight: bold;
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
         footer {
             text-align: center;
             padding: 15px;
@@ -166,15 +175,22 @@
         <a href="csl.html">Salary Calculator</a>
         <a href="tax.html">Tax Calculator</a>
         <a href="emi.html">EMI Calculator</a>
+        <a href="pf.html">PF Calculator <span class="blink">New</span></a>
         <a href="contact.html">Contact Us</a>
     </div>
     <section>
-<br>
         <div class="welcome-note">Welcome</div>
         <div class="welcome-subtext">
-<br>
-            This platform provides easy-to-use calculators for your salary, Loan and income tax.
+            This platform provides easy-to-use calculators for your salary, Loan, and income tax.
             Navigate through the Menu button above to access the tools.
+        </div>
+        <div class="content-box">
+            <h2>PF Calculator <span class="blink">New</span></h2>
+            <p>
+                Use this calculator to find out how much you will lose if you withdraw your PF, 
+                how much your PF balance will reduce if you opt for a higher pension, 
+                and how much pension you will receive.
+            </p>
         </div>
         <div class="content-box">
             <h2>Income Tax Comparison Feature</h2>
@@ -186,24 +202,28 @@
         <div class="content-box">
             <h2>Other Features</h2>
             <p>
-                Calculate your overtime amount with ease, know how far you are from your next grade promotion, and use the EMI Calculator to manage your loans effectively and graphically.
+                Calculate your overtime amount with ease, know how far you are from your next grade promotion, 
+                and use the EMI Calculator to manage your loans effectively and graphically.
             </p>
         </div>
     </section>
+<div style="height: 60px;"></div>
     <footer>
         &copy; 2025 CSL Calculations | All Rights Reserved
         <br>
         <span class="disclaimer">This is not the official app of CSL.</span>
         <br>
-        <span class="version">Version 1.3</span>
+        <span class="version">Version 2.0</span>
     </footer>
-    <script>
-        const menuIcon = document.getElementById('menu-icon');
-        const menuDrawer = document.getElementById('menu-drawer');
-
-        menuIcon.addEventListener('click', () => {
-            menuDrawer.classList.toggle('open');
-        });
-    </script>
+<script>
+    document.getElementById("menu-icon").addEventListener("click", function() {
+        var menu = document.getElementById("menu-drawer");
+        if (menu.classList.contains("open")) {
+            menu.classList.remove("open");
+        } else {
+            menu.classList.add("open");
+        }
+    });
+</script>
 </body>
 </html>
