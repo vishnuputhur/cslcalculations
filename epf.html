@@ -104,8 +104,8 @@
       <input type="number" id="basicPay" placeholder="Enter Basic Pay">
     </div>
     <div class="input-group">
-      <label>Joining Year:</label>
-      <input type="number" id="joiningYear" placeholder="Enter Joining Year">
+      <label>PF Starting Year:</label>
+      <input type="number" id="joiningYear" placeholder="Enter PF Joining Year">
     </div>
     <div class="input-group">
       <label>Retirement Year:</label>
@@ -156,7 +156,7 @@
       &nbsp;&nbsp;&nbsp;&nbsp;• Calculate monthly contributions using above formulas<br>
       &nbsp;&nbsp;&nbsp;&nbsp;• Annual Contribution = (Sum of monthly deposits) × 12<br>
       &nbsp;&nbsp;&nbsp;&nbsp;• PF Balance = (Previous PF Balance + Annual Contribution) compounded at 8.15% annually<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;• Basic+DA increases by 10% each year<br><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;• Basic+DA increases by 7% each year<br><br>
       3. Pension Calculation:<br>
       &nbsp;&nbsp;- Service Years = (Retirement Year - Joining Year) (if ≥20, add bonus 2 years)<br>
       &nbsp;&nbsp;- Pensionable Salary for Normal Pension = min(15000, Average of last 60 months Basic+DA)<br>
@@ -171,7 +171,7 @@
   
   <p class="footer">
     VT@Soft © 2025 | Version 1.0<br>
-    Disclaimer: Calculations assume an average annual 10% increase. Actual amounts may vary based on DA hikes, fitment, promotions, etc. This calculator helps understand the financial impact of PF withdrawals and pension differences.
+    Disclaimer: Calculations assume an average annual 7% increase. Actual amounts may vary based on DA hikes, fitment, promotions, etc. This calculator helps understand the financial impact of PF withdrawals and pension differences.
   </p>
   
   <script>
@@ -202,7 +202,7 @@
       var employerRate = 0.12; // Employer PF rate
       var epsRate = 0.0833; // EPS rate 8.33%
       var pfInterest = 0.0815; // Annual interest 8.15%
-      var annualIncrement = 1.10; // 10% increase per year
+      var annualIncrement = 1.07; // 7% increase per year
       var currentYear = 2025; // PF balance is as of 2025
       
       // Service years for pension calculation (full period)
@@ -266,7 +266,7 @@
         pfNormal = (pfNormal + annualContributionNormal) * (1 + pfInterest);
         pfHigher = (pfHigher + annualContributionHigher) * (1 + pfInterest);
         
-        // Increase basic pay by 10% for next year
+        // Increase basic pay by 7% for next year
         currentBasic *= annualIncrement;
       }
       
