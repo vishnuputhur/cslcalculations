@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+ <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSL Calculations - Trigonometry</title>
+    <style>
+        body {
+            background-color: #1E3A5F;
+            font-family: 'Poppins', sans-serif;
+            color: #F5E6C4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0F2A45;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .sub-title {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: 400;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            background-color: #F5E6C4;
+            color: #1E3A5F;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+        }
+
+        input {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+            margin: 8px 0;
+            border: 2px solid #1E3A5F;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 45%;
+            padding: 10px;
+            margin: 10px 5px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .calculate-btn {
+            background-color: #1E3A5F;
+        }
+
+        .clear-btn {
+            background-color: #8B1E3F;
+        }
+
+        .triangle-img {
+            width: 50%;
+            margin-top: 10px;
+        }
+
+        .footer {
+            font-size: 16px;
+            font-weight: normal;
+            padding: 20px;
+            background-color: #0F2A45;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">CSL Calculations</div>
+    <div class="sub-title">Trigonometry Calculator</div>
+
+    <div class="container">
+        <img src="https://i.ibb.co/4ZNrxL23/tri11-36521-lg.gif" alt="Triangle" class="triangle-img">
+        
+        <input type="number" id="sideA" placeholder="Side a">
+        <input type="number" id="sideB" placeholder="Side b">
+        <input type="number" id="sideC" placeholder="Hypotenuse c">
+
+        <div>
+            <button class="btn calculate-btn" onclick="calculate()">CALCULATE</button>
+            <button class="btn clear-btn" onclick="clearAll()">CLEAR ALL</button>
+        </div>
+    </div>
+
+    <div class="footer">Powered by VT@Soft © 2025 | Version 1.0</div>
+
+    <script>
+        function calculate() {
+            let a = parseFloat(document.getElementById('sideA').value);
+            let b = parseFloat(document.getElementById('sideB').value);
+            let c = parseFloat(document.getElementById('sideC').value);
+
+            if (a && b && !c) {
+                c = Math.sqrt(a * a + b * b).toFixed(2);
+                document.getElementById('sideC').value = c;
+            } else if (a && c && !b) {
+                b = Math.sqrt(c * c - a * a).toFixed(2);
+                document.getElementById('sideB').value = b;
+            } else if (b && c && !a) {
+                a = Math.sqrt(c * c - b * b).toFixed(2);
+                document.getElementById('sideA').value = a;
+            } 
+        }
+
+        function clearAll() {
+            document.getElementById('sideA').value = "";
+            document.getElementById('sideB').value = "";
+            document.getElementById('sideC').value = "";
+        }
+    </script>
+
+</body>
+</html>
