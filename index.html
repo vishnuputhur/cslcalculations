@@ -161,6 +161,46 @@
 html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+}/* Add this after existing .welcome-subtext style */
+.whats-new {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #004080;
+}
+
+.whats-new-header {
+    color: #ffcc00;
+    text-align: center;
+    margin-top: 0;
+    position: sticky;
+    top: 0;
+    background: #001a33;
+    padding: 5px 0;
+    z-index: 10;
+}
+
+.whats-new-content {
+    position: relative;
+    width: 100%;
+}
+
+.whats-new ul {
+    padding-left: 20px;
+    margin: 0;
+    list-style-type: none;
+}
+
+.whats-new li {
+    margin-bottom: 12px;
+    color: #fff;
+    padding: 5px 0;
 }
     </style>
 </head>
@@ -191,7 +231,25 @@ html {
         <div class="welcome-subtext">
             This platform provides easy-to-use calculators for your salary, Loan, and income tax.
             Navigate through the Menu button above to access the tools.
-        </div>
+<br>
+<br>
+<span class="blink">Whats New</span>
+<div class="whats-new">
+    <div class="whats-new-content">
+        <ul>
+            <li>Added CSL Calendar feature</li>
+            <li>New Trigonometric Calculator</li>
+            <li>Improved UI/UX design</li>
+            <li>Fixed tax calculation bugs</li>
+            <li>New DA added 48.9%</li>
+            <li>Enhanced dark mode</li>
+            <li>EMI calculator improvements</li>
+            <li>Salary calculation updates</li>
+            <!-- Add more points if needed -->
+        </ul>
+    </div>
+</div>
+
         <div class="content-box">
             <h2>PF Calculator </h2>
             <p>
@@ -208,9 +266,8 @@ html {
             </p>
         </div>
         <div class="content-box">
-            <h2>Other Features <span class="blink">New</span></h2>
+            <h2>Other Features </h2>
             <p>
-New DA 48.7% W.E.F 01/04/2025<br>
               CSL Calender Added! <br>
  Trigonametric Calculator added! <br>
 Trigonometry Calculator
@@ -237,6 +294,47 @@ Use this tool to check if a surface or frame is perfectly square by calculating 
             menu.classList.add("open");
         }
     });
+</script>
+<!-- Add this after menu toggle script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.whats-new');
+    const content = document.querySelector('.whats-new-content');
+    const list = document.querySelector('.whats-new ul');
+    let animating = true;
+    let scrollPos = 0;
+    
+    // Clone list items for seamless looping
+    list.innerHTML += list.innerHTML;
+
+    function animate() {
+        if (!animating) return;
+        
+        scrollPos -= 0.2; // Adjust speed (smaller = slower)
+        
+        // Reset when scrolled halfway (since we duplicated content)
+        if (scrollPos <= -list.scrollHeight/2) {
+            scrollPos = 0;
+        }
+        
+        content.style.transform = `translateY(${scrollPos}px)`;
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    animate();
+
+    // Pause on hover
+    container.addEventListener('mouseenter', () => {
+        animating = false;
+    });
+
+    // Resume on mouse leave
+    container.addEventListener('mouseleave', () => {
+        animating = true;
+        animate();
+    });
+});
 </script>
 </body>
 </html>
