@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSL Calculations - Weight Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-21G1BS7S3S');
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #e3f2fd);
+      color: #003366;
+      text-align: center;
+    }
+
+    header, footer {
+      background: linear-gradient(to right, #003366, #005580);
+      color: white;
+      padding: 15px;
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      left: 0;
+    }
+
+    header {
+      top: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    footer {
+      bottom: 0;
+      font-size: 14px;
+      box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    main {
+      margin-top: 120px;
+      margin-bottom: 70px;
+      padding: 20px;
+    }
+
+    select, input {
+      width: 90%;
+      max-width: 350px;
+      padding: 12px;
+      margin: 12px auto;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid #bbb;
+      box-shadow: inset 1px 1px 4px rgba(0,0,0,0.1);
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    button {
+      background: linear-gradient(to right, #006699, #0099cc);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 20px;
+      margin-top: 20px;
+      font-size: 16px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #004466, #0077aa);
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #004466;
+      text-shadow: 1px 1px #ccc;
+    }
+
+    small {
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>CSL Calculations</h2>
+  <div style="font-size: 16px;">Weight Calculator</div>
+</header>
+
+<main>
+  <label for="material">Select Material:</label>
+  <select id="material">
+    <option value="">-- Select --</option>
+    <option value="7.85">Mild Steel</option>
+    <option value="7.93">Stainless Steel</option>
+    <option value="2.70">Aluminium</option>
+    <option value="0.60">Wood</option>
+    <option value="2.50">Glass</option>
+    <option value="1.00">Water</option>
+  </select>
+
+  <label for="shape">Select Shape:</label>
+  <select id="shape">
+    <option value="">-- Select --</option>
+    <option value="rectangle">Square / Rectangle</option>
+    <option value="circle">Round / Circle</option>
+    <option value="triangle">Triangle</option>
+  </select>
+
+  <div id="inputs"></div>
+
+  <button onclick="calculateWeight()">Calculate</button>
+
+  <div id="result"></div>
+</main>
+
+<footer>
+  © VT@Soft 2025 | Version 1.0
+</footer>
+
+<script>
+  const shapeSelect = document.getElementById('shape');
+  const inputsDiv = document.getElementById('inputs');
+
+  shapeSelect.addEventListener('change', () => {
+    const shape = shapeSelect.value;
+    inputsDiv.innerHTML = '';
+
+    if (shape === 'rectangle') {
+      inputsDiv.innerHTML = `
+        <label>Length (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="length">
+        <label>Width (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="width">
+        <label>Thickness (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="thickness">
+      `;
+    } else if (shape === 'circle') {
+      inputsDiv.innerHTML = `
+        <label>Diameter (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="diameter">
+        <label>Thickness (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="thickness">
+      `;
+    } else if (shape === 'triangle') {
+      inputsDiv.innerHTML = `
+        <label>Base (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="base">
+        <label>Height (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="height">
+        <label>Thickness (mm) <small>(Input in mm)</small></label>
+        <input type="number" id="thickness">
+      `;
+    }
+  });
+
+  function calculateWeight() {
+    const materialDensity = parseFloat(document.getElementById('material').value);
+    const shape = document.getElementById('shape').value;
+    let volume_cm3 = 0;
+
+    if (!materialDensity || !shape) {
+      document.getElementById('result').innerText = "Please select both material and shape.";
+      return;
+    }
+
+    if (shape === 'rectangle') {
+      const l = parseFloat(document.getElementById('length').value) / 10;
+      const w = parseFloat(document.getElementById('width').value) / 10;
+      const t = parseFloat(document.getElementById('thickness').value) / 10;
+      if (!l || !w || !t) return;
+      volume_cm3 = l * w * t;
+    } else if (shape === 'circle') {
+      const d = parseFloat(document.getElementById('diameter').value) / 10;
+      const t = parseFloat(document.getElementById('thickness').value) / 10;
+      if (!d || !t) return;
+      volume_cm3 = Math.PI * (d ** 2) / 4 * t;
+    } else if (shape === 'triangle') {
+      const b = parseFloat(document.getElementById('base').value) / 10;
+      const h = parseFloat(document.getElementById('height').value) / 10;
+      const t = parseFloat(document.getElementById('thickness').value) / 10;
+      if (!b || !h || !t) return;
+      volume_cm3 = 0.5 * b * h * t;
+    }
+
+    const weight = volume_cm3 * materialDensity / 1000;
+    document.getElementById('result').innerText = `Weight: ${weight.toFixed(3)} kg`;
+  }
+</script>
+
+</body>
+</html>
