@@ -13,115 +13,7 @@
         gtag('js', new Date());
         gtag('config', 'G-21G1BS7S3S');
     </script>
-    
-</head>
-<body>
-
-    <img src="https://i.ibb.co/LZtyrFn/icon.png" alt="icon" border="0" class="logo" style="width: 50px; height: auto;">
-    <h1>EMI Calculator</h1>
-    <p class="explanation">Your home loan principal, interest, tenure, etc. <br>can be calculated graphically.</p>
-    <hr>
-    <div class="calculator">
-        <label for="principal" class="label">Loan Amount (₹)</label>
-        <input type="number" id="principal" placeholder="Enter Loan Amount" required>
-        
-        <label for="interest" class="label">Interest Rate (%)</label>
-        <input type="number" id="interest" placeholder="Enter Interest Rate" required>
-        
-        <label for="tenureType" class="label">Select Tenure Type</label>
-        <select id="tenureType">
-            <option value="months">Months</option>
-            <option value="years">Years</option>
-        </select>
-        
-        <label for="tenure" class="label">Tenure (Months/Years)</label>
-        <input type="number" id="tenure" placeholder="Enter Tenure" required>
-        
-        <button onclick="calculateEMI()">Calculate EMI</button>
-        <div id="result" class="result"></div>
-        
-        <canvas id="chart" width="300" height="300"></canvas>
-        
-        <button onclick="location.href='index.html'">Home</button>
-    </div>
-
-    <div class="footer">VT@Soft | ©2025</div>
-    <div class="version">Version: 1.4</div>
-
-    <script>
-        function calculateEMI() {
-            const principal = parseFloat(document.getElementById('principal').value);
-            const interestRate = parseFloat(document.getElementById('interest').value) / 100 / 12;
-            const tenureValue = parseInt(document.getElementById('tenure').value);
-            const tenureType = document.getElementById('tenureType').value;
-
-            const months = tenureType === "years" ? tenureValue * 12 : tenureValue;
-
-            if (principal && interestRate && months) {
-                const emi = (principal * interestRate * Math.pow(1 + interestRate, months)) / (Math.pow(1 + interestRate, months) - 1);
-                const totalPayment = emi * months;
-                const totalInterest = totalPayment - principal;
-
-                document.getElementById('result').innerHTML = `
-                    EMI: ₹${emi.toFixed(2)}<br>
-                    Total Payment: ₹${totalPayment.toFixed(2)}<br>
-                    Total Interest: ₹${totalInterest.toFixed(2)}
-                `;
-
-                drawDonutChart(principal, totalInterest);
-
-                // Scroll to the bottom of the page
-                window.scrollTo(0, document.body.scrollHeight);
-            } else {
-                document.getElementById('result').innerHTML = `<span style="color: #f44336;">Please fill out all fields!</span>`;
-            }
-        }
-
-        function drawDonutChart(principal, interest) {
-            const canvas = document.getElementById('chart');
-            const ctx = canvas.getContext('2d');
-            const total = principal + interest;
-
-            const data = [principal, interest];
-            const colors = ['#4caf50', '#f44336'];
-            const labels = ['Principal', 'Interest'];
-
-            let startAngle = 0;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = 100;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            data.forEach((value, index) => {
-                const sliceAngle = (value / total) * 2 * Math.PI;
-                const endAngle = startAngle + sliceAngle;
-
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[index];
-                ctx.fill();
-
-                startAngle = endAngle;
-            });
-
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#160c57'; // Updated inner circle color
-            ctx.fill();
-
-            labels.forEach((label, index) => {
-                ctx.fillStyle = colors[index];
-                ctx.fillRect(20, canvas.height - 60 + index * 20, 10, 10);
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '12px Arial';
-                ctx.fillText(`${label}: ₹${data[index].toFixed(2)}`, 40, canvas.height - 50 + index * 20);
-            });
-        }
-    </script>
-<style>  
+    <style>  
         body {  
             font-family: 'Arial', sans-serif;  
             background: linear-gradient(to bottom, #160c57, #3316c7); /* Dual-tone background */  
@@ -232,5 +124,113 @@
             text-align: center;  
         }  
     </style>
+</head>
+<body>
+
+    <img src="https://i.ibb.co/LZtyrFn/icon.png" alt="icon" border="0" class="logo" style="width: 50px; height: auto;">
+    <h1>EMI Calculator</h1>
+    <p class="explanation">Your home loan principal, interest, tenure, etc. <br>can be calculated graphically.</p>
+    <hr>
+    <div class="calculator">
+        <label for="principal" class="label">Loan Amount (₹)</label>
+        <input type="number" id="principal" placeholder="Enter Loan Amount" required>
+        
+        <label for="interest" class="label">Interest Rate (%)</label>
+        <input type="number" id="interest" placeholder="Enter Interest Rate" required>
+        
+        <label for="tenureType" class="label">Select Tenure Type</label>
+        <select id="tenureType">
+            <option value="months">Months</option>
+            <option value="years">Years</option>
+        </select>
+        
+        <label for="tenure" class="label">Tenure (Months/Years)</label>
+        <input type="number" id="tenure" placeholder="Enter Tenure" required>
+        
+        <button onclick="calculateEMI()">Calculate EMI</button>
+        <div id="result" class="result"></div>
+        
+        <canvas id="chart" width="300" height="300"></canvas>
+        
+        <button onclick="location.href='index.html'">Home</button>
+    </div>
+
+    <div class="footer">VT@Soft | ©2025</div>
+    <div class="version">Version: 1.4</div>
+
+    <script>
+        function calculateEMI() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const interestRate = parseFloat(document.getElementById('interest').value) / 100 / 12;
+            const tenureValue = parseInt(document.getElementById('tenure').value);
+            const tenureType = document.getElementById('tenureType').value;
+
+            const months = tenureType === "years" ? tenureValue * 12 : tenureValue;
+
+            if (principal && interestRate && months) {
+                const emi = (principal * interestRate * Math.pow(1 + interestRate, months)) / (Math.pow(1 + interestRate, months) - 1);
+                const totalPayment = emi * months;
+                const totalInterest = totalPayment - principal;
+
+                document.getElementById('result').innerHTML = `
+                    EMI: ₹${emi.toFixed(2)}<br>
+                    Total Payment: ₹${totalPayment.toFixed(2)}<br>
+                    Total Interest: ₹${totalInterest.toFixed(2)}
+                `;
+
+                drawDonutChart(principal, totalInterest);
+
+                // Scroll to the bottom of the page
+                window.scrollTo(0, document.body.scrollHeight);
+            } else {
+                document.getElementById('result').innerHTML = `<span style="color: #f44336;">Please fill out all fields!</span>`;
+            }
+        }
+
+        function drawDonutChart(principal, interest) {
+            const canvas = document.getElementById('chart');
+            const ctx = canvas.getContext('2d');
+            const total = principal + interest;
+
+            const data = [principal, interest];
+            const colors = ['#4caf50', '#f44336'];
+            const labels = ['Principal', 'Interest'];
+
+            let startAngle = 0;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 100;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            data.forEach((value, index) => {
+                const sliceAngle = (value / total) * 2 * Math.PI;
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[index];
+                ctx.fill();
+
+                startAngle = endAngle;
+            });
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
+            ctx.fillStyle = '#160c57'; // Updated inner circle color
+            ctx.fill();
+
+            labels.forEach((label, index) => {
+                ctx.fillStyle = colors[index];
+                ctx.fillRect(20, canvas.height - 60 + index * 20, 10, 10);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px Arial';
+                ctx.fillText(`${label}: ₹${data[index].toFixed(2)}`, 40, canvas.height - 50 + index * 20);
+            });
+        }
+    </script>
+
 </body>
 </html>
