@@ -1,4 +1,7 @@
 body {
-    background: linear-gradient(to bottom, #4f6df7, #0a084d); /* Light Blue to Dark Blue */
-    color: #ffffff;
+    background: linear-gradient(to bottom, #1e3c72, #2a5298); /* Light to dark blue */
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
