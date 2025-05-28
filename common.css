@@ -1,51 +1,109 @@
-/* Updated common theme with warm white + modern color scheme */
-
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #160c57, #3316c7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
     margin: 0;
-    padding: 0;
-    background: linear-gradient(to bottom, #e0f7fa, #ffffff);
-    color: #00264d;
-    font-size: 0.9rem;
+    color: #ffffff;
+    padding-top: 30px;
 }
 
-header {
-    background: #004d80;
-    color: white;
+.logo {
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin: 0;
     text-align: center;
-    padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+    margin-top: 10px;
 }
 
-footer {
-    background: #004466;
-    color: #fff;
-    text-align: center;
-    padding: 8px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    font-size: 0.75rem;
-}
-
-.content-box {
-    background-color: #faf8e3;
-    color: #00264d;
-    padding: 16px;
-    margin: 20px auto;
-    width: 90%;
-    max-width: 800px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    font-size: 0.9rem;
-    line-height: 1.6;
-}
-
-a {
-    color: #004080;
-    text-decoration: none;
+.explanation {
+    font-size: 1rem;
     font-weight: bold;
+    margin: 10px 0;
+    text-align: center;
+    color: #e0e0e0;
 }
-a:hover {
-    text-decoration: underline;
+
+hr {
+    width: 80%;
+    border: 0.5px solid #e0e0e0;
+    margin: 5px 0 15px;
+}
+
+.calculator {
+    background-color: #160c57;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    width: 320px;
+    text-align: center;
+}
+
+.label {
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #56789a;
+    border-radius: 5px;
+    background: #3316c7;
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3b82d1;
+    color: #ffffff;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #295b8f;
+    transform: translateY(-2px);
+}
+
+.result {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    color: #ffffff;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+.footer {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #cccccc;
+}
+
+.version {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #cccccc;
+    text-align: center;
 }
