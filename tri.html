@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ml">
 <head>
-<link rel="stylesheet" href="common.css">
- <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -26,20 +25,19 @@
             min-height: 100vh;
         }
 
-        .header {
-            background-color: #0F2A45;
-            padding: 20px;
-            font-size: 26px;
-            font-weight: bold;
-            font-family: 'Times New Roman', serif;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        .top-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            cursor: pointer;
         }
 
         .sub-title {
-            font-size: 18px;
+            font-size: 20px;
             margin-top: 10px;
-            font-weight: 400;
-            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            color: #ffffff;
         }
 
         .container {
@@ -95,17 +93,25 @@
             font-weight: normal;
             padding: 20px;
             background-color: #0F2A45;
-            position: relative;
-            bottom: 0;
             width: 100%;
-            margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
         }
 
+        /* Add padding to prevent content being hidden behind footer */
+        .bottom-padding {
+            height: 80px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">CSL Calculations</div>
+    <a href="index.html">
+        <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
+    </a>
+
     <div class="sub-title">Trigonometry Calculator</div>
 
     <div class="container">
@@ -120,6 +126,8 @@
             <button class="btn clear-btn" onclick="clearAll()">CLEAR ALL</button>
         </div>
     </div>
+
+    <div class="bottom-padding"></div> <!-- Spacer to avoid content behind footer -->
 
     <div class="footer">Powered by VT@Soft © 2025 | Version 1.0</div>
 
@@ -138,7 +146,7 @@
             } else if (b && c && !a) {
                 a = Math.sqrt(c * c - b * b).toFixed(2);
                 document.getElementById('sideA').value = a;
-            } 
+            }
         }
 
         function clearAll() {
