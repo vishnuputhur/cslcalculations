@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMI Calculator</title>
-<link rel="stylesheet" href="common.css?v=1.0">
     <!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
@@ -14,123 +13,130 @@
         gtag('config', 'G-21G1BS7S3S');
     </script>
     <style>  
-        body {  
-            font-family: 'Arial', sans-serif;  
-            background: linear-gradient(to bottom, #160c57, #3316c7); /* Dual-tone background */  
-            display: flex;  
-            flex-direction: column;  
-            align-items: center;  
-            justify-content: flex-start;  
-            height: 100vh;  
-            margin: 0;  
-            color: #ffffff;  
-            padding-top: 30px; /* Reduced top padding */  
-        }  
-  
-        .logo {  
-            margin-bottom: 10px; /* Slight gap reduction */  
-        }  
-  
-        h1 {  
-            font-size: 2.5rem;  
-            margin: 0;  
-            text-align: center;  
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);  
-            margin-top: 10px;  
-        }  
-  
-        .explanation {  
-            font-size: 1rem;  
-            font-weight: bold;  
-            margin: 10px 0;  
-            text-align: center;  
-            color: #e0e0e0;  
-        }  
-  
-        hr {  
-            width: 80%;  
-            border: 0.5px solid #e0e0e0; /* Horizontal line below description */  
-            margin: 5px 0 15px;  
-        }  
-  
-        .calculator {  
-            background-color: #160c57; /* Updated background color */  
-            padding: 25px;  
-            border-radius: 12px;  
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);  
-            width: 320px;  
-            text-align: center;  
-        }  
-  
-        .label {  
-            text-align: left;  
-            font-size: 0.85rem;  
-            font-weight: bold;  
-            color: #ffffff;  
-            margin-bottom: 5px;  
-        }  
-  
-        input, select {  
-            width: calc(100% - 20px);  
-            padding: 10px;  
-            margin-bottom: 15px;  
-            border: 1px solid #56789a;  
-            border-radius: 5px;  
-            background: #3316c7;  
-            color: #ffffff;  
-            font-size: 0.9rem;  
-            outline: none;  
-        }  
-  
-        input::placeholder {  
-            color: #aaa;  
-        }  
-  
-        button {  
-            padding: 10px;  
-            border: none;  
-            border-radius: 5px;  
-            background-color: #3b82d1;  
-            color: #ffffff;  
-            font-size: 1rem;  
-            cursor: pointer;  
-            margin-top: 10px;  
-            transition: background 0.3s, transform 0.2s;  
-        }  
-  
-        button:hover {  
-            background-color: #295b8f;  
-            transform: translateY(-2px);  
-        }  
-  
-        .result {  
-            margin-top: 15px;  
-            font-size: 1.2rem;  
-            color: #ffffff;  
-            font-weight: bold;  
-            line-height: 1.5;  
-        }  
-  
-        .footer {  
-            margin-top: 20px;  
-            font-size: 0.8rem;  
-            color: #cccccc;  
-        }  
-  
-        .version {  
-            margin-top: 10px;  
-            font-size: 0.85rem;  
-            color: #cccccc;  
-            text-align: center;  
-        }  
+        body {
+            background-color: #1E3A5F;
+            font-family: 'Poppins', sans-serif;
+            color: #F5E6C4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .sub-title {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            color: #ffffff;
+        }
+
+        .calculator {
+            background-color: #F5E6C4;
+            color: #1E3A5F;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #1E3A5F;
+            text-align: left;
+        }
+
+        input, select {
+            width: calc(100% - 20px);
+            padding: 8px;
+            font-size: 16px;
+            margin: 8px 0;
+            border: 2px solid #1E3A5F;
+            border-radius: 5px;
+            text-align: center;
+            background: #FAF8E3;
+        }
+
+        button {
+            width: 45%;
+            padding: 10px;
+            margin: 10px 5px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .calculate-btn {
+            background-color: #1E3A5F;
+        }
+
+        .clear-btn {
+            background-color: #8B1E3F;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1E3A5F;
+            background: #FAF8E3;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+            min-height: 40px;
+        }
+
+        .footer {
+            font-size: 16px;
+            font-weight: normal;
+            padding: 20px;
+            background-color: #0F2A45;
+            width: 100%;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .bottom-padding {
+            height: 80px;
+        }
+
+        canvas {
+            margin-top: 20px;
+            background: #FAF8E3;
+            border-radius: 8px;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <img src="https://i.ibb.co/LZtyrFn/icon.png" alt="icon" border="0" class="logo" style="width: 50px; height: auto;">
-    <h1>EMI Calculator</h1>
-    <p class="explanation">Your home loan principal, interest, tenure, etc. <br>can be calculated graphically.</p>
-    <hr>
+    <a href="index.html">
+        <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img" />
+    </a>
+
+    <div class="sub-title">EMI Calculator</div>
+
     <div class="calculator">
         <label for="principal" class="label">Loan Amount (₹)</label>
         <input type="number" id="principal" placeholder="Enter Loan Amount" required>
@@ -147,16 +153,17 @@
         <label for="tenure" class="label">Tenure (Months/Years)</label>
         <input type="number" id="tenure" placeholder="Enter Tenure" required>
         
-        <button onclick="calculateEMI()">Calculate EMI</button>
+        <button class="calculate-btn" onclick="calculateEMI()">Calculate EMI</button>
         <div id="result" class="result"></div>
         
         <canvas id="chart" width="300" height="300"></canvas>
         
-        <button onclick="location.href='index.html'">Home</button>
+        <button class="clear-btn" onclick="location.href='index.html'">Home</button>
     </div>
 
-    <div class="footer">VT@Soft | ©2025</div>
-    <div class="version">Version: 1.4</div>
+    <div class="bottom-padding"></div>
+
+    <div class="footer">Powered by VT@Soft © 2025 | Version 1.4</div>
 
     <script>
         function calculateEMI() {
@@ -183,7 +190,7 @@
                 // Scroll to the bottom of the page
                 window.scrollTo(0, document.body.scrollHeight);
             } else {
-                document.getElementById('result').innerHTML = `<span style="color: #f44336;">Please fill out all fields!</span>`;
+                document.getElementById('result').innerHTML = `<span style="color: #8B1E3F;">Please fill out all fields!</span>`;
             }
         }
 
@@ -193,7 +200,7 @@
             const total = principal + interest;
 
             const data = [principal, interest];
-            const colors = ['#4caf50', '#f44336'];
+            const colors = ['#1E3A5F', '#8B1E3F'];
             const labels = ['Principal', 'Interest'];
 
             let startAngle = 0;
@@ -219,14 +226,14 @@
 
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#160c57'; // Updated inner circle color
+            ctx.fillStyle = '#F5E6C4';
             ctx.fill();
 
             labels.forEach((label, index) => {
                 ctx.fillStyle = colors[index];
                 ctx.fillRect(20, canvas.height - 60 + index * 20, 10, 10);
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '12px Arial';
+                ctx.fillStyle = '#1E3A5F';
+                ctx.font = '12px Poppins';
                 ctx.fillText(`${label}: ₹${data[index].toFixed(2)}`, 40, canvas.height - 50 + index * 20);
             });
         }
