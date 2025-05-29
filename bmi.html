@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CSL Calculations - BMI & Age Calculator</title>
+
+    <style>
+        body {
+            background-color: #1E3A5F;
+            font-family: 'Poppins', sans-serif;
+            color: #F5E6C4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .sub-title {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #F5E6C4;
+            color: #1E3A5F;
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #1E3A5F;
+        }
+
+        input {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+            margin: 8px 0;
+            border: 2px solid #1E3A5F;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 45%;
+            padding: 10px;
+            margin: 10px 5px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .calculate-btn {
+            background-color: #1E3A5F;
+        }
+
+        .clear-btn {
+            background-color: #8B1E3F;
+        }
+
+        .bmi-img {
+            width: 50%;
+            margin-top: 10px;
+            object-fit: contain;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1E3A5F;
+            background: #FAF8E3;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+            min-height: 40px;
+        }
+
+        .footer {
+            font-size: 16px;
+            font-weight: normal;
+            padding: 20px;
+            background-color: #0F2A45;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .bottom-padding {
+            height: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html">
+        <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img" />
+    </a>
+
+    <div class="sub-title">BMI & Age Calculator</div>
+
+    <div class="container">
+        <img src="https://i.ibb.co/MDRdTSvD/body-mass-index.jpg" alt="BMI Calculator" style="width: 80%; max-width: 300px; margin-top: 10px;" />
+        
+        <label for="dob" class="input-label">ജനന തീയതി</label>
+        <input type="date" id="dob" />
+        
+        <label for="heightCm" class="input-label">ഉയരം (സെന്റിമീറ്റർ)</label>
+        <input type="number" id="heightCm" />
+        
+        <label for="weightKg" class="input-label">ഭാരം (കിലോഗ്രാം)</label>
+        <input type="number" id="weightKg" />
+
+        <div>
+            <button class="btn calculate-btn" onclick="calculateAll()">CALCULATE</button>
+            <button class="btn clear-btn" onclick="clearAll()">CLEAR ALL</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <div class="bottom-padding"></div>
+
+    <div class="footer">Powered by VT@Soft © 2025 | Version 1.0</div>
+
+    <script>
+        function calculateAll() {
+            // Calculate Age
+            const birthDate = new Date(document.getElementById('dob').value);
+            const today = new Date();
+            
+            if (!birthDate.getTime()) {
+                document.getElementById('result').textContent = "ദയവായി ശരിയായ ജനന തീയതി നൽകുക.";
+                return;
+            }
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            // Calculate months and days
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+            
+            if (days < 0) {
+                months--;
+                const prevMonthLastDay = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+                days += prevMonthLastDay;
+            }
+            
+            if (months < 0) {
+                months += 12;
+            }
+            
+            // Calculate BMI
+            const weight = parseFloat(document.getElementById('weightKg').value);
+            const heightCm = parseFloat(document.getElementById('heightCm').value);
+
+            if (!weight || !heightCm) {
+                document.getElementById('result').textContent = "ദയവായി ശരിയായ ഭാരവും ഉയരവും നൽകുക.";
+                return;
+            }
+
+            const heightM = heightCm / 100;
+            const bmi = weight / (heightM * heightM);
+            const bmiRounded = bmi.toFixed(2);
+
+            let category = "";
+
+            if (bmi < 18.5) {
+                category = "കഴിഞ്ഞു (Underweight)";
+            } else if (bmi < 25) {
+                category = "സാധാരണം (Normal weight)";
+            } else if (bmi < 30) {
+                category = "അധികം ഭാരമുള്ളത് (Overweight)";
+            } else {
+                category = "പ്രമേഹം (Obesity)";
+            }
+
+            document.getElementById('result').innerHTML = 
+                `<strong>BMI: ${bmiRounded} - ${category}</strong><br><br>
+                 <strong>നിങ്ങളുടെ പ്രായം:</strong> ${age} വർഷം, ${months} മാസം, ${days} ദിവസം`;
+        }
+
+        function clearAll() {
+            document.getElementById('dob').value = "";
+            document.getElementById('heightCm').value = "";
+            document.getElementById('weightKg').value = "";
+            document.getElementById('result').textContent = "";
+        }
+    </script>
+
+</body>
+</html>
