@@ -262,6 +262,7 @@ html {
 <span class="blink">Whats New</span>
 <div class="whats-new">
     <div class="whats-new-content">
+<div class="whats-new-header">New Updates</div>
         <ul>
             <li>Added CSL Calendar 
 <li><span class="blink">New</span> Weight Calculator Added </li>
@@ -276,7 +277,56 @@ html {
         </ul>
     </div>
 </div>
+<div class="whats-new" style="height: auto; margin-bottom: 15px;">
+    <div class="whats-new-header">Upcoming CSL Holidays</div>
+    <div onclick="window.location='calendar.html'" style="cursor: pointer; padding: 10px;">
+        <div id="upcomingHolidays" style="color: red; font-weight: bold; font-size: 0.8rem; line-height: 1.4; text-align: center;">
+            Loading holidays...
+        </div>
+    </div>
+</div>
 
+<script>
+// Holiday data (month is 0-indexed, so 0=January)
+const holidays = [
+    { date: new Date(new Date().getFullYear(), 2, 31), name: "Id-ul-Fitr (Ramzan)" },
+    { date: new Date(new Date().getFullYear(), 3, 14), name: "Vishu / Dr. BR Ambedkar Jayanthi" },
+    { date: new Date(new Date().getFullYear(), 3, 18), name: "Good Friday" },
+    { date: new Date(new Date().getFullYear(), 4, 1), name: "May Day" },
+    { date: new Date(new Date().getFullYear(), 5, 6), name: "Bakrid" },
+    { date: new Date(new Date().getFullYear(), 7, 15), name: "Independence Day" },
+    { date: new Date(new Date().getFullYear(), 8, 4), name: "First Onam" },
+    { date: new Date(new Date().getFullYear(), 8, 5), name: "Thiruvonam" },
+    { date: new Date(new Date().getFullYear(), 8, 6), name: "Third Onam" },
+    { date: new Date(new Date().getFullYear(), 9, 2), name: "Gandhi Jayanthi / Vijayadasami" },
+    { date: new Date(new Date().getFullYear(), 9, 20), name: "Deepavali" },
+    { date: new Date(new Date().getFullYear(), 11, 25), name: "Christmas" }
+];
+
+// Get current date
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+// Filter upcoming holidays (after or equal to today)
+const upcoming = holidays.filter(holiday => holiday.date >= today);
+
+// Get next 2 holidays
+const nextTwo = upcoming.slice(0, 2);
+
+// Format the display
+let displayText = "";
+if (nextTwo.length > 0) {
+    const options = { month: 'short', day: 'numeric' };
+    displayText = nextTwo.map(holiday => 
+        `${holiday.date.toLocaleDateString('en-IN', options)}: ${holiday.name}`
+    ).join("<br>");
+} else {
+    displayText = "No upcoming holidays";
+}
+
+// Update the display
+document.getElementById('upcomingHolidays').innerHTML = displayText;
+</script>
         <div class="content-box">
             <h2>PF Calculator </h2>
             <p>
