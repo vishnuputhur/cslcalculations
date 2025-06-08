@@ -526,6 +526,10 @@
         const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '');
 
         window.onload = () => {
+            if (!window.jspdf || !window.jspdf.AutoTable) {
+                alert('PDF libraries not loaded. Please check your internet connection.');
+                console.error('jsPDF or AutoTable not available');
+            }
             showModal();
             loadRecentUnits();
             setupCheckboxListeners();
@@ -655,7 +659,7 @@
         function computeBeforeWeldDifferences() {
             if (currentTab === 'afterWeld') {
                 const values = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
-                const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
+                const avg = values.length ? (values.reduce((a, b) => a + parseFloat(b), 0) / values.length).toFixed(2) : 0;
                 const bl = parseFloat(baseLine.beforeWeld);
                 const reference = useBaseLine.beforeWeld && !isNaN(bl) ? bl : avg;
                 beforeWeldDifferences = {};
@@ -709,7 +713,7 @@
 
         function updateAverage() {
             const values = Object.values(gridData[currentTab]).filter(v => !isNaN(v) && v !== '');
-            const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
+            const avg = values.length ? (values.reduce((a, b) => a + parseFloat(b), 0) / values.length).toFixed(2) : 0;
             const bl = parseFloat(baseLine[currentTab]);
             const reference = useBaseLine[currentTab] && !isNaN(bl) ? bl : avg;
             document.getElementById('averageValue').innerText = `${avg} mm`;
@@ -786,6 +790,12 @@
 
         function downloadPDF() {
             try {
+                if (!window.jspdf || !window.jspdf.AutoTable) {
+                    alert('PDF libraries not loaded. Please check your internet connection.');
+                    return;
+                }
+
+                alert('Starting PDF generation...');
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const unitName = document.getElementById('appTitle').innerText.split(' ')[0] || 'UNIT';
@@ -807,6 +817,7 @@
                 }
 
                 // Before Weld Page
+                alert('Generating Before Weld page...');
                 addPageHeaderAndBorder('Before Weld Water Level Details');
                 let startY = margin + 30;
 
@@ -851,6 +862,7 @@
                 doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
                 // After Weld Page
+                alert('Generating After Weld page...');
                 doc.addPage();
                 addPageHeaderAndBorder('After Weld Water Level Details');
                 startY = margin + 30;
@@ -895,10 +907,21 @@
                 doc.text(useBaseLine.afterWeld && !isNaN(afterBL) ? `Base Line: ${afterBL.toFixed(2)} mm` : `Plain Average: ${afterAvg} mm`, margin + 10, footerY + 5);
                 doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
-                doc.save(fileName);
+                // Blob-based download
+                alert('Attempting to download PDF...');
+                const pdfBlob = doc.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(pdfUrl);
+                alert('PDF download triggered. Check your Downloads folder.');
             } catch (error) {
-                console.error('PDF Download Error:', error);
-                alert('Failed to download PDF. Please try again or check console for errors.');
+                console.error('PDF Download Error:', error.message, error.stack);
+                alert('Failed to download PDF: ' + error.message);
             }
         }
     </script>
