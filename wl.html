@@ -1,17 +1,12 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ship Unit Leveling App</title>
-  <!-- Google Analytics Tag -->
+<!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-21G1BS7S3S');
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Times+New+Roman&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -59,10 +54,10 @@
             top: 0;
             left: 0;
             right: 0;
-            margin-right: 20px; /* Added to shift the heading slightly to the left */
             width: 100%;
             padding: 15px 10px;
-            margin-top: 0; /* Ensure no extra top margin */
+            margin: 0;
+            transform: translateX(-10px);
             z-index: 1000;
             white-space: nowrap;
             overflow: hidden;
@@ -126,12 +121,9 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 558px; /* Reduced from 600px to 558px (7% reduction) */
+            max-width: 450px;
+            margin: 0 auto;
         }
 
         .reference-item {
@@ -394,7 +386,6 @@
                 justify-content: space-between;
                 align-items: flex-start;
                 gap: 10px;
-                padding: 10px;
             }
 
             .reference-item {
@@ -466,7 +457,7 @@
 <body>
     <div class="modal" id="unitModal">
         <div class="modal-content">
-            <h2>Select Unit</h2>
+            <h2>Water Level Calculator</h2>
             <input type="text" id="newUnitInput" placeholder="Enter new unit name">
             <button onclick="createNewUnitFromInput()">Create Unit</button>
             <div class="unit-list" id="unitList"></div>
