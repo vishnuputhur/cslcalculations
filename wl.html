@@ -374,6 +374,22 @@
             border-bottom: none;
         }
 
+        #debugLog {
+            position: fixed;
+            bottom: 50px;
+            left: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--black);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
         @media (max-width: 480px) {
             .reference-container {
                 display: flex;
@@ -509,6 +525,7 @@
             </div>
         </div>
     </div>
+    <div id="debugLog"></div>
     <footer>Created by Vishnu Puthoor © 2025</footer>
 
     <script>
@@ -525,11 +542,21 @@
         const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '');
         const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '');
 
+        function logDebug(message) {
+            const debugLog = document.getElementById('debugLog');
+            debugLog.style.display = 'block';
+            debugLog.innerHTML += `[${new Date().toLocaleTimeString()}] ${message}<br>`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+
         window.onload = () => {
             if (!window.jspdf || !window.jspdf.AutoTable) {
+                logDebug('Error: PDF libraries not loaded. Check internet connection.');
                 alert('PDF libraries not loaded. Please check your internet connection.');
                 console.error('jsPDF or AutoTable not available');
+                return;
             }
+            logDebug('App loaded successfully.');
             showModal();
             loadRecentUnits();
             setupCheckboxListeners();
@@ -790,12 +817,13 @@
 
         function downloadPDF() {
             try {
+                logDebug('Button clicked: Starting PDF generation...');
                 if (!window.jspdf || !window.jspdf.AutoTable) {
+                    logDebug('Error: PDF libraries not loaded.');
                     alert('PDF libraries not loaded. Please check your internet connection.');
                     return;
                 }
 
-                alert('Starting PDF generation...');
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const unitName = document.getElementById('appTitle').innerText.split(' ')[0] || 'UNIT';
@@ -817,7 +845,7 @@
                 }
 
                 // Before Weld Page
-                alert('Generating Before Weld page...');
+                logDebug('Generating Before Weld page...');
                 addPageHeaderAndBorder('Before Weld Water Level Details');
                 let startY = margin + 30;
 
@@ -862,7 +890,7 @@
                 doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
                 // After Weld Page
-                alert('Generating After Weld page...');
+                logDebug('Generating After Weld page...');
                 doc.addPage();
                 addPageHeaderAndBorder('After Weld Water Level Details');
                 startY = margin + 30;
@@ -907,20 +935,46 @@
                 doc.text(useBaseLine.afterWeld && !isNaN(afterBL) ? `Base Line: ${afterBL.toFixed(2)} mm` : `Plain Average: ${afterAvg} mm`, margin + 10, footerY + 5);
                 doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
-                // Blob-based download
-                alert('Attempting to download PDF...');
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                const link = document.createElement('a');
-                link.href = pdfUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(pdfUrl);
-                alert('PDF download triggered. Check your Downloads folder.');
+                // Download the PDF
+                logDebug('Attempting to download PDF...');
+                const pdfBase64 = doc.output('datauristring').split(',')[1]; // Get Base64 string
+                const pdfDataUri = `data:application/pdf;base64,${pdfBase64}`;
+
+                // Try Blob download first
+                try {
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(pdfUrl);
+                    logDebug('Blob download triggered.');
+                } catch (blobError) {
+                    logDebug('Blob download failed: ' + blobError.message);
+                    // Fallback to Base64 download
+                    try {
+                        const link = document.createElement('a');
+                        link.href = pdfDataUri;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        logDebug('Base64 download triggered.');
+                    } catch (base64Error) {
+                        logDebug('Base64 download failed: ' + base64Error.message);
+                        // Last resort: try redirect
+                        window.location.href = pdfDataUri;
+                        logDebug('Redirect download attempted.');
+                    }
+                }
+
+                logDebug('PDF download process completed. Check your Downloads folder.');
             } catch (error) {
                 console.error('PDF Download Error:', error.message, error.stack);
+                logDebug('Error: Failed to download PDF: ' + error.message);
                 alert('Failed to download PDF: ' + error.message);
             }
         }
