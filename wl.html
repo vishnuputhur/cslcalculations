@@ -523,7 +523,7 @@
 
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '');
-        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', '');
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/:/g, '');
 
         window.onload = () => {
             showModal();
@@ -718,8 +718,8 @@
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
                     const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = parseFloat(gridData[currentTab][label]);
                     const diffEl = document.getElementById(`diff-${label}`);
+                    const value = parseFloat(gridData[currentTab][label]);
                     if (!isNaN(value) && value !== '') {
                         const diff = (value - reference).toFixed(2);
                         diffEl.innerText = `${diff > 0 ? '+' : ''}${diff} mm`;
@@ -785,114 +785,121 @@
         }
 
         function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
-            const fileName = `${unitName}WaterLevel${dateStr}${timeStr}.pdf`;
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const unitName = document.getElementById('appTitle').innerText.split(' ')[0] || 'UNIT';
+                const fileName = `${unitName}_WaterLevel_${dateStr}${timeStr}.pdf`;
 
-            const margin = 15;
-            const pageWidth = 210;
-            const pageHeight = 297;
-            const contentWidth = pageWidth - 2 * margin;
+                const margin = 15;
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const contentWidth = pageWidth - 2 * margin;
 
-            function addPageHeaderAndBorder(pageTitle) {
-                doc.setLineWidth(0.5);
-                doc.rect(margin, margin, contentWidth, pageHeight - 2 * margin);
-                doc.setFontSize(16);
-                doc.text('Cochin Shipyard Limited', margin + contentWidth / 2, margin + 10, { align: 'center' });
+                function addPageHeaderAndBorder(pageTitle) {
+                    doc.setLineWidth(0.5);
+                    doc.rect(margin, margin, contentWidth, pageHeight - 2 * margin);
+                    doc.setFontSize(16);
+                    doc.text('Cochin Shipyard Limited', margin + contentWidth / 2, margin + 10, { align: 'center' });
+                    doc.setFontSize(12);
+                    doc.text(`${unitName} ${pageTitle}`, margin + contentWidth / 2, margin + 20, { align: 'center' });
+                    doc.text(`Date: ${now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth - margin - 10, margin + 20, { align: 'right' });
+                }
+
+                // Before Weld Page
+                addPageHeaderAndBorder('Before Weld Water Level Details');
+                let startY = margin + 30;
+
                 doc.setFontSize(12);
-                doc.text(`${unitName} ${pageTitle}`, margin + contentWidth / 2, margin + 20, { align: 'center' });
-                doc.text(`Date: ${now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth - margin - 10, margin + 20, { align: 'right' });
-            }
+                doc.text('Before Weld Data', margin + 10, startY);
+                startY += 5;
 
-            addPageHeaderAndBorder('Before Weld Water Level Details');
-            let startY = margin + 30;
+                const beforeValues = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
+                const beforeAvg = beforeValues.length ? (beforeValues.reduce((a, b) => a + parseFloat(b), 0) / beforeValues.length).toFixed(2) : 0;
+                const beforeBL = parseFloat(baseLine.beforeWeld);
+                const beforeReference = useBaseLine.beforeWeld && !isNaN(beforeBL) ? beforeBL : beforeAvg;
+                const beforeTol = tolerance.beforeWeld || 2;
 
-            doc.setFontSize(12);
-            doc.text('Before Weld Data', margin + 10, startY);
-            startY += 5;
-
-            const beforeValues = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
-            const beforeAvg = beforeValues.length ? (beforeValues.reduce((a, b) => a + b, 0) / beforeValues.length).toFixed(2) : 0;
-            const beforeBL = parseFloat(baseLine.beforeWeld);
-            const beforeReference = useBaseLine.beforeWeld && !isNaN(beforeBL) ? beforeBL : beforeAvg;
-            const beforeTol = tolerance.beforeWeld || 2;
-
-            const beforeTableData = [];
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = gridData.beforeWeld[label] || 'N/A';
-                    const diff = !isNaN(value) && value !== '' ? (value - beforeReference).toFixed(2) : '0.00';
-                    const color = !isNaN(value) && value !== '' && Math.abs(diff) <= beforeTol ? [22, 163, 74] : [220, 38, 38];
-                    beforeTableData.push([
-                        label,
-                        value,
-                        { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
-                    ]);
+                const beforeTableData = [];
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const label = String.fromCharCode(65 + i) + (j + 1);
+                        const value = gridData.beforeWeld[label] || 'N/A';
+                        const diff = value !== 'N/A' ? (parseFloat(value) - beforeReference).toFixed(2) : '0.00';
+                        const color = value !== 'N/A' && Math.abs(diff) <= beforeTol ? [22, 163, 74] : [220, 38, 38];
+                        beforeTableData.push([
+                            label,
+                            value,
+                            { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
+                        ]);
+                    }
                 }
-            }
 
-            doc.autoTable({
-                startY: startY,
-                head: [['Cell', 'Value (mm)', 'Difference (mm)']],
-                body: beforeTableData,
-                theme: 'grid',
-                styles: { halign: 'center', cellPadding: 2, lineHeight: 1.5 },
-                margin: { left: margin + 10, right: margin + 10 },
-            });
+                doc.autoTable({
+                    startY: startY,
+                    head: [['Cell', 'Value (mm)', 'Difference (mm)']],
+                    body: beforeTableData,
+                    theme: 'grid',
+                    styles: { halign: 'center', cellPadding: 2, fontSize: 10 },
+                    margin: { left: margin + 10, right: margin + 10 },
+                });
 
-            let footerY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(10);
-            doc.text(`Before Weld - Tolerance: ${beforeTol} mm`, margin + 10, footerY);
-            doc.text(useBaseLine.beforeWeld && !isNaN(beforeBL) ? `Base Line: ${beforeBL.toFixed(2)} mm` : `Plain Average: ${beforeAvg} mm`, margin + 10, footerY + 5);
-            doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
+                let footerY = doc.lastAutoTable.finalY + 10;
+                doc.setFontSize(10);
+                doc.text(`Before Weld - Tolerance: ${beforeTol} mm`, margin + 10, footerY);
+                doc.text(useBaseLine.beforeWeld && !isNaN(beforeBL) ? `Base Line: ${beforeBL.toFixed(2)} mm` : `Plain Average: ${beforeAvg} mm`, margin + 10, footerY + 5);
+                doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
-            doc.addPage();
-            addPageHeaderAndBorder('After Weld Water Level Details');
-            startY = margin + 30;
+                // After Weld Page
+                doc.addPage();
+                addPageHeaderAndBorder('After Weld Water Level Details');
+                startY = margin + 30;
 
-            doc.setFontSize(12);
-            doc.text('After Weld Data', margin + 10, startY);
-            startY += 5;
+                doc.setFontSize(12);
+                doc.text('After Weld Data', margin + 10, startY);
+                startY += 5;
 
-            const afterValues = Object.values(gridData.afterWeld).filter(v => !isNaN(v) && v !== '');
-            const afterAvg = afterValues.length ? (afterValues.reduce((a, b) => a + b, 0) / afterValues.length).toFixed(2) : 0;
-            const afterBL = parseFloat(baseLine.afterWeld);
-            const afterReference = useBaseLine.afterWeld && !isNaN(afterBL) ? afterBL : afterAvg;
-            const afterTol = tolerance.afterWeld || 2;
+                const afterValues = Object.values(gridData.afterWeld).filter(v => !isNaN(v) && v !== '');
+                const afterAvg = afterValues.length ? (afterValues.reduce((a, b) => a + parseFloat(b), 0) / afterValues.length).toFixed(2) : 0;
+                const afterBL = parseFloat(baseLine.afterWeld);
+                const afterReference = useBaseLine.afterWeld && !isNaN(afterBL) ? afterBL : afterAvg;
+                const afterTol = tolerance.afterWeld || 2;
 
-            const afterTableData = [];
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = gridData.afterWeld[label] || 'N/A';
-                    const diff = !isNaN(value) && value !== '' ? (value - afterReference).toFixed(2) : '0.00';
-                    const color = !isNaN(value) && value !== '' && Math.abs(diff) <= afterTol ? [22, 163, 74] : [220, 38, 38];
-                    afterTableData.push([
-                        label,
-                        value,
-                        { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
-                    ]);
+                const afterTableData = [];
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const label = String.fromCharCode(65 + i) + (j + 1);
+                        const value = gridData.afterWeld[label] || 'N/A';
+                        const diff = value !== 'N/A' ? (parseFloat(value) - afterReference).toFixed(2) : '0.00';
+                        const color = value !== 'N/A' && Math.abs(diff) <= afterTol ? [22, 163, 74] : [220, 38, 38];
+                        afterTableData.push([
+                            label,
+                            value,
+                            { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
+                        ]);
+                    }
                 }
+
+                doc.autoTable({
+                    startY: startY,
+                    head: [['Cell', 'Value (mm)', 'Difference (mm)']],
+                    body: afterTableData,
+                    theme: 'grid',
+                    styles: { halign: 'center', cellPadding: 2, fontSize: 10 },
+                    margin: { left: margin + 10, right: margin + 10 },
+                });
+
+                footerY = doc.lastAutoTable.finalY + 10;
+                doc.setFontSize(10);
+                doc.text(`After Weld - Tolerance: ${afterTol} mm`, margin + 10, footerY);
+                doc.text(useBaseLine.afterWeld && !isNaN(afterBL) ? `Base Line: ${afterBL.toFixed(2)} mm` : `Plain Average: ${afterAvg} mm`, margin + 10, footerY + 5);
+                doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
+
+                doc.save(fileName);
+            } catch (error) {
+                console.error('PDF Download Error:', error);
+                alert('Failed to download PDF. Please try again or check console for errors.');
             }
-
-            doc.autoTable({
-                startY: startY,
-                head: [['Cell', 'Value (mm)', 'Difference (mm)']],
-                body: afterTableData,
-                theme: 'grid',
-                styles: { halign: 'center', cellPadding: 2, lineHeight: 1.5 },
-                margin: { left: margin + 10, right: margin + 10 },
-            });
-
-            footerY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(10);
-            doc.text(`After Weld - Tolerance: ${afterTol} mm`, margin + 10, footerY);
-            doc.text(useBaseLine.afterWeld && !isNaN(afterBL) ? `Base Line: ${afterBL.toFixed(2)} mm` : `Plain Average: ${afterAvg} mm`, margin + 10, footerY + 5);
-            doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
-
-            doc.save(fileName);
         }
     </script>
 </body>
