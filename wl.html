@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ship Unit Leveling App</title>
+  <!-- Google Analytics Tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Times+New+Roman&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -38,8 +46,8 @@
             max-width: 600px;
             margin-top: 80px;
             margin-bottom: 60px;
-            margin-left: auto; /* Added to center the container */
-            margin-right: auto; /* Added to center the container */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h1 {
@@ -49,11 +57,12 @@
             text-align: center;
             position: fixed;
             top: 0;
-            left: 0; /* Added to ensure centering */
-            right: 0; /* Added to ensure centering */
+            left: 0;
+            right: 0;
+            margin-right: 20px; /* Added to shift the heading slightly to the left */
             width: 100%;
-            padding: 15px 10px; /* Updated to add horizontal padding */
-            margin: 0;
+            padding: 15px 10px;
+            margin-top: 0; /* Ensure no extra top margin */
             z-index: 1000;
             white-space: nowrap;
             overflow: hidden;
@@ -122,7 +131,7 @@
             padding: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 600px;
+            max-width: 558px; /* Reduced from 600px to 558px (7% reduction) */
         }
 
         .reference-item {
