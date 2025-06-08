@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ship Unit Leveling App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Times+New+Roman&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --dark-blue: #1e3a8a;
+            --medium-blue: #2563eb;
+            --light-blue: #3b82f6;
+            --white: #ffffff;
+            --light-gray: #f3f4f6;
+            --green: #16a34a;
+            --red: #dc2626;
+            --black: #000000;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-blue);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            margin-top: 80px;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Times New Roman', serif;
+            font-size: 18px;
+            color: var(--white);
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 0;
+            margin: 0;
+            z-index: 1000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+        }
+
+        .tabs {
+            position: fixed;
+            top: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 999;
+            background-color: transparent;
+        }
+
+        .tab {
+            padding: 12px 30px;
+            color: var(--white);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            border: none;
+            background: none;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab.active::after {
+            background-color: var(--white);
+        }
+
+        .tab:first-child.active {
+            background-color: var(--dark-blue);
+        }
+
+        .tab:last-child.active {
+            background-color: var(--light-blue);
+        }
+
+        .reference-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .reference-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .reference-item.left {
+            align-items: flex-start;
+        }
+
+        .reference-item.center {
+            align-items: center;
+        }
+
+        .reference-item.right {
+            align-items: flex-end;
+        }
+
+        .reference-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .reference-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .reference-input input[type="number"] {
+            width: 60px;
+            height: 30px;
+            padding: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .reference-input input[type="number"]:focus {
+            outline: none;
+            border-color: var(--white);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .reference-input span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--white);
+            margin-top: 5px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 5px;
+            accent-color: var(--medium-blue);
+            width: 14px;
+            height: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .grid-cell {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .grid-cell:hover {
+            transform: translateY(-2px);
+        }
+
+        .grid-cell .previous-diff {
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--black);
+            margin-bottom: 5px;
+        }
+
+        .grid-cell label {
+            display: block;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--dark-blue);
+            margin-bottom: 5px;
+        }
+
+        .grid-cell input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .difference {
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .difference.green {
+            color: var(--green);
+        }
+
+        .difference.red {
+            color: var(--red);
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--medium-blue);
+            color: var(--white);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        button:hover {
+            background-color: var(--light-blue);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--white);
+            padding: 12px 0;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .modal-content button {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .unit-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .unit-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: var(--dark-blue);
+            font-size: 14px;
+        }
+
+        .unit-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .unit-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .reference-container {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .reference-item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .reference-item.left {
+                align-items: flex-start;
+            }
+
+            .reference-item.center {
+                align-items: center;
+            }
+
+            .reference-item.right {
+                align-items: flex-end;
+            }
+
+            .reference-input input[type="number"]#baseLine {
+                width: 40px; /* Doubled from 20px */
+                height: 14px; /* Doubled from 7px */
+                font-size: 10px;
+                padding: 2px;
+            }
+
+            .reference-input input[type="number"]#tolerance {
+                width: 24px; /* Doubled from 12px */
+                height: 14px; /* Doubled from 7px */
+                font-size: 10px;
+                padding: 2px;
+            }
+
+            .reference-item label {
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+
+            .reference-input span {
+                font-size: 10px;
+                margin-top: 3px;
+            }
+
+            .checkbox-container {
+                margin-top: 3px;
+            }
+
+            .checkbox-container input[type="checkbox"] {
+                width: 12px;
+                height: 12px;
+            }
+
+            .checkbox-container span {
+                font-size: 10px;
+            }
+
+            .button-row {
+                flex-wrap: wrap;
+            }
+
+            button {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="modal" id="unitModal">
+        <div class="modal-content">
+            <h2>Select Unit</h2>
+            <button onclick="createNewUnit()">New Unit</button>
+            <div class="unit-list" id="unitList"></div>
+        </div>
+    </div>
+    <div class="container" id="mainApp" style="display: none;">
+        <h1 id="appTitle">Ship Unit Leveling App</h1>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('beforeWeld')">Before Weld</button>
+            <button class="tab" onclick="switchTab('afterWeld')">After Weld</button>
+        </div>
+        <div class="reference-container">
+            <div class="reference-item left">
+                <label>Base Line</label>
+                <div class="reference-input">
+                    <input type="number" id="baseLine" step="0.1" oninput="updateBaseLine(this.value)">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="useBaseLine">
+                        <span>Use</span>
+                    </div>
+                </div>
+            </div>
+            <div class="reference-item center">
+                <label>Tolerance</label>
+                <div class="reference-input">
+                    <input type="number" id="tolerance" placeholder="Tolerance" value="2" step="0.1">
+                </div>
+            </div>
+            <div class="reference-item right">
+                <label>Plain Average</label>
+                <div class="reference-input">
+                    <span id="averageValue">0.00 mm</span>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="useAverage" checked>
+                        <span>Use</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="button-group">
+            <div class="button-row">
+                <button onclick="addRow()">Add Row</button>
+                <button onclick="deleteRow()">Delete Row</button>
+            </div>
+            <div class="button-row">
+                <button onclick="addColumn()">Add Column</button>
+                <button onclick="deleteColumn()">Delete Column</button>
+            </div>
+            <div class="button-row">
+                <button onclick="downloadPDF()">Download PDF</button>
+                <button onclick="saveAndExit()">Save & Exit</button>
+            </div>
+        </div>
+    </div>
+    <footer>Created by Vishnu Puthoor © 2025</footer>
+
+    <script>
+        let rows = 4;
+        let cols = 4;
+        let gridData = { beforeWeld: {}, afterWeld: {} };
+        let useBaseLine = { beforeWeld: false, afterWeld: false };
+        let tolerance = { beforeWeld: 2, afterWeld: 2 };
+        let baseLine = { beforeWeld: '', afterWeld: '' };
+        let currentTab = 'beforeWeld';
+        let beforeWeldDifferences = {};
+
+        // Current date and time
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '');
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', '');
+
+        // Load modal on page load
+        window.onload = () => {
+            showModal();
+            loadRecentUnits();
+            setupCheckboxListeners();
+        };
+
+        // Setup checkbox event listeners
+        function setupCheckboxListeners() {
+            const baseLineCheckbox = document.getElementById('useBaseLine');
+            const averageCheckbox = document.getElementById('useAverage');
+
+            baseLineCheckbox.addEventListener('change', () => {
+                if (baseLineCheckbox.checked) {
+                    useBaseLine[currentTab] = true;
+                    averageCheckbox.checked = false;
+                } else {
+                    useBaseLine[currentTab] = false;
+                    averageCheckbox.checked = true;
+                }
+                if (currentTab === 'beforeWeld') computeBeforeWeldDifferences();
+                updateAverage();
+            });
+
+            averageCheckbox.addEventListener('change', () => {
+                if (averageCheckbox.checked) {
+                    useBaseLine[currentTab] = false;
+                    baseLineCheckbox.checked = false;
+                } else {
+                    useBaseLine[currentTab] = true;
+                    baseLineCheckbox.checked = true;
+                }
+                if (currentTab === 'beforeWeld') computeBeforeWeldDifferences();
+                updateAverage();
+            });
+        }
+
+        // Show modal
+        function showModal() {
+            document.getElementById('unitModal').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        // Create new unit
+        function createNewUnit() {
+            const unitName = prompt("Enter new unit name:");
+            if (unitName) {
+                const upperUnitName = unitName.toUpperCase();
+                tolerance = { beforeWeld: 2, afterWeld: 2 };
+                baseLine = { beforeWeld: '', afterWeld: '' };
+                useBaseLine = { beforeWeld: false, afterWeld: false };
+                document.getElementById('tolerance').value = tolerance[currentTab];
+                document.getElementById('baseLine').value = baseLine[currentTab];
+                document.getElementById('useBaseLine').checked = false;
+                document.getElementById('useAverage').checked = true;
+                document.getElementById('appTitle').innerText = `${upperUnitName} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+                document.title = `${upperUnitName} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+                gridData = { beforeWeld: {}, afterWeld: {} };
+                beforeWeldDifferences = {};
+                rows = 4;
+                cols = 4;
+                renderGrid();
+                document.getElementById('unitModal').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                updateAverage();
+            }
+        }
+
+        // Load recent units
+        function loadRecentUnits() {
+            const unitList = document.getElementById('unitList');
+            unitList.innerHTML = '';
+            const units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
+            for (let unit in units) {
+                const div = document.createElement('div');
+                div.className = 'unit-item';
+                div.innerText = unit;
+                div.onclick = () => loadUnit(unit);
+                unitList.appendChild(div);
+            }
+        }
+
+        // Load a selected unit
+        function loadUnit(unit) {
+            const units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
+            const data = units[unit];
+            currentTab = 'beforeWeld';
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.tab:first-child').classList.add('active');
+            document.body.style.backgroundColor = '#1e3a8a';
+            tolerance = data.tolerance || { beforeWeld: 2, afterWeld: 2 };
+            baseLine = data.baseLine || { beforeWeld: '', afterWeld: '' };
+            useBaseLine = data.useBaseLine || { beforeWeld: false, afterWeld: false };
+            document.getElementById('tolerance').value = tolerance[currentTab];
+            document.getElementById('baseLine').value = baseLine[currentTab];
+            document.getElementById('useBaseLine').checked = useBaseLine[currentTab];
+            document.getElementById('useAverage').checked = !useBaseLine[currentTab];
+            document.getElementById('appTitle').innerText = `${unit.toUpperCase()} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+            document.title = `${unit.toUpperCase()} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+            gridData = data.grid || { beforeWeld: {}, afterWeld: {} };
+            rows = data.rows || 4;
+            cols = data.cols || 4;
+            computeBeforeWeldDifferences();
+            renderGrid();
+            document.getElementById('unitModal').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            updateAverage();
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${tab === 'beforeWeld' ? 1 : 2})`).classList.add('active');
+            const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
+            document.getElementById('appTitle').innerText = `${unitName} ${tab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+            document.title = `${unitName} ${tab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
+            document.getElementById('tolerance').value = tolerance[tab];
+            document.getElementById('baseLine').value = baseLine[tab];
+            document.getElementById('useBaseLine').checked = useBaseLine[tab];
+            document.getElementById('useAverage').checked = !useBaseLine[tab];
+            document.body.style.backgroundColor = tab === 'beforeWeld' ? '#1e3a8a' : '#3b82f6';
+            computeBeforeWeldDifferences();
+            renderGrid();
+            updateAverage();
+        }
+
+        // Compute Before Weld differences for After Weld display
+        function computeBeforeWeldDifferences() {
+            if (currentTab === 'afterWeld') {
+                const values = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
+                const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
+                const bl = parseFloat(baseLine.beforeWeld);
+                const reference = useBaseLine.beforeWeld && !isNaN(bl) ? bl : avg;
+                beforeWeldDifferences = {};
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const label = String.fromCharCode(65 + i) + (j + 1);
+                        const value = parseFloat(gridData.beforeWeld[label]);
+                        if (!isNaN(value) && value !== '') {
+                            const diff = (value - reference).toFixed(2);
+                            beforeWeldDifferences[label] = `${diff > 0 ? '+' : ''}${diff} mm`;
+                        } else {
+                            beforeWeldDifferences[label] = 'N/A';
+                        }
+                    }
+                }
+            }
+        }
+
+        // Render grid
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            grid.innerHTML = '';
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const label = String.fromCharCode(65 + i) + (j + 1);
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    const prevDiff = currentTab === 'afterWeld' ? `<div class="previous-diff">${beforeWeldDifferences[label] || 'N/A'}</div>` : '';
+                    cell.innerHTML = `
+                        ${prevDiff}
+                        <label>${label}</label>
+                        <input type="number" step="0.1" value="${gridData[currentTab][label] || ''}" oninput="updateValue('${label}', this.value)">
+                        <div class="difference" id="diff-${label}">0.00 mm</div>
+                    `;
+                    grid.appendChild(cell);
+                }
+            }
+            updateAverage();
+        }
+
+        // Update grid value
+        function updateValue(label, value) {
+            gridData[currentTab][label] = value ? parseFloat(value) : '';
+            updateAverage();
+            if (currentTab === 'beforeWeld') computeBeforeWeldDifferences();
+        }
+
+        // Update Base Line
+        function updateBaseLine(value) {
+            baseLine[currentTab] = value;
+            if (useBaseLine[currentTab]) updateAverage();
+        }
+
+        // Calculate and update average and differences
+        function updateAverage() {
+            const values = Object.values(gridData[currentTab]).filter(v => !isNaN(v) && v !== '');
+            const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
+            const bl = parseFloat(baseLine[currentTab]);
+            const reference = useBaseLine[currentTab] && !isNaN(bl) ? bl : avg;
+            document.getElementById('averageValue').innerText = `${avg} mm`;
+            document.getElementById('baseLine').value = baseLine[currentTab] || '';
+            tolerance[currentTab] = parseFloat(document.getElementById('tolerance').value) || 2;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const label = String.fromCharCode(65 + i) + (j + 1);
+                    const value = parseFloat(gridData[currentTab][label]);
+                    const diffEl = document.getElementById(`diff-${label}`);
+                    if (!isNaN(value) && value !== '') {
+                        const diff = (value - reference).toFixed(2);
+                        diffEl.innerText = `${diff > 0 ? '+' : ''}${diff} mm`;
+                        diffEl.className = `difference ${Math.abs(diff) <= tolerance[currentTab] ? 'green' : 'red'}`;
+                    } else {
+                        diffEl.innerText = '0.00 mm';
+                        diffEl.className = 'difference';
+                    }
+                }
+            }
+        }
+
+        // Add row
+        function addRow() {
+            rows++;
+            renderGrid();
+        }
+
+        // Delete row
+        function deleteRow() {
+            if (rows > 4) {
+                rows--;
+                for (let j = 0; j < cols; j++) {
+                    const label = String.fromCharCode(65 + rows) + (j + 1);
+                    delete gridData[currentTab][label];
+                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[label];
+                }
+                renderGrid();
+            } else {
+                alert('Cannot delete below 4 rows!');
+            }
+        }
+
+        // Add column
+        function addColumn() {
+            cols++;
+            renderGrid();
+        }
+
+        // Delete column
+        function deleteColumn() {
+            if (cols > 4) {
+                cols--;
+                for (let i = 0; i < rows; i++) {
+                    const label = String.fromCharCode(65 + i) + (cols + 1);
+                    delete gridData[currentTab][label];
+                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[label];
+                }
+                renderGrid();
+            } else {
+                alert('Cannot delete below 4 columns!');
+            }
+        }
+
+        // Save and exit
+        function saveAndExit() {
+            const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
+            if (unitName) {
+                let units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
+                units[unitName] = { tolerance, baseLine, useBaseLine, grid: gridData, rows, cols };
+                localStorage.setItem('shipUnits', JSON.stringify(units));
+                alert('Unit data saved!');
+                showModal();
+                loadRecentUnits();
+            } else {
+                alert('Unit name is required!');
+            }
+        }
+
+        // Download PDF
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
+            const fileName = `${unitName}WaterLevel${dateStr}${timeStr}.pdf`;
+
+            // Margins and page dimensions (A4: 210mm x 297mm)
+            const margin = 15;
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const contentWidth = pageWidth - 2 * margin;
+
+            // Function to add header and border to a page
+            function addPageHeaderAndBorder(pageTitle) {
+                // Draw border
+                doc.setLineWidth(0.5);
+                doc.rect(margin, margin, contentWidth, pageHeight - 2 * margin);
+
+                // Header
+                doc.setFontSize(16);
+                doc.text('Cochin Shipyard Limited', margin + contentWidth / 2, margin + 10, { align: 'center' });
+                doc.setFontSize(12);
+                doc.text(`${unitName} ${pageTitle}`, margin + contentWidth / 2, margin + 20, { align: 'center' });
+                doc.text(`Date: ${now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth - margin - 10, margin + 20, { align: 'right' });
+            }
+
+            // Page 1: Before Weld Data
+            addPageHeaderAndBorder('Before Weld Water Level Details');
+            let startY = margin + 30;
+
+            doc.setFontSize(12);
+            doc.text('Before Weld Data', margin + 10, startY);
+            startY += 5;
+
+            const beforeValues = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
+            const beforeAvg = beforeValues.length ? (beforeValues.reduce((a, b) => a + b, 0) / beforeValues.length).toFixed(2) : 0;
+            const beforeBL = parseFloat(baseLine.beforeWeld);
+            const beforeReference = useBaseLine.beforeWeld && !isNaN(beforeBL) ? beforeBL : beforeAvg;
+            const beforeTol = tolerance.beforeWeld || 2;
+
+            const beforeTableData = [];
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const label = String.fromCharCode(65 + i) + (j + 1);
+                    const value = gridData.beforeWeld[label] || 'N/A';
+                    const diff = !isNaN(value) && value !== '' ? (value - beforeReference).toFixed(2) : '0.00';
+                    const color = !isNaN(value) && value !== '' && Math.abs(diff) <= beforeTol ? [22, 163, 74] : [220, 38, 38];
+                    beforeTableData.push([
+                        label,
+                        value,
+                        { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
+                    ]);
+                }
+            }
+
+            doc.autoTable({
+                startY: startY,
+                head: [['Cell', 'Value (mm)', 'Difference (mm)']],
+                body: beforeTableData,
+                theme: 'grid',
+                styles: { halign: 'center', cellPadding: 2, lineHeight: 1.5 },
+                margin: { left: margin + 10, right: margin + 10 },
+            });
+
+            let footerY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10);
+            doc.text(`Before Weld - Tolerance: ${beforeTol} mm`, margin + 10, footerY);
+            doc.text(useBaseLine.beforeWeld && !isNaN(beforeBL) ? `Base Line: ${beforeBL.toFixed(2)} mm` : `Plain Average: ${beforeAvg} mm`, margin + 10, footerY + 5);
+            doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
+
+            // Page 2: After Weld Data
+            doc.addPage();
+            addPageHeaderAndBorder('After Weld Water Level Details');
+            startY = margin + 30;
+
+            doc.setFontSize(12);
+            doc.text('After Weld Data', margin + 10, startY);
+            startY += 5;
+
+            const afterValues = Object.values(gridData.afterWeld).filter(v => !isNaN(v) && v !== '');
+            const afterAvg = afterValues.length ? (afterValues.reduce((a, b) => a + b, 0) / afterValues.length).toFixed(2) : 0;
+            const afterBL = parseFloat(baseLine.afterWeld);
+            const afterReference = useBaseLine.afterWeld && !isNaN(afterBL) ? afterBL : afterAvg;
+            const afterTol = tolerance.afterWeld || 2;
+
+            const afterTableData = [];
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const label = String.fromCharCode(65 + i) + (j + 1);
+                    const value = gridData.afterWeld[label] || 'N/A';
+                    const diff = !isNaN(value) && value !== '' ? (value - afterReference).toFixed(2) : '0.00';
+                    const color = !isNaN(value) && value !== '' && Math.abs(diff) <= afterTol ? [22, 163, 74] : [220, 38, 38];
+                    afterTableData.push([
+                        label,
+                        value,
+                        { content: `${diff > 0 ? '+' : ''}${diff} mm`, styles: { textColor: color } }
+                    ]);
+                }
+            }
+
+            doc.autoTable({
+                startY: startY,
+                head: [['Cell', 'Value (mm)', 'Difference (mm)']],
+                body: afterTableData,
+                theme: 'grid',
+                styles: { halign: 'center', cellPadding: 2, lineHeight: 1.5 },
+                margin: { left: margin + 10, right: margin + 10 },
+            });
+
+            footerY = doc.lastAutoTable.finalY + 10;
+            doc.setFontSize(10);
+            doc.text(`After Weld - Tolerance: ${afterTol} mm`, margin + 10, footerY);
+            doc.text(useBaseLine.afterWeld && !isNaN(afterBL) ? `Base Line: ${afterBL.toFixed(2)} mm` : `Plain Average: ${afterAvg} mm`, margin + 10, footerY + 5);
+            doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
+
+            doc.save(fileName);
+        }
+    </script>
+</body>
+</html>
