@@ -335,6 +335,15 @@
             font-size: 18px;
         }
 
+        .modal-content input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
         .modal-content button {
             margin-bottom: 15px;
             width: 100%;
@@ -365,7 +374,6 @@
             border-bottom: none;
         }
 
-        /* Responsive adjustments */
         @media (max-width: 480px) {
             .reference-container {
                 display: flex;
@@ -396,15 +404,15 @@
             }
 
             .reference-input input[type="number"]#baseLine {
-                width: 40px; /* Doubled from 20px */
-                height: 14px; /* Doubled from 7px */
+                width: 40px;
+                height: 14px;
                 font-size: 10px;
                 padding: 2px;
             }
 
             .reference-input input[type="number"]#tolerance {
-                width: 24px; /* Doubled from 12px */
-                height: 14px; /* Doubled from 7px */
+                width: 24px;
+                height: 14px;
                 font-size: 10px;
                 padding: 2px;
             }
@@ -446,7 +454,8 @@
     <div class="modal" id="unitModal">
         <div class="modal-content">
             <h2>Select Unit</h2>
-            <button onclick="createNewUnit()">New Unit</button>
+            <input type="text" id="newUnitInput" placeholder="Enter new unit name">
+            <button onclick="createNewUnitFromInput()">Create Unit</button>
             <div class="unit-list" id="unitList"></div>
         </div>
     </div>
@@ -512,19 +521,16 @@
         let currentTab = 'beforeWeld';
         let beforeWeldDifferences = {};
 
-        // Current date and time
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '');
         const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', '');
 
-        // Load modal on page load
         window.onload = () => {
             showModal();
             loadRecentUnits();
             setupCheckboxListeners();
         };
 
-        // Setup checkbox event listeners
         function setupCheckboxListeners() {
             const baseLineCheckbox = document.getElementById('useBaseLine');
             const averageCheckbox = document.getElementById('useAverage');
@@ -554,15 +560,13 @@
             });
         }
 
-        // Show modal
         function showModal() {
             document.getElementById('unitModal').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
         }
 
-        // Create new unit
-        function createNewUnit() {
-            const unitName = prompt("Enter new unit name:");
+        function createNewUnitFromInput() {
+            const unitName = document.getElementById('newUnitInput').value.trim();
             if (unitName) {
                 const upperUnitName = unitName.toUpperCase();
                 tolerance = { beforeWeld: 2, afterWeld: 2 };
@@ -582,14 +586,20 @@
                 document.getElementById('unitModal').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 updateAverage();
+            } else {
+                alert('Please enter a unit name!');
             }
         }
 
-        // Load recent units
         function loadRecentUnits() {
             const unitList = document.getElementById('unitList');
             unitList.innerHTML = '';
-            const units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
+            let units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
+            if (Object.keys(units).length === 0) {
+                units = { "TEST_UNIT": { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {} }, rows: 4, cols: 4 } };
+                localStorage.setItem('shipUnits', JSON.stringify(units));
+            }
+            console.log('Units:', units);
             for (let unit in units) {
                 const div = document.createElement('div');
                 div.className = 'unit-item';
@@ -599,10 +609,9 @@
             }
         }
 
-        // Load a selected unit
         function loadUnit(unit) {
             const units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
-            const data = units[unit];
+            const data = units[unit] || { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {} }, rows: 4, cols: 4 };
             currentTab = 'beforeWeld';
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector('.tab:first-child').classList.add('active');
@@ -626,7 +635,6 @@
             updateAverage();
         }
 
-        // Switch tabs
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -644,7 +652,6 @@
             updateAverage();
         }
 
-        // Compute Before Weld differences for After Weld display
         function computeBeforeWeldDifferences() {
             if (currentTab === 'afterWeld') {
                 const values = Object.values(gridData.beforeWeld).filter(v => !isNaN(v) && v !== '');
@@ -667,7 +674,6 @@
             }
         }
 
-        // Render grid
         function renderGrid() {
             const grid = document.getElementById('grid');
             grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -690,20 +696,17 @@
             updateAverage();
         }
 
-        // Update grid value
         function updateValue(label, value) {
             gridData[currentTab][label] = value ? parseFloat(value) : '';
             updateAverage();
             if (currentTab === 'beforeWeld') computeBeforeWeldDifferences();
         }
 
-        // Update Base Line
         function updateBaseLine(value) {
             baseLine[currentTab] = value;
             if (useBaseLine[currentTab]) updateAverage();
         }
 
-        // Calculate and update average and differences
         function updateAverage() {
             const values = Object.values(gridData[currentTab]).filter(v => !isNaN(v) && v !== '');
             const avg = values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : 0;
@@ -729,13 +732,11 @@
             }
         }
 
-        // Add row
         function addRow() {
             rows++;
             renderGrid();
         }
 
-        // Delete row
         function deleteRow() {
             if (rows > 4) {
                 rows--;
@@ -750,13 +751,11 @@
             }
         }
 
-        // Add column
         function addColumn() {
             cols++;
             renderGrid();
         }
 
-        // Delete column
         function deleteColumn() {
             if (cols > 4) {
                 cols--;
@@ -771,7 +770,6 @@
             }
         }
 
-        // Save and exit
         function saveAndExit() {
             const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
             if (unitName) {
@@ -786,26 +784,20 @@
             }
         }
 
-        // Download PDF
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const unitName = document.getElementById('appTitle').innerText.split(' ')[0];
             const fileName = `${unitName}WaterLevel${dateStr}${timeStr}.pdf`;
 
-            // Margins and page dimensions (A4: 210mm x 297mm)
             const margin = 15;
             const pageWidth = 210;
             const pageHeight = 297;
             const contentWidth = pageWidth - 2 * margin;
 
-            // Function to add header and border to a page
             function addPageHeaderAndBorder(pageTitle) {
-                // Draw border
                 doc.setLineWidth(0.5);
                 doc.rect(margin, margin, contentWidth, pageHeight - 2 * margin);
-
-                // Header
                 doc.setFontSize(16);
                 doc.text('Cochin Shipyard Limited', margin + contentWidth / 2, margin + 10, { align: 'center' });
                 doc.setFontSize(12);
@@ -813,7 +805,6 @@
                 doc.text(`Date: ${now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth - margin - 10, margin + 20, { align: 'right' });
             }
 
-            // Page 1: Before Weld Data
             addPageHeaderAndBorder('Before Weld Water Level Details');
             let startY = margin + 30;
 
@@ -857,7 +848,6 @@
             doc.text(useBaseLine.beforeWeld && !isNaN(beforeBL) ? `Base Line: ${beforeBL.toFixed(2)} mm` : `Plain Average: ${beforeAvg} mm`, margin + 10, footerY + 5);
             doc.text('Created by Vishnu Puthoor © 2025', margin + contentWidth / 2, pageHeight - margin - 5, { align: 'center' });
 
-            // Page 2: After Weld Data
             doc.addPage();
             addPageHeaderAndBorder('After Weld Water Level Details');
             startY = margin + 30;
