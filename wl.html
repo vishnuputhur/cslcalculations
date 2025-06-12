@@ -1,5 +1,4 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,12 +6,13 @@
     <title>Ship Unit Leveling App</title>
 <!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-21G1BS7S3S');
-  </script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Times+New+Roman&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -119,7 +119,7 @@
         }
 
         .tab:last-child.active {
-            background-color: var(--light-blue);
+            background-color: var(--black);
         }
 
         .reference-container {
@@ -232,12 +232,13 @@
             margin-bottom: 5px;
         }
 
-        .grid-cell label {
+        .grid-cell .label-container {
             display: block;
             font-weight: 600;
             font-size: 12px;
             color: var(--dark-blue);
             margin-bottom: 5px;
+            cursor: pointer;
         }
 
         .grid-cell input {
@@ -249,6 +250,12 @@
             font-size: 12px;
             font-weight: 600;
             text-align: center;
+        }
+
+        .grid-cell input.label-input {
+            width: 50px;
+            padding: 2px;
+            font-size: 12px;
         }
 
         .difference {
@@ -524,7 +531,7 @@
     <script>
         let rows = 4;
         let cols = 4;
-        let gridData = { beforeWeld: {}, afterWeld: {} };
+        let gridData = { beforeWeld: {}, afterWeld: {}, customLabels: {} };
         let useBaseLine = { beforeWeld: false, afterWeld: false };
         let tolerance = { beforeWeld: 2, afterWeld: 2 };
         let baseLine = { beforeWeld: '', afterWeld: '' };
@@ -588,7 +595,7 @@
                 document.getElementById('useAverage').checked = true;
                 document.getElementById('appTitle').innerText = `${upperUnitName} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
                 document.title = `${upperUnitName} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
-                gridData = { beforeWeld: {}, afterWeld: {} };
+                gridData = { beforeWeld: {}, afterWeld: {}, customLabels: {} };
                 beforeWeldDifferences = {};
                 rows = 4;
                 cols = 4;
@@ -606,7 +613,7 @@
             unitList.innerHTML = '';
             let units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
             if (Object.keys(units).length === 0) {
-                units = { "TEST_UNIT": { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {} }, rows: 4, cols: 4 } };
+                units = { "TEST_UNIT": { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {}, customLabels: {} }, rows: 4, cols: 4 } };
                 localStorage.setItem('shipUnits', JSON.stringify(units));
             }
             console.log('Units:', units);
@@ -621,7 +628,7 @@
 
         function loadUnit(unit) {
             const units = JSON.parse(localStorage.getItem('shipUnits') || '{}');
-            const data = units[unit] || { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {} }, rows: 4, cols: 4 };
+            const data = units[unit] || { tolerance: { beforeWeld: 2, afterWeld: 2 }, baseLine: { beforeWeld: '', afterWeld: '' }, useBaseLine: { beforeWeld: false, afterWeld: false }, grid: { beforeWeld: {}, afterWeld: {}, customLabels: {} }, rows: 4, cols: 4 };
             currentTab = 'beforeWeld';
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector('.tab:first-child').classList.add('active');
@@ -635,7 +642,7 @@
             document.getElementById('useAverage').checked = !useBaseLine[currentTab];
             document.getElementById('appTitle').innerText = `${unit.toUpperCase()} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
             document.title = `${unit.toUpperCase()} ${currentTab === 'beforeWeld' ? 'Before Weld' : 'After Weld'} Water Level Details`;
-            gridData = data.grid || { beforeWeld: {}, afterWeld: {} };
+            gridData = data.grid || { beforeWeld: {}, afterWeld: {}, customLabels: {} };
             rows = data.rows || 4;
             cols = data.cols || 4;
             computeBeforeWeldDifferences();
@@ -656,7 +663,7 @@
             document.getElementById('baseLine').value = baseLine[tab];
             document.getElementById('useBaseLine').checked = useBaseLine[tab];
             document.getElementById('useAverage').checked = !useBaseLine[tab];
-            document.body.style.backgroundColor = tab === 'beforeWeld' ? '#1e3a8a' : '#3b82f6';
+            document.body.style.backgroundColor = tab === 'beforeWeld' ? '#1e3a8a' : '#000000';
             computeBeforeWeldDifferences();
             renderGrid();
             updateAverage();
@@ -671,8 +678,9 @@
                 beforeWeldDifferences = {};
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
-                        const label = String.fromCharCode(65 + i) + (j + 1);
-                        const value = parseFloat(gridData.beforeWeld[label]);
+                        const defaultLabel = String.fromCharCode(65 + i) + (j + 1);
+                        const label = gridData.customLabels[defaultLabel] || defaultLabel;
+                        const value = parseFloat(gridData.beforeWeld[defaultLabel]);
                         if (!isNaN(value) && value !== '') {
                             const diff = (value - reference).toFixed(2);
                             beforeWeldDifferences[label] = `${diff > 0 ? '+' : ''}${diff} mm`;
@@ -684,21 +692,65 @@
             }
         }
 
+        function makeLabelEditable(label, defaultLabel) {
+            const span = document.getElementById(`label-${defaultLabel}`);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'label-input';
+            input.value = gridData.customLabels[defaultLabel] || defaultLabel;
+            input.style.display = 'inline-block';
+
+            input.onblur = function () {
+                const newLabel = this.value.trim();
+                if (newLabel) {
+                    gridData.customLabels[defaultLabel] = newLabel;
+                } else {
+                    delete gridData.customLabels[defaultLabel];
+                }
+                span.innerText = newLabel || defaultLabel;
+                span.style.display = 'block';
+                this.remove();
+                computeBeforeWeldDifferences();
+                renderGrid();
+            };
+
+            input.onkeypress = function (e) {
+                if (e.key === 'Enter') {
+                    const newLabel = this.value.trim();
+                    if (newLabel) {
+                        gridData.customLabels[defaultLabel] = newLabel;
+                    } else {
+                        delete gridData.customLabels[defaultLabel];
+                    }
+                    span.innerText = newLabel || defaultLabel;
+                    span.style.display = 'block';
+                    this.remove();
+                    computeBeforeWeldDifferences();
+                    renderGrid();
+                }
+            };
+
+            span.style.display = 'none';
+            span.parentNode.insertBefore(input, span.nextSibling);
+            input.focus();
+        }
+
         function renderGrid() {
             const grid = document.getElementById('grid');
             grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             grid.innerHTML = '';
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
+                    const defaultLabel = String.fromCharCode(65 + i) + (j + 1);
+                    const label = gridData.customLabels[defaultLabel] || defaultLabel;
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
                     const prevDiff = currentTab === 'afterWeld' ? `<div class="previous-diff">${beforeWeldDifferences[label] || 'N/A'}</div>` : '';
                     cell.innerHTML = `
                         ${prevDiff}
-                        <label>${label}</label>
-                        <input type="number" step="0.1" value="${gridData[currentTab][label] || ''}" oninput="updateValue('${label}', this.value)">
-                        <div class="difference" id="diff-${label}">0.00 mm</div>
+                        <span class="label-container" id="label-${defaultLabel}" onclick="makeLabelEditable('${defaultLabel}', '${defaultLabel}')">${label}</span>
+                        <input type="number" step="0.1" value="${gridData[currentTab][defaultLabel] || ''}" oninput="updateValue('${defaultLabel}', this.value)">
+                        <div class="difference" id="diff-${defaultLabel}">0.00 mm</div>
                     `;
                     grid.appendChild(cell);
                 }
@@ -706,8 +758,8 @@
             updateAverage();
         }
 
-        function updateValue(label, value) {
-            gridData[currentTab][label] = value ? parseFloat(value) : '';
+        function updateValue(defaultLabel, value) {
+            gridData[currentTab][defaultLabel] = value ? parseFloat(value) : '';
             updateAverage();
             if (currentTab === 'beforeWeld') computeBeforeWeldDifferences();
         }
@@ -727,9 +779,9 @@
             tolerance[currentTab] = parseFloat(document.getElementById('tolerance').value) || 2;
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = parseFloat(gridData[currentTab][label]);
-                    const diffEl = document.getElementById(`diff-${label}`);
+                    const defaultLabel = String.fromCharCode(65 + i) + (j + 1);
+                    const value = parseFloat(gridData[currentTab][defaultLabel]);
+                    const diffEl = document.getElementById(`diff-${defaultLabel}`);
                     if (!isNaN(value) && value !== '') {
                         const diff = (value - reference).toFixed(2);
                         diffEl.innerText = `${diff > 0 ? '+' : ''}${diff} mm`;
@@ -751,9 +803,10 @@
             if (rows > 4) {
                 rows--;
                 for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + rows) + (j + 1);
-                    delete gridData[currentTab][label];
-                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[label];
+                    const defaultLabel = String.fromCharCode(65 + rows) + (j + 1);
+                    delete gridData[currentTab][defaultLabel];
+                    delete gridData.customLabels[defaultLabel];
+                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[defaultLabel];
                 }
                 renderGrid();
             } else {
@@ -770,9 +823,10 @@
             if (cols > 4) {
                 cols--;
                 for (let i = 0; i < rows; i++) {
-                    const label = String.fromCharCode(65 + i) + (cols + 1);
-                    delete gridData[currentTab][label];
-                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[label];
+                    const defaultLabel = String.fromCharCode(65 + i) + (cols + 1);
+                    delete gridData[currentTab][defaultLabel];
+                    delete gridData.customLabels[defaultLabel];
+                    if (currentTab === 'beforeWeld') delete beforeWeldDifferences[defaultLabel];
                 }
                 renderGrid();
             } else {
@@ -831,8 +885,9 @@
             const beforeTableData = [];
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = gridData.beforeWeld[label] || 'N/A';
+                    const defaultLabel = String.fromCharCode(65 + i) + (j + 1);
+                    const label = gridData.customLabels[defaultLabel] || defaultLabel;
+                    const value = gridData.beforeWeld[defaultLabel] || 'N/A';
                     const diff = !isNaN(value) && value !== '' ? (value - beforeReference).toFixed(2) : '0.00';
                     const color = !isNaN(value) && value !== '' && Math.abs(diff) <= beforeTol ? [22, 163, 74] : [220, 38, 38];
                     beforeTableData.push([
@@ -875,8 +930,9 @@
             const afterTableData = [];
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
-                    const label = String.fromCharCode(65 + i) + (j + 1);
-                    const value = gridData.afterWeld[label] || 'N/A';
+                    const defaultLabel = String.fromCharCode(65 + i) + (j + 1);
+                    const label = gridData.customLabels[defaultLabel] || defaultLabel;
+                    const value = gridData.afterWeld[defaultLabel] || 'N/A';
                     const diff = !isNaN(value) && value !== '' ? (value - afterReference).toFixed(2) : '0.00';
                     const color = !isNaN(value) && value !== '' && Math.abs(diff) <= afterTol ? [22, 163, 74] : [220, 38, 38];
                     afterTableData.push([
