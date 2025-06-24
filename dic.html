@@ -22,6 +22,8 @@
       text-align: center;
       margin: 0;
       padding: 0;
+      overscroll-behavior-y: none;
+  touch-action: pan-y;
     }
     .top-img {
       width: 100%;
@@ -55,18 +57,20 @@
       background-color: #FAF8E3;
       text-align: center;
     }
-    .word-list {
+   .word-list {
   height: 390px;
-  overflow-y: scroll;
-  overscroll-behavior: contain;
+  overflow-y: auto; /* scroll-ന് പകരം auto */
+  overscroll-behavior-y: contain; /* overscroll-behavior-ന് പകരം */
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   background-color: #FAF8E3;
   padding: 10px;
   border-radius: 8px;
   text-align: left;
   font-weight: bold;
   font-size: 16px;
-  touch-action: pan-y; /* IMPORTANT for Android WebView */
+  -ms-overflow-style: auto; /* ചേർക്കുക */
+  scrollbar-width: auto; /* ചേർക്കുക */
 }
     .word-list div {
       padding: 8px 0;
@@ -163,7 +167,10 @@
       renderList();
     }
 
-    searchInput.addEventListener("input", () => renderList(searchInput.value));
+  searchInput.addEventListener("input", () => {
+  renderList(searchInput.value);
+  restoreScroll();
+});
     renderList();
   </script>
 
