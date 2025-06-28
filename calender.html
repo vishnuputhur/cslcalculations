@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ml">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CSL Calendar 2025</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
@@ -31,9 +31,19 @@
             font-weight: bold;
             z-index: 1000;
         }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            padding: 5px;
+            text-align: center;
+            z-index: 1000;
+        }
         .calendar-container {
             margin-top: 60px;
-            padding-bottom: 60px;
+            padding-bottom: 60px; /* Footer avoid overlap */
         }
         .month {
             margin: 20px 0 5px 0;
@@ -42,7 +52,7 @@
             color: white;
             border-radius: 5px;
             position: sticky;
-            top: 50px;
+            top: 60px;
             z-index: 900;
         }
         .week-header {
@@ -51,7 +61,7 @@
             padding: 5px;
             font-weight: bold;
             position: sticky;
-            top: 100px;
+            top: 110px;
             z-index: 800;
         }
         .week-header div, .day {
@@ -68,6 +78,7 @@
             background: white;
             cursor: pointer;
             font-weight: bold;
+            position: relative;
         }
         .day.green-week {
             background: #b9f542;
@@ -91,15 +102,13 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
             z-index: 2000;
         }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #007bff;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            z-index: 700;
+        .note-preview {
+            font-size: 9px;
+            color: #333;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -125,7 +134,14 @@
             "2025-12-25": "Christmas"
         };
 
-        const weekends = ["2025-01-11", "2025-01-25", "2025-02-08", "2025-02-22", "2025-03-08", "2025-03-22", "2025-04-12", "2025-04-26", "2025-05-10", "2025-05-24", "2025-06-14", "2025-06-28", "2025-07-12", "2025-07-26", "2025-08-09", "2025-08-23", "2025-09-13", "2025-09-27", "2025-10-11", "2025-10-25", "2025-11-08", "2025-11-22", "2025-12-13", "2025-12-27"];
+        const weekends = [
+            "2025-01-11", "2025-01-25", "2025-02-08", "2025-02-22",
+            "2025-03-08", "2025-03-22", "2025-04-12", "2025-04-26",
+            "2025-05-10", "2025-05-24", "2025-06-14", "2025-06-28",
+            "2025-07-12", "2025-07-26", "2025-08-09", "2025-08-23",
+            "2025-09-13", "2025-09-27", "2025-10-11", "2025-10-25",
+            "2025-11-08", "2025-11-22", "2025-12-13", "2025-12-27"
+        ];
 
         const today = new Date();
 
@@ -168,7 +184,7 @@
                             const currentDate = new Date(2025, month, date);
                             const dateStr = `2025-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                             const isoWeek = getISOWeek(currentDate);
-                            const isGreenWeek = isoWeek % 2 === 0 && j !== 0; // no green for Sunday
+                            const isGreenWeek = isoWeek % 2 === 0 && j !== 0;
 
                             let classes = 'day';
                             if (isGreenWeek) classes += ' green-week';
@@ -179,7 +195,10 @@
                                 classes += ' today';
                             }
 
-                            calendarHTML += `<div class="${classes}" onclick="showHoliday('${dateStr}')">${date}</div>`;
+                            const savedNote = localStorage.getItem("note_" + dateStr);
+                            const notePreview = savedNote ? `<div class="note-preview">${savedNote.split(' ')[0]}</div>` : '';
+
+                            calendarHTML += `<div class="${classes}" onclick="showHoliday('${dateStr}')">${date}${notePreview}</div>`;
                             date++;
                         }
                     }
@@ -192,13 +211,24 @@
         }
 
         function showHoliday(dateStr) {
-            if (holidays[dateStr]) {
-                document.getElementById('holiday-popup').innerHTML = `
-                    <h3>${holidays[dateStr]}</h3>
-                    <button onclick="document.getElementById('holiday-popup').style.display='none'">Close</button>
-                `;
-                document.getElementById('holiday-popup').style.display = 'block';
-            }
+            const popup = document.getElementById('holiday-popup');
+            const note = localStorage.getItem("note_" + dateStr) || "";
+            const holiday = holidays[dateStr] ? `<h3>${holidays[dateStr]}</h3>` : '';
+            popup.innerHTML = `
+                ${holiday}
+                <textarea id="note-input" placeholder="Add note..." rows="2" style="width:100%;">${note}</textarea>
+                <br>
+                <button onclick="saveNote('${dateStr}')">Save</button>
+                <button onclick="document.getElementById('holiday-popup').style.display='none'">Close</button>
+            `;
+            popup.style.display = 'block';
+        }
+
+        function saveNote(dateStr) {
+            const note = document.getElementById("note-input").value.trim();
+            localStorage.setItem("note_" + dateStr, note);
+            document.getElementById("holiday-popup").style.display = "none";
+            generateCalendar();
         }
 
         function scrollToToday() {
@@ -207,7 +237,7 @@
             const monthElement = document.getElementById(`month-${currentMonth}`);
             if (monthElement) {
                 window.scrollTo({
-                    top: monthElement.offsetTop - 120,
+                    top: monthElement.offsetTop - 150,
                     behavior: 'smooth'
                 });
             }
