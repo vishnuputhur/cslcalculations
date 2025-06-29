@@ -430,5 +430,65 @@
         <br>
         <span class="disclaimer">This is not the official app of CSL.</span>
     </footer>
+<script>
+    // Snowflake creation
+    function createSnowflake() {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.fontSize = (Math.random() * 10 + 8) + 'px';
+        snowflake.style.opacity = Math.random().toFixed(2);
+        snowflake.style.animationDuration = (Math.random() * 3 + 5) + 's';
+        snowflake.innerHTML = '❄️';
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 10000);
+    }
+
+    // Start and stop functions
+    function startSnowfall() {
+        if (window.snowfallActive) return;
+        window.snowfallActive = true;
+        window.snowfallInterval = setInterval(createSnowflake, 200);
+    }
+
+    function stopSnowfall() {
+        window.snowfallActive = false;
+        clearInterval(window.snowfallInterval);
+        document.querySelectorAll('.snowflake').forEach(flake => flake.remove());
+    }
+
+    // Idle detection - 5 seconds
+    let idleTimer;
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        if (window.snowfallActive) stopSnowfall();
+        idleTimer = setTimeout(startSnowfall, 5000);
+    }
+
+    // Detect user activity
+    ['mousemove', 'mousedown', 'touchstart', 'scroll', 'keydown'].forEach(event =>
+        document.addEventListener(event, resetIdleTimer)
+    );
+    resetIdleTimer(); // Initialize
+</script>
+
+<style>
+    .snowflake {
+        position: fixed;
+        top: -5%;
+        z-index: 9999;
+        color: white;
+        pointer-events: none;
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-iteration-count: 1;
+    }
+
+    @keyframes fall {
+        to {
+            transform: translateY(110vh) rotate(360deg);
+        }
+    }
+</style>
 </body>
 </html>
