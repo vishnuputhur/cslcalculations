@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .construction {
+            color: #FF5733;
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 180px;
+            transition: background-color 0.3s;
+        }
+        .menu-btn {
+            background-color: #008CBA;
+        }
+        .menu-btn:hover {
+            background-color: #0077a3;
+        }
+        .download-btn {
+            background-color: #FF5733;
+        }
+        .download-btn:hover {
+            background-color: #e04a2d;
+        }
+        .check-btn {
+            background-color: #4CAF50;
+        }
+        .check-btn:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <div class="construction">Under Construction</div>
+        
+        <!-- Menu Button -->
+        <button class="button menu-btn" onclick="window.location.href='https://vishnuputhur.github.io/cslv2/'">Menu</button>
+        
+        <!-- Check Button -->
+        <button class="button check-btn" onclick="window.location.href='wl.html'">Check</button>
+        
+        <!-- Download APK Button (from GitHub Pages direct link) -->
+        <a class="button download-btn" href="https://vishnuputhur.github.io/cslv2/v2.apk" download>
+            Download APK
+        </a>
+    </div>
+</body>
+</html>
