@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSL Update - Version 2.0</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSL Calculations Update</title>
   <style>
     body {
       background-color: #1E3A5F;
@@ -21,7 +21,6 @@
       width: 100%;
       max-height: 200px;
       object-fit: cover;
-      cursor: pointer;
       position: fixed;
       top: 0;
       left: 0;
@@ -37,7 +36,7 @@
       background-color: #F5E6C4;
       color: #1E3A5F;
       width: 90%;
-      max-width: 320px;
+      max-width: 350px;
       margin: 0 auto;
       padding: 20px;
       border-radius: 12px;
@@ -51,24 +50,8 @@
 
     .box p {
       font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .download-btn {
-      margin-top: 15px;
-      padding: 12px 20px;
-      background-color: #1E3A5F;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.4);
-    }
-
-    .download-btn:active {
-      background-color: #142f4a;
+      line-height: 1.6;
+      text-align: left;
     }
 
     .link-text {
@@ -84,7 +67,7 @@
 
     .copy-btn {
       margin-top: 10px;
-      padding: 8px 14px;
+      padding: 10px 16px;
       font-size: 14px;
       background-color: #1E3A5F;
       color: white;
@@ -94,7 +77,7 @@
     }
 
     .footer {
-      font-size: 15px;
+      font-size: 14px;
       padding: 15px;
       background-color: #0F2A45;
       width: 100%;
@@ -111,28 +94,28 @@
 </head>
 <body>
 
+  <!-- Top Image with link to home page -->
   <a href="index.html">
     <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
   </a>
 
   <div class="content">
     <div class="box">
-      <h2>CSL Calculations Version 2.0 Available!</h2>
+      <h2>CSL Calculations - Version 2.0 Update</h2>
       <p>
-        For your security, this app does not access device storage. <br><br>
-        Please download the updated version below:
+        ഈ അപ്‌ഡേറ്റിനായി, താഴെയുള്ള ലിങ്ക് ബ്രൗസറിൽ paste ചെയ്ത് APK ഫയൽ ഡൗൺലോഡ് ചെയ്യണം. നമ്മുടെ ആപ്പ് സേഫ്റ്റിക്കായി storage access ചെയ്യുന്നില്ല.<br><br>
+
+        <strong>ഇതുപോലെ ചെയ്യുക:</strong><br><br>
+        1️⃣ താഴെയുള്ള ലിങ്ക് "Copy to Clipboard" ബട്ടൺ അമർത്തി കോപ്പി ചെയ്യുക.<br><br>
+        2️⃣ Chrome അല്ലെങ്കിൽ മറ്റേതെങ്കിലും Browser open ചെയ്യുക.<br><br>
+        3️⃣ Address bar-ൽ paste ചെയ്യുക.<br><br>
+        4️⃣ Enter അമർത്തുക – APK ഡൗൺലോഡ് ആരംഭിക്കും.<br><br>
+        🔐 നിങ്ങളുടെ സുരക്ഷയ്ക്കായാണ് ഈ സാങ്കേതിക മാർഗം സ്വീകരിക്കുന്നത്.
       </p>
 
-      <a href="https://vishnuputhur.github.io/cslcalculations/CS2.apk" download>
-        <button class="download-btn">Download APK (v2.0)</button>
-      </a>
-
-      <p style="font-size: 13px; color: #8B1E3F; margin-top: 10px;">
-        If the download doesn't start, long press and copy the link below and paste your browser and try:
-      </p>
-
+      <!-- APK Link (non-clickable) -->
       <div class="link-text" id="apkLink">
-        https://vishnuputhur.github.io/<br>cslcalculations/n.html
+        https://cslcalculations.netlify.app/v2.apk
       </div>
 
       <button class="copy-btn" onclick="copyLink()">Copy to Clipboard</button>
@@ -145,11 +128,11 @@
 
   <script>
     function copyLink() {
-      const text = "https://vishnuputhur.github.io/cslcalculations/n.html";
+      const text = "https://cslcalculations.netlify.app/v2.apk";
       navigator.clipboard.writeText(text).then(() => {
         alert("Link copied to clipboard!");
       }).catch(err => {
-        alert("Copy failed. Please try manually.");
+        alert("Copy failed. Please copy manually.");
       });
     }
   </script>
