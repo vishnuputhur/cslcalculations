@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CSL Calculations Update</title>
+  <title>CSL Update</title>
   <style>
     body {
       background-color: #1E3A5F;
@@ -12,24 +12,19 @@
       text-align: center;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
     }
 
     .top-img {
       width: 100%;
-      max-height: 200px;
+      max-height: 160px;
       object-fit: cover;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 99;
     }
 
-    .content {
-      margin-top: 220px;
-      padding: 20px;
+    h1 {
+      font-size: 22px;
+      margin: 10px 0 5px 0;
+      color: #F9D342;
+      font-weight: bold;
     }
 
     .box {
@@ -37,21 +32,17 @@
       color: #1E3A5F;
       width: 90%;
       max-width: 350px;
-      margin: 0 auto;
+      margin: 10px auto 30px auto;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
     }
 
-    .box h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
-
     .box p {
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.7;
       text-align: left;
+      font-weight: bold;
     }
 
     .link-text {
@@ -94,32 +85,32 @@
 </head>
 <body>
 
-  <!-- Top Image with link to home page -->
-  <a href="index.html">
-    <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
-  </a>
+  <!-- Top image -->
+  <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
 
-  <div class="content">
-    <div class="box">
-      <h2>CSL Calculations - Version 2.0 Update</h2>
-      <p>
-        ഈ അപ്‌ഡേറ്റിനായി, താഴെയുള്ള ലിങ്ക് ബ്രൗസറിൽ paste ചെയ്ത് APK ഫയൽ ഡൗൺലോഡ് ചെയ്യണം. നമ്മുടെ ആപ്പ് സേഫ്റ്റിക്കായി storage access ചെയ്യുന്നില്ല.<br><br>
+  <!-- Heading outside the box -->
+  <h1>New Updates Available</h1>
 
-        <strong>ഇതുപോലെ ചെയ്യുക:</strong><br><br>
-        1️⃣ താഴെയുള്ള ലിങ്ക് "Copy to Clipboard" ബട്ടൺ അമർത്തി കോപ്പി ചെയ്യുക.<br><br>
-        2️⃣ Chrome അല്ലെങ്കിൽ മറ്റേതെങ്കിലും Browser open ചെയ്യുക.<br><br>
-        3️⃣ Address bar-ൽ paste ചെയ്യുക.<br><br>
-        4️⃣ Enter അമർത്തുക – APK ഡൗൺലോഡ് ആരംഭിക്കും.<br><br>
-        🔐 നിങ്ങളുടെ സുരക്ഷയ്ക്കായാണ് ഈ സാങ്കേതിക മാർഗം സ്വീകരിക്കുന്നത്.
-      </p>
+  <div class="box">
+    <p>
+      നമ്മുടെ ആപ്പ്<strong> നിങ്ങളുടെ സുരക്ഷ മുൻനിർത്തിയാണ്</strong> നിർമ്മിച്ചിരിക്കുന്നത്.<br><br>
+      ആപ്പിൽ<strong> storage permission അടക്കമുള്ള അനാവശ്യ permissions ഒന്നും സ്വീകരിച്ചിട്ടില്ല</strong>.<br><br>
+      അതിനാൽ, അപ്‌ഡേറ്റ് ചെയ്യാൻ താഴെയുള്ള ലിങ്ക് ഉപയോഗിക്കണം.
+      WebView-ൽ നിന്ന് direct download സാധ്യമല്ല.<br><br>
 
-      <!-- APK Link (non-clickable) -->
-      <div class="link-text" id="apkLink">
-        https://cslcalculations.netlify.app/v2.apk
-      </div>
+      <strong>ഇങ്ങനെ ചെയ്യുക:</strong><br><br>
+      1️⃣ താഴെയുള്ള ലിങ്ക് കോപ്പി ചെയ്യുക<br>
+      2️⃣ Chrome അല്ലെങ്കിൽ മറ്റൊരു browser തുറക്കുക<br>
+      3️⃣ Address bar-ൽ paste ചെയ്ത് Enter അമർത്തുക<br><br>
+      ✅ അതുവഴി APK ഡൗൺലോഡ് ചെയ്യാം
+    </p>
 
-      <button class="copy-btn" onclick="copyLink()">Copy to Clipboard</button>
+    <!-- Link shown in 2 lines -->
+    <div class="link-text" id="apkLink">
+      https://cslcalculations.netlify.app/<br>v2.apk
     </div>
+
+    <button class="copy-btn" onclick="copyLink()">Copy to Clipboard</button>
   </div>
 
   <div class="bottom-space"></div>
