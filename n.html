@@ -36,6 +36,8 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
+      box-sizing: border-box; /* Prevent padding/margin overflow */
+      overflow: auto; /* Handle content overflow */
     }
 
     .box p {
@@ -43,6 +45,7 @@
       line-height: 1.7;
       text-align: left;
       font-weight: bold;
+      margin: 0; /* Remove default margins for cleaner rendering */
     }
 
     .link-text {
@@ -79,7 +82,7 @@
     }
 
     .bottom-space {
-      height: 100px;
+      height: 120px; /* Increased to ensure footer doesn't overlap */
     }
   </style>
 </head>
@@ -98,7 +101,7 @@
       ഈ ആപ്പ്-ൽ നിന്ന് direct download സാധ്യമല്ല.<br><br>
 
       <strong>ഇങ്ങനെ ചെയ്യുക:</strong><br><br>
-      1️⃣ താഴെയുള്ള ലിങ്ക് കോപ്പി ചെയ്യുക<br>
+      1️⃣ താഴെയുള്ള ലിങ্ক് കോപ്പി ചെയ്യുക<br>
       2️⃣ Chrome അല്ലെങ്കിൽ മറ്റൊരു browser തുറക്കുക<br>
       3️⃣ Address bar-ൽ paste ചെയ്ത് Enter അമർത്തുക<br>
       4️⃣ APK ഡൗൺലോഡ് ആയ ശേഷം, നിലവിൽ ഫോണിൽ ഉള്ള CSL Calculations ആപ്പ് uninstall ചെയ്യുക<br>
@@ -115,7 +118,7 @@
     </div>
 
     <button class="copy-btn" onclick="copyLink()">Copy to Clipboard</button>
-  dużo
+  </div>
 
   <div class="bottom-space"></div>
 
