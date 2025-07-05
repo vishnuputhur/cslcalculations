@@ -241,6 +241,60 @@
             padding: 4px 0;
             font-size: 0.8rem;
         }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff5e6; /* Warm white */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .popup h2 {
+            color: #00264d;
+            font-size: 1.2rem;
+            margin: 0 0 15px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .popup-buttons a, .popup-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+        }
+
+        .popup-buttons a {
+            background-color: #005580;
+        }
+
+        .popup-buttons a:hover {
+            background-color: #0073b3;
+        }
+
+        .popup-buttons button {
+            background-color: #666;
+        }
+
+        .popup-buttons button:hover {
+            background-color: #888;
+        }
     </style>
 </head>
 <body>
@@ -268,7 +322,7 @@
         <a href="wl.html">Water Level Calculator</a>
         <a href="bmi.html">BMI & Age Calculator</a>
         <a href="contact.html">Contact Us</a>
-<a href="n.html">Update</a>
+        <a href="n.html">Update</a>
     </div>
     <section>
         <div class="whats-new-header">New Updates</div>
@@ -306,100 +360,14 @@
             </div>
         </div>
 
-        <script>
-            // Holiday data (month is 0-indexed, so 0=January)
-            const holidays = [
-                { date: new Date(new Date().getFullYear(), 2, 31), name: "Id-ul-Fitr (Ramzan)" },
-                { date: new Date(new Date().getFullYear(), 3, 14), name: "Vishu / Dr. BR Ambedkar Jayanthi" },
-                { date: new Date(new Date().getFullYear(), 3, 18), name: "Good Friday" },
-                { date: new Date(new Date().getFullYear(), 4, 1), name: "May Day" },
-                { date: new Date(new Date().getFullYear(), 5, 6), name: "Bakrid" },
-                { date: new Date(new Date().getFullYear(), 7, 15), name: "Independence Day" },
-                { date: new Date(new Date().getFullYear(), 8, 4), name: "First Onam" },
-                { date: new Date(new Date().getFullYear(), 8, 5), name: "Thiruvonam" },
-                { date: new Date(new Date().getFullYear(), 8, 6), name: "Third Onam" },
-                { date: new Date(new Date().getFullYear(), 9, 2), name: "Gandhi Jayanthi / Vijayadasami" },
-                { date: new Date(new Date().getFullYear(), 9, 20), name: "Deepavali" },
-                { date: new Date(new Date().getFullYear(), 11, 25), name: "Christmas" }
-            ];
-
-            // Get current date
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            // Find upcoming holidays
-            const upcoming = holidays.filter(holiday => holiday.date >= today);
-            const nextTwo = upcoming.slice(0, 2);
-
-            // Format display
-            let displayText = nextTwo.length > 0 
-                ? nextTwo.map(holiday => 
-                    `${holiday.date.toLocaleDateString('en-IN', {month:'short', day:'numeric'})}: ${holiday.name}`
-                  ).join("<br>") 
-                : "No upcoming holidays";
-
-            document.getElementById('upcomingHolidays').innerHTML = displayText;
-
-            // Dynamically set --index for each menu item
-            document.addEventListener('DOMContentLoaded', function() {
-                const menuItems = document.querySelectorAll('.menu-drawer a');
-                menuItems.forEach((item, index) => {
-                    item.style.setProperty('--index', index);
-                });
-
-                // Menu toggle
-                document.getElementById("menu-icon").addEventListener("click", function() {
-                    var menu = document.getElementById("menu-drawer");
-                    menu.classList.toggle("open");
-                });
-
-                // What's new animation
-                const container = document.querySelector('.whats-new');
-                const content = document.querySelector('.whats-new-content');
-                const list = document.querySelector('.whats-new ul');
-                let animating = true;
-                let scrollPos = 0;
-                
-                // Clone list items for seamless looping
-                list.innerHTML += list.innerHTML;
-
-                function animate() {
-                    if (!animating) return;
-                    
-                    scrollPos -= 0.2; // Adjust speed (smaller = slower)
-                    
-                    // Reset when scrolled halfway (since we duplicated content)
-                    if (scrollPos <= -list.scrollHeight/2) {
-                        scrollPos = 0;
-                    }
-                    
-                    content.style.transform = `translateY(${scrollPos}px)`;
-                    requestAnimationFrame(animate);
-                }
-
-                // Start animation
-                animate();
-
-                // Pause on hover
-                container.addEventListener('mouseenter', () => {
-                    animating = false;
-                });
-
-                // Resume on mouse leave
-                container.addEventListener('mouseleave', () => {
-                    animating = true;
-                    animate();
-                });
-            });
-        </script>
-<div class="content-box">
+        <div class="content-box">
             <h2>Ship Theory Dictionary</h2>
             <p>
                 "Explore 300+ essential ship theory definitions — clear, Simple, and easy to find when you need them."<br>
                 <a href="dic.html">Click to Open</a>
             </p>
         </div>
-       <div class="content-box">
+        <div class="content-box">
             <h2>PF Calculator</h2>
             <p>
                 Calculate your PF withdrawal amount, balance after opting for a higher pension, or estimated pension amount.
@@ -431,65 +399,170 @@
         <br>
         <span class="disclaimer">This is not the official app of CSL.</span>
     </footer>
-<script>
-    // Snowflake creation
-    function createSnowflake() {
-        const snowflake = document.createElement('div');
-        snowflake.classList.add('snowflake');
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.fontSize = (Math.random() * 10 + 8) + 'px';
-        snowflake.style.opacity = Math.random().toFixed(2);
-        snowflake.style.animationDuration = (Math.random() * 3 + 5) + 's';
-        snowflake.innerHTML = '❄️';
-        document.body.appendChild(snowflake);
-        setTimeout(() => snowflake.remove(), 10000);
-    }
 
-    // Start and stop functions
-    function startSnowfall() {
-        if (window.snowfallActive) return;
-        window.snowfallActive = true;
-        window.snowfallInterval = setInterval(createSnowflake, 200);
-    }
+    <!-- Popup HTML -->
+    <div class="popup" id="updatePopup">
+        <h2>New Update Available</h2>
+        <div class="popup-buttons">
+            <a href="n.html">Update Now</a>
+            <button onclick="closePopup()">Update Later</button>
+        </div>
+    </div>
 
-    function stopSnowfall() {
-        window.snowfallActive = false;
-        clearInterval(window.snowfallInterval);
-        document.querySelectorAll('.snowflake').forEach(flake => flake.remove());
-    }
+    <script>
+        // Holiday data (month is 0-indexed, so 0=January)
+        const holidays = [
+            { date: new Date(new Date().getFullYear(), 2, 31), name: "Id-ul-Fitr (Ramzan)" },
+            { date: new Date(new Date().getFullYear(), 3, 14), name: "Vishu / Dr. BR Ambedkar Jayanthi" },
+            { date: new Date(new Date().getFullYear(), 3, 18), name: "Good Friday" },
+            { date: new Date(new Date().getFullYear(), 4, 1), name: "May Day" },
+            { date: new Date(new Date().getFullYear(), 5, 6), name: "Bakrid" },
+            { date: new Date(new Date().getFullYear(), 7, 15), name: "Independence Day" },
+            { date: new Date(new Date().getFullYear(), 8, 4), name: "First Onam" },
+            { date: new Date(new Date().getFullYear(), 8, 5), name: "Thiruvonam" },
+            { date: new Date(new Date().getFullYear(), 8, 6), name: "Third Onam" },
+            { date: new Date(new Date().getFullYear(), 9, 2), name: "Gandhi Jayanthi / Vijayadasami" },
+            { date: new Date(new Date().getFullYear(), 9, 20), name: "Deepavali" },
+            { date: new Date(new Date().getFullYear(), 11, 25), name: "Christmas" }
+        ];
 
-    // Idle detection - 5 seconds
-    let idleTimer;
-    function resetIdleTimer() {
-        clearTimeout(idleTimer);
-        if (window.snowfallActive) stopSnowfall();
-        idleTimer = setTimeout(startSnowfall, 5000);
-    }
+        // Get current date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-    // Detect user activity
-    ['mousemove', 'mousedown', 'touchstart', 'scroll', 'keydown'].forEach(event =>
-        document.addEventListener(event, resetIdleTimer)
-    );
-    resetIdleTimer(); // Initialize
-</script>
+        // Find upcoming holidays
+        const upcoming = holidays.filter(holiday => holiday.date >= today);
+        const nextTwo = upcoming.slice(0, 2);
 
-<style>
-    .snowflake {
-        position: fixed;
-        top: -5%;
-        z-index: 9999;
-        color: white;
-        pointer-events: none;
-        animation-name: fall;
-        animation-timing-function: linear;
-        animation-iteration-count: 1;
-    }
+        // Format display
+        let displayText = nextTwo.length > 0 
+            ? nextTwo.map(holiday => 
+                `${holiday.date.toLocaleDateString('en-IN', {month:'short', day:'numeric'})}: ${holiday.name}`
+              ).join("<br>") 
+            : "No upcoming holidays";
 
-    @keyframes fall {
-        to {
-            transform: translateY(110vh) rotate(360deg);
+        document.getElementById('upcomingHolidays').innerHTML = displayText;
+
+        // Dynamically set --index for each menu item
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-drawer a');
+            menuItems.forEach((item, index) => {
+                item.style.setProperty('--index', index);
+            });
+
+            // Menu toggle
+            document.getElementById("menu-icon").addEventListener("click", function() {
+                var menu = document.getElementById("menu-drawer");
+                menu.classList.toggle("open");
+            });
+
+            // What's new animation
+            const container = document.querySelector('.whats-new');
+            const content = document.querySelector('.whats-new-content');
+            const list = document.querySelector('.whats-new ul');
+            let animating = true;
+            let scrollPos = 0;
+            
+            // Clone list items for seamless looping
+            list.innerHTML += list.innerHTML;
+
+            function animate() {
+                if (!animating) return;
+                
+                scrollPos -= 0.2; // Adjust speed (smaller = slower)
+                
+                // Reset when scrolled halfway (since we duplicated content)
+                if (scrollPos <= -list.scrollHeight/2) {
+                    scrollPos = 0;
+                }
+                
+                content.style.transform = `translateY(${scrollPos}px)`;
+                requestAnimationFrame(animate);
+            }
+
+            // Start animation
+            animate();
+
+            // Pause on hover
+            container.addEventListener('mouseenter', () => {
+                animating = false;
+            });
+
+            // Resume on mouse leave
+            container.addEventListener('mouseleave', () => {
+                animating = true;
+                animate();
+            });
+
+            // Show popup after 1.5 seconds
+            setTimeout(() => {
+                document.getElementById('updatePopup').style.display = 'block';
+            }, 1500);
+        });
+
+        // Function to close popup
+        function closePopup() {
+            document.getElementById('updatePopup').style.display = 'none';
         }
-    }
-</style>
+
+        // Snowflake creation
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.fontSize = (Math.random() * 10 + 8) + 'px';
+            snowflake.style.opacity = Math.random().toFixed(2);
+            snowflake.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            snowflake.innerHTML = '❄️';
+            document.body.appendChild(snowflake);
+            setTimeout(() => snowflake.remove(), 10000);
+        }
+
+        // Start and stop functions
+        function startSnowfall() {
+            if (window.snowfallActive) return;
+            window.snowfallActive = true;
+            window.snowfallInterval = setInterval(createSnowflake, 200);
+        }
+
+        function stopSnowfall() {
+            window.snowfallActive = false;
+            clearInterval(window.snowfallInterval);
+            document.querySelectorAll('.snowflake').forEach(flake => flake.remove());
+        }
+
+        // Idle detection - 5 seconds
+        let idleTimer;
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            if (window.snowfallActive) stopSnowfall();
+            idleTimer = setTimeout(startSnowfall, 5000);
+        }
+
+        // Detect user activity
+        ['mousemove', 'mousedown', 'touchstart', 'scroll', 'keydown'].forEach(event =>
+            document.addEventListener(event, resetIdleTimer)
+        );
+        resetIdleTimer(); // Initialize
+    </script>
+
+    <style>
+        .snowflake {
+            position: fixed;
+            top: -5%;
+            z-index: 9999;
+            color: white;
+            pointer-events: none;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+    </style>
 </body>
 </html>
