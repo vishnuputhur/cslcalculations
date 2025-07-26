@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBanker - PDF Generator</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f0f4f8; }
+    .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+    h2 { color: #1c948e; margin-bottom: 20px; }
+    button { background: #1c948e; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    button:hover { background: #168078; }
+    @media (max-width: 600px) { .container { padding: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ProBanker PDF Generator</h2>
+    <button onclick="generateUserPDF()">Generate User Statement</button>
+    <button onclick="generateAdminPDF()">Generate Admin Report</button>
+  </div>
+
+  <script>
+    function generateUserPDF() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+      const password = urlParams.get('password');
+      if (!userId || !password) {
+        alert("Please provide User ID and Password in URL (e.g., ?userId=john123&password=pass123)");
+        return;
+      }
+      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=login&userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            const { memberNumber, customerName, totalShare, loans, shares } = data;
+            let pdfContent = `
+              <h1>ProBanker User Statement</h1>
+              <h2>Member: ${memberNumber} - ${customerName}</h2>
+              <h3>Summary</h3>
+              <p>Total Shares: ₹${totalShare.toFixed(2)}</p>
+              <h3>Loans</h3>
+              ${loans.length > 0 ? loans.map(loan => `<p>Loan #${loan.loanNumber}: ₹${loan.currentBalance.toFixed(2)} (Started: ${loan.loanStartDate})</p>`).join('') : '<p>No loans</p>'}
+              <h3>Shares</h3>
+              ${shares.length > 0 ? shares.map(share => `<p>Share #${share.shareId}: ₹${share.amount} (Date: ${share.date})</p>`).join('') : '<p>No shares</p>'}
+              <p style="text-align: right;">Date: ${new Date().toLocaleDateString()}</p>
+            `;
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(`
+              <!DOCTYPE html><html><head><title>User Statement</title>
+              <style>body { font-family: Arial, sans-serif; padding: 20px; } h1 { color: #1c948e; } h2, h3 { color: #333; }</style></head><body>${pdfContent}</body></html>
+            `);
+            pdfWindow.document.close();
+            pdfWindow.print();
+          } else {
+            alert("Login failed: " + data.message);
+          }
+        });
+    }
+
+    function generateAdminPDF() {
+      const sheets = ["Users", "Loans", "Payments", "Shares"];
+      let pdfContent = `<h1>ProBanker Admin Report</h1><p>Date: ${new Date().toLocaleDateString()}</p>`;
+      sheets.forEach(sheet => {
+        fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminGetData&sheetName=${encodeURIComponent(sheet)}`)
+          .then(response => response.json())
+          .then(data => {
+            pdfContent += `<h2>${sheet}</h2><table border="1"><tr>`;
+            data[0].forEach(cell => pdfContent += `<th>${cell}</th>`);
+            pdfContent += "</tr>";
+            data.slice(1).forEach(row => {
+              pdfContent += "<tr>";
+              row.forEach(cell => pdfContent += `<td>${cell || '-'}</td>`);
+              pdfContent += "</tr>";
+            });
+            pdfContent += "</table>";
+            if (sheet === "Shares") {
+              const pdfWindow = window.open('', '_blank');
+              pdfWindow.document.write(`
+                <!DOCTYPE html><html><head><title>Admin Report</title>
+                <style>body { font-family: Arial, sans-serif; padding: 20px; } h1 { color: #1c948e; } h2 { color: #333; } table { border-collapse: collapse; width: 100%; } th, td { padding: 8px; text-align: left; }</style></head><body>${pdfContent}</body></html>
+              `);
+              pdfWindow.document.close();
+              pdfWindow.print();
+            }
+          });
+      });
+    }
+
+    window.onload = function() {
+      // Auto-check URL params for user PDF if provided
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+      const password = urlParams.get('password');
+      if (userId && password) generateUserPDF();
+    };
+  </script>
+</body>
+</html>
