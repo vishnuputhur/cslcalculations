@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProBanker - User Dashboard</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f0f4f8; }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h2 { color: #1c948e; text-align: center; margin-bottom: 20px; }
+    .section { margin-bottom: 25px; padding: 15px; background: #fafafa; border-radius: 5px; }
+    .details p, .loans p, .shares p { margin: 5px 0; }
+    .message { font-style: italic; color: #555; }
+    button { background: #1c948e; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #168078; }
+    @media (max-width: 600px) { .container { padding: 10px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Dashboard</h2>
+    <div class="section" id="userDetails"></div>
+    <div class="section" id="userMessages"></div>
+    <div class="section" id="userLoans"></div>
+    <div class="section" id="userShares"></div>
+    <div class="section">
+      <button onclick="downloadPDF()">Download Statement</button>
+    </div>
+  </div>
+
+  <script>
+    function loadDashboard(userId, password) {
+      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=login&userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            document.getElementById("userDetails").innerHTML = `
+              <h3>Profile</h3>
+              <div class="details">
+                <p><strong>Member Number:</strong> ${data.memberNumber}</p>
+                <p><strong>Name:</strong> ${data.customerName}</p>
+                <p><strong>User ID:</strong> ${data.userId}</p>
+                <p><strong>Monthly Share:</strong> ₹${data.monthlyShare.toFixed(2)}</p>
+                <p><strong>Total Share:</strong> ₹${data.totalShare.toFixed(2)}</p>
+                <p><strong>Last Share Date:</strong> ${data.lastShareDate}</p>
+                <p><strong>Last Paid Month:</strong> ${data.lastPaidMonth}</p>
+              </div>
+            `;
+            document.getElementById("userMessages").innerHTML = `
+              <h3>Messages</h3>
+              <div class="message">
+                <p>${data.message1 || "No message 1"}</p>
+                <p>${data.message2 || "No message 2"}</p>
+              </div>
+            `;
+            fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=getLoans&memberNumber=${data.memberNumber}`)
+              .then(response => response.json())
+              .then(loans => {
+                document.getElementById("userLoans").innerHTML = `
+                  <h3>Loans</h3>
+                  ${loans.length > 0 ? `<div class="loans">${loans.map(loan => `
+                    <p><strong>Loan #${loan.loanNumber}</strong>: ₹${loan.currentBalance.toFixed(2)} (Started: ${loan.loanStartDate}, Rate: ${loan.interestRate}%)</p>
+                  `).join('')}</div>` : '<p>No loans found.</p>'}
+                `;
+              });
+            fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=getShares&memberNumber=${data.memberNumber}`)
+              .then(response => response.json())
+              .then(shares => {
+                document.getElementById("userShares").innerHTML = `
+                  <h3>Recent Shares</h3>
+                  ${shares.length > 0 ? `<div class="shares">${shares.map(share => `
+                    <p><strong>Share #${share.shareId}</strong>: ₹${share.amount} (Date: ${share.date}, Month: ${share.month})</p>
+                  `).join('')}</div>` : '<p>No shares found.</p>'}
+                `;
+              });
+          } else {
+            alert("Login failed: " + data.message);
+          }
+        })
+        .catch(error => alert("Error loading dashboard: " + error));
+
+      // PDF Download Function
+      window.downloadPDF = function() {
+        fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=login&userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success") {
+              const { memberNumber, customerName, totalShare, loans, shares } = data;
+              let pdfContent = `
+                <h1>ProBanker Statement</h1>
+                <h2>Member: ${customerNumber} - ${customerName}</h2>
+                <h3>Summary</h3>
+                <p>Total Shares: ₹${totalShare.toFixed(2)}</p>
+                <h3>Loans</h3>
+                ${loans.length > 0 ? loans.map(loan => `<p>Loan #${loan.loanNumber}: ₹${loan.currentBalance.toFixed(2)} (Started: ${loan.loanStartDate})</p>`).join('') : '<p>No loans</p>'}
+                <h3>Shares</h3>
+                ${shares.length > 0 ? shares.map(share => `<p>Share #${share.shareId}: ₹${share.amount} (Date: ${share.date})</p>`).join('') : '<p>No shares</p>'}
+                <p style="text-align: right;">Date: ${new Date().toLocaleDateString()}</p>
+              `;
+              const pdfWindow = window.open('', '_blank');
+              pdfWindow.document.write(`
+                <!DOCTYPE html><html><head><title>Statement</title>
+                <style>body { font-family: Arial, sans-serif; padding: 20px; } h1 { color: #1c948e; } h2, h3 { color: #333; }</style></head><body>${pdfContent}</body></html>
+              `);
+              pdfWindow.document.close();
+              pdfWindow.print();
+            }
+          });
+      };
+    }
+
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+      const password = urlParams.get('password');
+      if (userId && password) loadDashboard(userId, password);
+      else alert("Invalid access. Please login.");
+    };
+  </script>
+</body>
+</html>
