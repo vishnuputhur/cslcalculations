@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProBanker - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #0077b6;
+      font-size: 1.5em;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #00b4d8;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.2em; }
+      button { padding: 7px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>ProBanker Login</h1>
+    <form id="loginForm" onsubmit="login(event)">
+      <label>User ID:</label><input type="text" id="userId" required>
+      <label>Password:</label><input type="password" id="password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    function login(event) {
+      event.preventDefault();
+      const userId = document.getElementById("userId").value;
+      const password = document.getElementById("password").value;
+      if (userId === "admin" && password === "admin123") {
+        sessionStorage.setItem("isAdmin", true);
+        window.location.href = "admin_dashboard.html";
+      } else {
+        alert("Invalid credentials.");
+      }
+    }
+  </script>
+</body>
+</html>
