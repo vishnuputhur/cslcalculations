@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ProBanker - Admin Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #fff;
+      padding: 5px 10px;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      height: 60px;
+    }
+    header h1 {
+      color: #0077b6;
+      margin: 0;
+      font-size: 1.2em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    header h2 {
+      color: #333;
+      margin: 2px 0 0;
+      font-size: 0.9em;
+      font-style: italic;
+    }
+    .content {
+      margin: 70px 0 60px;
+      padding: 15px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    input, select {
+      width: 40%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 0.85em;
+    }
+    .output {
+      background: #e0f7fa;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.85em;
+    }
+    .output span {
+      color: red;
+      font-weight: bold;
+    }
+    button {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: #00b4d8;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      width: 48%;
+      margin-right: 2%;
+      font-size: 0.85em;
+    }
+    .button-row {
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.75em;
+      overflow-x: auto;
+      display: block;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 5px;
+      text-align: center;
+    }
+    th {
+      background: #90e0ef;
+    }
+    tr:nth-child(even) {
+      background: #f1f1f1;
+    }
+    .loading {
+      color: #555;
+      font-style: italic;
+      padding: 10px;
+      display: none;
+    }
+    .form-section {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    footer {
+      background: #0077b6;
+      padding: 10px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      color: #fff;
+      font-size: 0.75em;
+      z-index: 1000;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .tab {
+      cursor: pointer;
+      padding: 7px 14px;
+      background: #0077b6;
+      color: white;
+      border-radius: 8px;
+      font-size: 0.85em;
+      flex: 1;
+      text-align: center;
+      margin: 0 5px;
+    }
+    .tab.active {
+      background: #00b4d8;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .content {
+        margin: 50px 0 50px;
+        padding: 10px;
+      }
+      button {
+        width: 100%;
+        margin-right: 0;
+        padding: 7px;
+        font-size: 0.8em;
+      }
+      .button-row {
+        flex-direction: column;
+      }
+      table {
+        font-size: 0.7em;
+      }
+      .tab {
+        padding: 5px 9px;
+        font-size: 0.8em;
+      }
+      input, select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ProBanker</h1>
+    <h2>Admin Dashboard</h2>
+  </header>
+  <div class="content">
+    <div class="tabs">
+      <div class="tab active" id="tabHome" onclick="openTab(event, 'home')">Home</div>
+      <div class="tab" id="tabUsers" onclick="openTab(event, 'users')">Users</div>
+      <div class="tab" id="tabLoans" onclick="openTab(event, 'loans')">Loans</div>
+      <div class="tab" id="tabPayments" onclick="openTab(event, 'payments')">Payments</div>
+      <div class="tab" id="tabShares" onclick="openTab(event, 'shares')">Shares</div>
+      <div class="tab" id="tabSettings" onclick="openTab(event, 'settings')">Settings</div>
+    </div>
+
+    <div id="home" class="tab-content active">
+      <h3>Welcome to ProBanker Admin Panel</h3>
+      <p>Select a module to manage data.</p>
+    </div>
+
+    <div id="users" class="tab-content">
+      <h3>Manage Users</h3>
+      <div class="button-row">
+        <button onclick="openForm('users', 'add')">Add User</button>
+        <button onclick="loadUsers()">Refresh List</button>
+      </div>
+      <div class="loading" id="userLoading">Loading...</div>
+      <table id="userTable" onclick="editRow(event, 'users')">
+        <thead><tr><th>Member #</th><th>Name</th><th>User ID</th><th>Password</th><th>Monthly Share</th><th>Total Share</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="userForm" class="form-section">
+        <label>Member Number:</label><input type="text" id="userMemberNumber" required>
+        <label>Customer Name:</label><input type="text" id="userName">
+        <label>User ID:</label><input type="text" id="userId">
+        <label>Password:</label><input type="password" id="userPassword">
+        <label>Monthly Share:</label><input type="number" id="userMonthlyShare" step="0.01">
+        <label>Total Share:</label><input type="number" id="userTotalShare" step="0.01">
+        <div class="button-row">
+          <button onclick="submitData('Users')">Submit</button>
+          <button onclick="clearForm('users')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="loans" class="tab-content">
+      <h3>Manage Loans</h3>
+      <div class="button-row">
+        <button onclick="openForm('loans', 'add')">Add Loan</button>
+        <button onclick="loadLoans()">Refresh List</button>
+      </div>
+      <div class="loading" id="loanLoading">Loading...</div>
+      <table id="loanTable" onclick="editRow(event, 'loans')">
+        <thead><tr><th>Loan #</th><th>Member #</th><th>Start Date</th><th>Amount</th><th>Interest</th><th>Balance</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="loanForm" class="form-section">
+        <label>Loan Number:</label><input type="text" id="loanNumber" required>
+        <label>Member Number:</label><input type="text" id="loanMemberNumber">
+        <label>Loan Start Date:</label><input type="date" id="loanStartDate">
+        <label>Total Loan Amount:</label><input type="number" id="totalLoanAmount" step="0.01">
+        <label>Interest Rate (%):</label><input type="number" id="loanInterestRate" step="0.01">
+        <label>Current Balance:</label><input type="number" id="loanCurrentBalance" step="0.01">
+        <div class="button-row">
+          <button onclick="submitData('Loans')">Submit</button>
+          <button onclick="clearForm('loans')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="payments" class="tab-content">
+      <h3>Manage Payments</h3>
+      <div class="button-row">
+        <button onclick="openForm('payments', 'add')">Add Payment</button>
+        <button onclick="loadPayments()">Refresh List</button>
+      </div>
+      <div class="loading" id="paymentLoading">Loading...</div>
+      <table id="paymentTable" onclick="editRow(event, 'payments')">
+        <thead><tr><th>Payment ID</th><th>Member #</th><th>Loan #</th><th>Date</th><th>Amount</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="paymentForm" class="form-section">
+        <label>Payment ID:</label><input type="text" id="paymentId" required>
+        <label>Member Number:</label><input type="text" id="paymentMemberNumber">
+        <label>Loan Number:</label><input type="text" id="paymentLoanNumber">
+        <label>Payment Date:</label><input type="date" id="paymentDate">
+        <label>Payment Amount:</label><input type="number" id="paymentAmount" step="0.01">
+        <label>Principal Paid:</label><input type="number" id="paymentPrincipal" step="0.01">
+        <label>Interest Paid:</label><input type="number" id="paymentInterest" step="0.01">
+        <label>New Balance:</label><input type="number" id="paymentNewBalance" step="0.01">
+        <div class="button-row">
+          <button onclick="submitData('Payments')">Submit</button>
+          <button onclick="clearForm('payments')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="shares" class="tab-content">
+      <h3>Manage Shares</h3>
+      <div class="button-row">
+        <button onclick="openForm('shares', 'add')">Add Share</button>
+        <button onclick="loadShares()">Refresh List</button>
+      </div>
+      <div class="loading" id="shareLoading">Loading...</div>
+      <table id="shareTable" onclick="editRow(event, 'shares')">
+        <thead><tr><th>Share ID</th><th>Member #</th><th>Amount</th><th>Date</th><th>Month</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="shareForm" class="form-section">
+        <label>Share ID:</label><input type="text" id="shareId" required>
+        <label>Member Number:</label><input type="text" id="shareMemberNumber">
+        <label>Share Amount:</label><input type="number" id="shareAmount" step="0.01">
+        <label>Share Date:</label><input type="text" id="shareDate">
+        <label>Share Month:</label><input type="text" id="shareMonth">
+        <div class="button-row">
+          <button onclick="submitData('Shares')">Submit</button>
+          <button onclick="clearForm('shares')">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings" class="tab-content">
+      <h3>Settings</h3>
+      <label>Backup Sheet ID:</label>
+      <input type="text" id="backupSheetId" placeholder="Enter Sheet ID for backup">
+      <div class="button-row">
+        <button onclick="saveSettings()">Save Settings</button>
+      </div>
+      <p id="settingsResult"></p>
+    </div>
+  </div>
+  <footer>Powered by VTSoft, Copyright 2025</footer>
+
+  <script>
+    let isAdmin = false;
+
+    window.onload = function() {
+      if (!sessionStorage.getItem("isAdmin")) {
+        window.location.href = "index.html";
+      } else {
+        isAdmin = true;
+        document.getElementsByClassName("tab")[0].click();
+        loadAllData();
+      }
+    };
+
+    function openTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tab-content");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+      }
+      tablinks = document.getElementsByClassName("tab");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+      }
+      document.getElementById(tabName).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    function openForm(type, action) {
+      const form = document.getElementById(`${type}Form`);
+      form.style.display = "block";
+      if (action === "edit") return; // Edit handled via table click
+      clearForm(type);
+    }
+
+    function loadAllData() {
+      if (!isAdmin) return;
+      loadUsers();
+      loadLoans();
+      loadPayments();
+      loadShares();
+    }
+
+    function loadUsers() {
+      const loading = document.getElementById("userLoading");
+      loading.style.display = "block";
+      loading.scrollIntoView({ behavior: "smooth", block: "center" });
+      fetchData("Users", (data) => {
+        updateTable("userTable", data, ["MemberNumber", "Name", "UserId", "Password", "MonthlyShare", "TotalShare"]);
+        loading.style.display = "none";
+      });
+    }
+
+    function loadLoans() {
+      const loading = document.getElementById("loanLoading");
+      loading.style.display = "block";
+      loading.scrollIntoView({ behavior: "smooth", block: "center" });
+      fetchData("Loans", (data) => {
+        updateTable("loanTable", data, ["LoanNumber", "MemberNumber", "StartDate", "TotalAmount", "InterestRate", "CurrentBalance"]);
+        loading.style.display = "none";
+      });
+    }
+
+    function loadPayments() {
+      const loading = document.getElementById("paymentLoading");
+      loading.style.display = "block";
+      loading.scrollIntoView({ behavior: "smooth", block: "center" });
+      fetchData("Payments", (data) => {
+        updateTable("paymentTable", data, ["PaymentId", "MemberNumber", "LoanNumber", "Date", "Amount", "Principal", "Interest", "NewBalance"]);
+        loading.style.display = "none";
+      });
+    }
+
+    function loadShares() {
+      const loading = document.getElementById("shareLoading");
+      loading.style.display = "block";
+      loading.scrollIntoView({ behavior: "smooth", block: "center" });
+      fetchData("Shares", (data) => {
+        updateTable("shareTable", data, ["ShareId", "MemberNumber", "Amount", "Date", "Month"]);
+        loading.style.display = "none";
+      });
+    }
+
+    function fetchData(sheetName, callback) {
+      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminGetData&sheetName=${encodeURIComponent(sheetName)}`)
+        .then(response => response.json())
+        .then(data => callback(data))
+        .catch(error => {
+          console.error(`Error fetching ${sheetName}:`, error);
+          setTimeout(() => document.getElementById(`${sheetName.toLowerCase()}Loading`).style.display = "none", 2000);
+        });
+    }
+
+    function updateTable(tableId, data, headers) {
+      const table = document.getElementById(tableId);
+      const tbody = table.getElementsByTagName("tbody")[0] || table.createTBody();
+      tbody.innerHTML = "";
+      if (Array.isArray(data)) {
+        data.forEach(row => {
+          const tr = tbody.insertRow();
+          headers.forEach((header, idx) => {
+            const td = tr.insertCell();
+            td.innerText = row[idx] || "-";
+            td.dataset.field = header;
+          });
+        });
+      }
+    }
+
+    function editRow(event, type) {
+      if (event.target.tagName !== "TD") return;
+      const tr = event.target.parentElement;
+      const form = document.getElementById(`${type}Form`);
+      form.style.display = "block";
+      const inputs = form.getElementsByTagName("input");
+      Array.from(tr.cells).forEach((cell, idx) => {
+        if (inputs[idx]) inputs[idx].value = cell.innerText;
+      });
+    }
+
+    function submitData(sheetName) {
+      const form = document.getElementById(`${sheetName}Form`);
+      const loading = document.getElementById(`${sheetName.toLowerCase()}Loading`);
+      loading.style.display = "block";
+      loading.scrollIntoView({ behavior: "smooth", block: "center" });
+      const data = Array.from(form.getElementsByTagName("input")).map(input => input.value);
+      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminUpdate&isAdmin=true&sheetName=${encodeURIComponent(sheetName)}&operation=${data.some(item => !item) ? "edit" : "add"}&data=${encodeURIComponent(JSON.stringify([data]))}`)
+        .then(response => response.json())
+        .then(result => {
+          alert(result.message);
+          if (result.status === "success") {
+            clearForm(sheetName);
+            window[`load${sheetName}`]();
+          }
+          loading.style.display = "none";
+        })
+        .catch(error => {
+          console.error(`Error submitting ${sheetName}:`, error);
+          loading.innerHTML = `Error: ${error.message}`;
+          setTimeout(() => loading.style.display = "none", 2000);
+        });
+    }
+
+    function saveSettings() {
+      const backupSheetId = document.getElementById("backupSheetId").value;
+      if (!backupSheetId) {
+        document.getElementById("settingsResult").innerHTML = `<p style="color: red;">Please enter a Sheet ID.</p>`;
+        return;
+      }
+      document.getElementById("settingsResult").innerHTML = `<p>Settings saved (Sheet ID: ${backupSheetId}). Update script on PC to use.</p>`;
+    }
+
+    function clearForm(type) {
+      const form = document.getElementById(`${type}Form`);
+      form.style.display = "none";
+      const inputs = form.getElementsByTagName("input");
+      for (let input of inputs) input.value = "";
+    }
+  </script>
+</body>
+</html>
