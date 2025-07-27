@@ -5,60 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Society App - Login</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input, button { margin: 10px 0; padding: 10px; width: 100%; }
-    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, button { margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box; }
+    button { background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #45a049; }
     #error { color: red; text-align: center; }
   </style>
 </head>
 <body>
-  <h1>Society App Login</h1>
-  <input type="email" id="email" placeholder="Email">
-  <input type="text" id="memberNumber" placeholder="Member Number">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p id="error"></p>
+  <div class="container">
+    <h1>Society App Login</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="memberNumber" placeholder="Member Number">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="error"></p>
+  </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-      authDomain: "probanker-2bce7.firebaseapp.com",
-      projectId: "probanker-2bce7",
-      storageBucket: "probanker-2bce7.firebasestorage.app",
-      messagingSenderId: "27106244956",
-      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-      measurementId: "G-31138VCDFZ"
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+        authDomain: "probanker-2bce7.firebaseapp.com",
+        projectId: "probanker-2bce7",
+        storageBucket: "probanker-2bce7.firebasestorage.app",
+        messagingSenderId: "27106244956",
+        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+        measurementId: "G-31138VCDFZ"
+      };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Login function
-    async function login() {
-      const email = document.getElementById('email').value;
-      const memberNumber = document.getElementById('memberNumber').value;
-      const password = document.getElementById('password').value;
-      const errorElement = document.getElementById('error');
       try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
-        if (userDoc.exists && userDoc.data().memberNumber === memberNumber) {
-          alert('Login successful!');
-          window.location.href = 'home.html';
-        } else {
-          errorElement.innerText = 'Invalid Member Number';
-        }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Login function
+        window.login = async function() {
+          const email = document.getElementById('email').value;
+          const memberNumber = document.getElementById('memberNumber').value;
+          const password = document.getElementById('password').value;
+          const errorElement = document.getElementById('error');
+          try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+            if (userDoc.exists && userDoc.data().memberNumber === memberNumber) {
+              alert('Login successful!');
+              window.location.href = 'home.html';
+            } else {
+              errorElement.innerText = 'Invalid Member Number';
+            }
+          } catch (error) {
+            errorElement.innerText = 'Login failed: ' + error.message;
+          }
+        };
       } catch (error) {
-        errorElement.innerText = 'Login failed: ' + error.message;
+        document.getElementById('error').innerText = 'Firebase initialization failed: ' + error.message;
       }
-    }
+    });
   </script>
 </body>
 </html>
