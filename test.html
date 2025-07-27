@@ -2,40 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Testing Firebase</title>
+  <title>Firestore Test</title>
 </head>
 <body>
-  <h2>Testing Firebase</h2>
-  <p id="result">Loading...</p>
+  <h1>Test Firestore Read</h1>
+  <pre id="result">Loading...</pre>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
 
   <script>
-    // ✅ Replace with your actual config
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
       authDomain: "probanker-2bce7.firebaseapp.com",
       projectId: "probanker-2bce7",
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
-
-    db.collection("shares").get()
-      .then((querySnapshot) => {
-        let output = "";
-        querySnapshot.forEach((doc) => {
-          output += JSON.stringify(doc.data()) + "<br>";
-        });
-        document.getElementById("result").innerHTML = output || "No data found.";
-      })
-      .catch((error) => {
-        document.getElementById("result").innerHTML = "Error: " + error;
-        console.error(error);
+    db.collection('shares').get().then(snap => {
+      let out = '';
+      snap.forEach(doc => {
+        out += JSON.stringify(doc.data()) + '\n';
       });
+      document.getElementById('result').innerText = out || 'No docs found.';
+    }).catch(err => {
+      document.getElementById('result').innerText = 'ERROR: ' + err.message;
+    });
   </script>
 </body>
 </html>
