@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Society App - Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #error, #success {
+      text-align: center;
+    }
+    #error { color: red; }
+    #success { color: green; }
+    a {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 5px;
+    }
+    a:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Profile</h1>
+    <p>Name: <span id="name">User</span></p>
+    <p>Member Number: <span id="memberNumber">N/A</span></p>
+    <p>CSL Code No: <span id="cslCodeNo">N/A</span></p>
+    <p>Address: <span id="address">N/A</span></p>
+    <p>Pincode: <span id="pincode">N/A</span></p>
+    <p>Phone: <span id="phone">N/A</span></p>
+    <p>Email: <span id="email">N/A</span></p>
+    <input type="password" id="newPassword" placeholder="New Password">
+    <button onclick="changePassword()">Change Password</button>
+    <p id="success"></p>
+    <p id="error"></p>
+    <a href="home.html">Back to Home</a>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Check authentication and fetch user data
+    auth.onAuthStateChanged(async (user) => {
+      const errorElement = document.getElementById('error');
+      if (user) {
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists) {
+            document.getElementById('name').innerText = userDoc.data().name || 'User';
+            document.getElementById('memberNumber').innerText = userDoc.data().memberNumber || 'N/A';
+            document.getElementById('cslCodeNo').innerText = userDoc.data().cslCodeNo || 'N/A';
+            document.getElementById('address').innerText = userDoc.data().address || 'N/A';
+            document.getElementById('pincode').innerText = userDoc.data().pincode || 'N/A';
+            document.getElementById('phone').innerText = userDoc.data().phone || 'N/A';
+            document.getElementById('email').innerText = userDoc.data().email || 'N/A';
+          } else {
+            errorElement.innerText = 'User data not found';
+          }
+        } catch (error) {
+          errorElement.innerText = 'Error fetching data: ' + error.message;
+        }
+      } else {
+        window.location.href = 'index.html'; // Redirect to login if not authenticated
+      }
+    });
+
+    // Change password function
+    async function changePassword() {
+      const newPassword = document.getElementById('newPassword').value;
+      const errorElement = document.getElementById('error');
+      const successElement = document.getElementById('success');
+      if (!newPassword || newPassword.length < 6) {
+        errorElement.innerText = 'Password must be at least 6 characters';
+        return;
+      }
+      try {
+        await auth.currentUser.updatePassword(newPassword);
+        successElement.innerText = 'Password updated successfully!';
+        errorElement.innerText = '';
+        document.getElementById('newPassword').value = '';
+      } catch (error) {
+        errorElement.innerText = 'Error changing password: ' + error.message;
+        successElement.innerText = '';
+      }
+    }
+  </script>
+</body>
+</html>
