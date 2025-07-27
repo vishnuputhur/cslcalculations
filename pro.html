@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Society App - Login</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, button { margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box; }
-    button { background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #45a049; }
-    #error { color: red; text-align: center; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; }
+    input, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    button { background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #error { color: red; }
   </style>
 </head>
 <body>
@@ -19,59 +19,47 @@
     <input type="email" id="email" placeholder="Email">
     <input type="text" id="memberNumber" placeholder="Member Number">
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
     <p id="error"></p>
   </div>
 
-  <!-- Firebase CDN SDK -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof firebase === 'undefined') {
-        document.getElementById('error').innerText = 'Firebase SDK load ആകുന്നില്ല. Network അല്ലെങ്കിൽ CDN URL check ചെയ്യൂ.';
-        return;
-      }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-      // Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-        authDomain: "probanker-2bce7.firebaseapp.com",
-        projectId: "probanker-2bce7",
-        storageBucket: "probanker-2bce7.firebasestorage.app",
-        messagingSenderId: "27106244956",
-        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-        measurementId: "G-31138VCDFZ"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const memberNumber = document.getElementById('memberNumber').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('error');
 
       try {
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Login function
-        window.login = async function() {
-          const email = document.getElementById('email').value;
-          const memberNumber = document.getElementById('memberNumber').value;
-          const password = document.getElementById('password').value;
-          const errorElement = document.getElementById('error');
-          try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
-            if (userDoc.exists && userDoc.data().memberNumber === memberNumber) {
-              alert('Login വിജയകരം!');
-              window.location.href = 'home.html';
-            } else {
-              errorElement.innerText = 'Member Number തെറ്റാണ്';
-            }
-          } catch (error) {
-            errorElement.innerText = 'Login പരാജയപ്പെട്ടു: ' + error.message;
-          }
-        };
-      } catch (error) {
-        document.getElementById('error').innerText = 'Firebase initialization പരാജയപ്പെട്ടു: ' + error.message;
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().memberNumber === memberNumber) {
+          alert('Login വിജയകരം!');
+          window.location.href = 'home.html';
+        } else {
+          errorEl.innerText = 'Member Number തെറ്റാണ്';
+        }
+      } catch (err) {
+        errorEl.innerText = 'Login പരാജയപ്പെട്ടു: ' + err.message;
       }
     });
   </script>
