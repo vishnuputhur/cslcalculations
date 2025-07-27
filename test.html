@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Firebase Test</title>
+</head>
+<body>
+  <h1>Testing Firebase</h1>
+  <p id="status">Loading...</p>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    if (typeof firebase === 'undefined') {
+      document.getElementById('status').innerText = "Firebase NOT Loaded!";
+    } else {
+      document.getElementById('status').innerText = "Firebase Loaded ✅";
+    }
+  </script>
+</body>
+</html>
