@@ -3,131 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Society App - Home</title>
+  <title>Society App - Login</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 30px;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-    p {
-      margin: 10px 0;
-      font-size: 1rem;
-      color: #555;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background: #4CAF50;
-      border: none;
-      color: #fff;
-      font-size: 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    #error {
-      margin-top: 15px;
-      color: #e74c3c;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; }
+    input, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    button { background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #error { color: red; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome to Society App</h1>
-    <p id="userInfo">Loading user info...</p>
-    <p id="loanDetails">Loan Details: Loading...</p>
-    <p id="shareDetails">Share Details: Loading...</p>
-
-    <button onclick="window.location.href='profile.html'">View Profile</button>
-    <button onclick="window.location.href='loan-details.html'">View Loan Details</button>
-    <button onclick="window.location.href='applications.html'">View Applications</button>
-    <button onclick="logout()">Logout</button>
-
+    <h1>Society App Login</h1>
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="memberNumber" placeholder="Member Number">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login</button>
     <p id="error"></p>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (typeof firebase === 'undefined') {
-        document.getElementById('error').innerText = 'Firebase SDK load ആകുന്നില്ല.';
-        return;
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
 
-      // Firebase config
-      const firebaseConfig = {
-        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-        authDomain: "probanker-2bce7.firebaseapp.com",
-        projectId: "probanker-2bce7",
-        storageBucket: "probanker-2bce7.appspot.com",
-        messagingSenderId: "27106244956",
-        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-        measurementId: "G-31138VCDFZ"
-      };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.firestore();
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const memberNumber = document.getElementById('memberNumber').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('error');
 
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-              document.getElementById('userInfo').innerText = `Welcome, ${userDoc.data().name}`;
-            } else {
-              document.getElementById('userInfo').innerText = 'User info not found.';
-            }
-
-            const loanDoc = await db.collection('loans').doc(user.uid).get();
-            if (loanDoc.exists) {
-              document.getElementById('loanDetails').innerText = `Loan Balance: ₹${loanDoc.data().balance}`;
-            } else {
-              document.getElementById('loanDetails').innerText = 'Loan Details: NA';
-            }
-
-            const shareDoc = await db.collection('shares').doc(user.uid).get();
-            if (shareDoc.exists) {
-              document.getElementById('shareDetails').innerText = `Shares: ₹${shareDoc.data().amount}`;
-            } else {
-              document.getElementById('shareDetails').innerText = 'Share Details: NA';
-            }
-
-          } catch (err) {
-            document.getElementById('error').innerText = `Error: ${err.message}`;
-          }
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().memberNumber === memberNumber) {
+          alert('Login വിജയകരം!');
+          window.location.href = 'home.html';
         } else {
-          window.location.href = 'index.html'; // redirect to login
+          errorEl.innerText = 'Member Number തെറ്റാണ്';
         }
-      });
-
-      window.logout = async function() {
-        await auth.signOut();
-        window.location.href = 'index.html';
-      };
+      } catch (err) {
+        errorEl.innerText = 'Login പരാജയപ്പെട്ടു: ' + err.message;
+      }
     });
   </script>
 </body>
