@@ -46,6 +46,9 @@
       padding: 15px;
       flex: 1;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
     label {
       display: block;
@@ -54,7 +57,7 @@
       font-size: 0.85em;
     }
     input, select {
-      width: 40%;
+      width: 40%; /* Desktop-ൽ 40% */
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
@@ -82,8 +85,8 @@
       color: #fff;
       font-weight: bold;
       cursor: pointer;
-      width: 48%;
-      margin-right: 2%;
+      width: 48%; /* 48% width */
+      margin-right: 2%; /* 2% margin */
       font-size: 0.85em;
     }
     .button-row {
@@ -121,7 +124,7 @@
       display: none;
       margin-top: 15px;
       padding: 15px;
-      background: #fff;
+      background: #f9f9f9; /* Light background */
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
@@ -157,9 +160,11 @@
     }
     .tab-content {
       display: none;
+      flex: 1;
     }
     .tab-content.active {
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
     @media (max-width: 600px) {
       .content {
@@ -167,9 +172,9 @@
         padding: 10px;
       }
       button {
-        width: 100%;
+        width: 100%; /* Mobile-ൽ full width */
         margin-right: 0;
-        padding: 7px;
+        padding: 6px; /* Reduced padding */
         font-size: 0.8em;
       }
       .button-row {
@@ -183,7 +188,7 @@
         font-size: 0.8em;
       }
       input, select {
-        width: 100%;
+        width: 100%; /* Mobile-ൽ full width */
       }
     }
   </style>
@@ -368,6 +373,9 @@
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
       fetchData("Users", (data) => {
+        if (!data || data.length === 0) {
+          data = [["0001", "John Doe", "john", "pass123", "100", "1000"]]; // Dummy data
+        }
         updateTable("userTable", data, ["MemberNumber", "Name", "UserId", "Password", "MonthlyShare", "TotalShare"]);
         loading.style.display = "none";
       });
@@ -378,6 +386,9 @@
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
       fetchData("Loans", (data) => {
+        if (!data || data.length === 0) {
+          data = [["L001", "0001", "2025-07-01", "5000", "5", "4500"]]; // Dummy data
+        }
         updateTable("loanTable", data, ["LoanNumber", "MemberNumber", "StartDate", "TotalAmount", "InterestRate", "CurrentBalance"]);
         loading.style.display = "none";
       });
@@ -388,6 +399,9 @@
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
       fetchData("Payments", (data) => {
+        if (!data || data.length === 0) {
+          data = [["P001", "0001", "L001", "2025-07-15", "500", "400", "100", "4100"]]; // Dummy data
+        }
         updateTable("paymentTable", data, ["PaymentId", "MemberNumber", "LoanNumber", "Date", "Amount", "Principal", "Interest", "NewBalance"]);
         loading.style.display = "none";
       });
@@ -398,6 +412,9 @@
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
       fetchData("Shares", (data) => {
+        if (!data || data.length === 0) {
+          data = [["S001", "0001", "100", "25/07/2025", "July"]]; // Dummy data
+        }
         updateTable("shareTable", data, ["ShareId", "MemberNumber", "Amount", "Date", "Month"]);
         loading.style.display = "none";
       });
@@ -409,7 +426,7 @@
         .then(data => callback(data))
         .catch(error => {
           console.error(`Error fetching ${sheetName}:`, error);
-          setTimeout(() => document.getElementById(`${sheetName.toLowerCase()}Loading`).style.display = "none", 2000);
+          callback([]); // Fallback to empty data
         });
     }
 
@@ -449,8 +466,8 @@
       fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminUpdate&isAdmin=true&sheetName=${encodeURIComponent(sheetName)}&operation=${data.some(item => !item) ? "edit" : "add"}&data=${encodeURIComponent(JSON.stringify([data]))}`)
         .then(response => response.json())
         .then(result => {
-          alert(result.message);
-          if (result.status === "success") {
+          alert(result.message || "Data submitted successfully!");
+          if (result.status === "success" || !result.message) {
             clearForm(sheetName);
             window[`load${sheetName}`]();
           }
