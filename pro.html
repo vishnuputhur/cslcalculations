@@ -1,89 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ProBanker - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Society App - Login</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .login-container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
-      width: 300px;
-    }
-    h1 {
-      color: #0077b6;
-      font-size: 1.5em;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #00b4d8;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-    }
-    @media (max-width: 600px) {
-      h1 { font-size: 1.2em; }
-      button { padding: 7px; }
-      .login-container { width: 90%; }
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { margin: 10px 0; padding: 10px; width: 100%; }
+    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>ProBanker Login</h1>
-    <form id="loginForm" onsubmit="login(event)">
-      <label>User ID:</label><input type="text" id="userId" required>
-      <label>Password:</label><input type="password" id="password" required>
-      <button type="submit">Login</button>
-    </form>
-  </div>
+  <h1>Society App Login</h1>
+  <input type="email" id="email" placeholder="Email">
+  <input type="text" id="memberNumber" placeholder="Member Number">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="error" style="color: red;"></p>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
   <script>
-    function login(event) {
-      event.preventDefault();
-      const userId = document.getElementById("userId").value.trim();
-      const password = document.getElementById("password").value.trim();
-      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=login&userId=${userId}&password=${password}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === "success") {
-            sessionStorage.setItem("isAdmin", data.isAdmin);
-            window.location.href = "admin_dashboard.html";
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch(error => alert("Login error: " + error.message));
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Login function
+    async function login() {
+      const email = document.getElementById('email').value;
+      const memberNumber = document.getElementById('memberNumber').value;
+      const password = document.getElementById('password').value;
+      const errorElement = document.getElementById('error');
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+        if (userDoc.exists && userDoc.data().memberNumber === memberNumber) {
+          alert('Login successful!');
+          window.location.href = 'home.html';
+        } else {
+          errorElement.innerText = 'Invalid Member Number';
+        }
+      } catch (error) {
+        errorElement.innerText = 'Login failed: ' + error.message;
+      }
     }
   </script>
 </body>
