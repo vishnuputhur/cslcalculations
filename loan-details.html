@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Society App - Loan Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .transaction {
+      border-bottom: 1px solid #ddd;
+      padding: 5px 0;
+    }
+    a {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 5px;
+    }
+    a:hover {
+      background-color: #45a049;
+    }
+    #error {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Loan Details</h1>
+    <p>Loan Number: <span id="loanNumber">N/A</span></p>
+    <p>Current Balance: ₹<span id="balance">0</span></p>
+    <p>Start Date: <span id="startDate">N/A</span></p>
+    <p>Interest: <span id="interest">0%</span></p>
+    <p>Guarantors: <span id="guarantors">N/A</span></p>
+    <h3>Last Transactions</h3>
+    <div id="transactions"></div>
+    <p id="error"></p>
+    <a href="home.html">Back to Home</a>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Check authentication and fetch loan data
+    auth.onAuthStateChanged(async (user) => {
+      const errorElement = document.getElementById('error');
+      if (user) {
+        try {
+          const loanDoc = await db.collection('loans').where('userId', '==', user.uid).get();
+          if (!loanDoc.empty) {
+            const loanData = loanDoc.docs[0].data();
+            document.getElementById('loanNumber').innerText = loanData.loanNumber || 'N/A';
+            document.getElementById('balance').innerText = loanData.balance || '0';
+            document.getElementById('startDate').innerText = loanData.startDate || 'N/A';
+            document.getElementById('interest').innerText = loanData.interest ? `${loanData.interest}%` : '0%';
+            document.getElementById('guarantors').innerText = loanData.guarantors?.join(', ') || 'N/A';
+
+            // Display transactions
+            const transactionsDiv = document.getElementById('transactions');
+            if (loanData.transactions && loanData.transactions.length > 0) {
+              loanData.transactions.forEach(tx => {
+                const txDiv = document.createElement('div');
+                txDiv.className = 'transaction';
+                txDiv.innerText = `Date: ${tx.date}, Amount: ₹${tx.amount}`;
+                transactionsDiv.appendChild(txDiv);
+              });
+            } else {
+              transactionsDiv.innerText = 'No transactions';
+            }
+          } else {
+            errorElement.innerText = 'No loan data found';
+          }
+        } catch (error) {
+          errorElement.innerText = 'Error fetching loan data: ' + error.message;
+        }
+      } else {
+        window.location.href = 'index.html'; // Redirect to login if not authenticated
+      }
+    });
+  </script>
+</body>
+</html>
