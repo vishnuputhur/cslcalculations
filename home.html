@@ -1,127 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Society App - Home</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
-    h1 {
-      color: #333;
-      text-align: center;
-    }
+
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    p {
-      font-size: 16px;
-      margin: 10px 0;
-    }
-    a {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 30px;
       text-align: center;
-      border-radius: 5px;
     }
-    a:hover {
-      background-color: #45a049;
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
     }
+
+    p {
+      margin: 10px 0;
+      color: #555;
+      font-size: 16px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
     #error {
       color: red;
-      text-align: center;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    .loading {
+      font-style: italic;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome, <span id="userName">User</span></h1>
-    <p>Message 1: <span id="message1">No message</span></p>
-    <p>Message 2: <span id="message2">No message</span></p>
-    <p>Loan Balance: ₹<span id="loanBalance">0</span></p>
-    <p>Share Amount: ₹<span id="shareAmount">0</span></p>
-    <a href="profile.html">Profile</a>
-    <a href="loan-details.html">Loan Details</a>
-    <a href="applications.html">Application Status</a>
+    <h1>Welcome to Society App</h1>
+    <p id="userInfo" class="loading">Loading user info...</p>
+    <p id="loanDetails" class="loading">Loading loan details...</p>
+    <p id="shareDetails" class="loading">Loading share details...</p>
+
+    <button onclick="window.location.href='profile.html'">View Profile</button>
+    <button onclick="window.location.href='loan-details.html'">View Loan Details</button>
+    <button onclick="window.location.href='applications.html'">View Applications</button>
+    <button onclick="logout()">Logout</button>
+
     <p id="error"></p>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <!-- Firebase SDKs -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
+
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-      authDomain: "probanker-2bce7.firebaseapp.com",
-      projectId: "probanker-2bce7",
-      storageBucket: "probanker-2bce7.firebasestorage.app",
-      messagingSenderId: "27106244956",
-      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-      measurementId: "G-31138VCDFZ"
-    };
+    document.addEventListener('DOMContentLoaded', async function() {
+      const errorEl = document.getElementById('error');
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+      if (typeof firebase === 'undefined') {
+        errorEl.innerText = 'Firebase SDK load ആകുന്നില്ല.';
+        return;
+      }
 
-    // Check user authentication and fetch data
-    auth.onAuthStateChanged(async (user) => {
-      const errorElement = document.getElementById('error');
-      if (user) {
-        try {
-          // Fetch user data
-          const userDoc = await db.collection('users').doc(user.uid).get();
-          if (userDoc.exists) {
-            document.getElementById('userName').innerText = userDoc.data().name || 'User';
-          } else {
-            errorElement.innerText = 'User data not found';
-          }
+      const firebaseConfig = {
+        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+        authDomain: "probanker-2bce7.firebaseapp.com",
+        projectId: "probanker-2bce7",
+        storageBucket: "probanker-2bce7.firebasestorage.app",
+        messagingSenderId: "27106244956",
+        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+        measurementId: "G-31138VCDFZ"
+      };
 
-          // Fetch messages
-          const messageDoc = await db.collection('messages').where('userId', '==', user.uid).get();
-          if (!messageDoc.empty) {
-            document.getElementById('message1').innerText = messageDoc.docs[0].data().message1 || 'No message';
-            document.getElementById('message2').innerText = messageDoc.docs[0].data().message2 || 'No message';
-          } else {
-            document.getElementById('message1').innerText = 'No message';
-            document.getElementById('message2').innerText = 'No message';
-          }
-
-          // Fetch loan balance
-          const loanDoc = await db.collection('loans').where('userId', '==', user.uid).get();
-          if (!loanDoc.empty) {
-            document.getElementById('loanBalance').innerText = loanDoc.docs[0].data().balance || '0';
-          } else {
-            document.getElementById('loanBalance').innerText = '0';
-          }
-
-          // Fetch share amount
-          const shareDoc = await db.collection('shares').where('userId', '==', user.uid).get();
-          if (!shareDoc.empty) {
-            document.getElementById('shareAmount').innerText = shareDoc.docs[0].data().shareAmount || '0';
-          } else {
-            document.getElementById('shareAmount').innerText = '0';
-          }
-        } catch (error) {
-          errorElement.innerText = 'Error fetching data: ' + error.message;
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
         }
-      } else {
-        window.location.href = 'index.html'; // Redirect to login if not authenticated
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            try {
+              const userDoc = await db.collection('users').doc(user.uid).get();
+              if (userDoc.exists) {
+                document.getElementById('userInfo').innerText = `Welcome, ${userDoc.data().name}`;
+
+                const loanDoc = await db.collection('loans').doc(user.uid).get();
+                document.getElementById('loanDetails').innerText = loanDoc.exists
+                  ? `Loan Amount: ₹${loanDoc.data().amount}`
+                  : 'No loan details found';
+
+                const shareDoc = await db.collection('shares').doc(user.uid).get();
+                document.getElementById('shareDetails').innerText = shareDoc.exists
+                  ? `Share Amount: ₹${shareDoc.data().amount}`
+                  : 'No share details found';
+              } else {
+                errorEl.innerText = 'User record not found!';
+                auth.signOut();
+                window.location.href = 'index.html';
+              }
+            } catch (e) {
+              errorEl.innerText = 'Error loading data: ' + e.message;
+            }
+          } else {
+            window.location.href = 'index.html';
+          }
+        });
+
+        window.logout = async function() {
+          try {
+            await auth.signOut();
+            window.location.href = 'index.html';
+          } catch (e) {
+            errorEl.innerText = 'Error logging out: ' + e.message;
+          }
+        };
+      } catch (err) {
+        errorEl.innerText = 'Firebase init failed: ' + err.message;
       }
     });
   </script>
