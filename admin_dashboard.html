@@ -49,6 +49,7 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      background: #f0f4f8; /* Remove white box effect */
     }
     label {
       display: block;
@@ -57,7 +58,7 @@
       font-size: 0.85em;
     }
     input, select {
-      width: 40%; /* Desktop-ൽ 40% */
+      width: 40%; /* Desktop width */
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
@@ -85,8 +86,8 @@
       color: #fff;
       font-weight: bold;
       cursor: pointer;
-      width: 48%; /* 48% width */
-      margin-right: 2%; /* 2% margin */
+      width: 30%; /* Reduced to 30% as requested */
+      margin-right: 2%;
       font-size: 0.85em;
     }
     .button-row {
@@ -124,7 +125,7 @@
       display: none;
       margin-top: 15px;
       padding: 15px;
-      background: #f9f9f9; /* Light background */
+      background: #f0f4f8; /* Match body background to remove white box */
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
@@ -172,9 +173,9 @@
         padding: 10px;
       }
       button {
-        width: 100%; /* Mobile-ൽ full width */
+        width: 100%; /* Full width on mobile */
         margin-right: 0;
-        padding: 6px; /* Reduced padding */
+        padding: 6px;
         font-size: 0.8em;
       }
       .button-row {
@@ -188,7 +189,7 @@
         font-size: 0.8em;
       }
       input, select {
-        width: 100%; /* Mobile-ൽ full width */
+        width: 100%; /* Full width on mobile */
       }
     }
   </style>
@@ -372,62 +373,87 @@
       const loading = document.getElementById("userLoading");
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
-      fetchData("Users", (data) => {
-        if (!data || data.length === 0) {
-          data = [["0001", "John Doe", "john", "pass123", "100", "1000"]]; // Dummy data
-        }
-        updateTable("userTable", data, ["MemberNumber", "Name", "UserId", "Password", "MonthlyShare", "TotalShare"]);
-        loading.style.display = "none";
-      });
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=adminGetAllData&sheetName=Users`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            updateTable("userTable", data.data, ["MemberNumber", "Name", "UserId", "Password", "MonthlyShare", "TotalShare"]);
+          } else {
+            console.error("Users fetch error:", data.message);
+          }
+          loading.style.display = "none";
+        })
+        .catch(error => {
+          console.error("Error fetching Users:", error);
+          loading.style.display = "none";
+        });
     }
 
     function loadLoans() {
       const loading = document.getElementById("loanLoading");
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
-      fetchData("Loans", (data) => {
-        if (!data || data.length === 0) {
-          data = [["L001", "0001", "2025-07-01", "5000", "5", "4500"]]; // Dummy data
-        }
-        updateTable("loanTable", data, ["LoanNumber", "MemberNumber", "StartDate", "TotalAmount", "InterestRate", "CurrentBalance"]);
-        loading.style.display = "none";
-      });
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=adminGetAllData&sheetName=Loans`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            updateTable("loanTable", data.data, ["LoanNumber", "MemberNumber", "StartDate", "TotalAmount", "InterestRate", "CurrentBalance"]);
+          } else {
+            console.error("Loans fetch error:", data.message);
+          }
+          loading.style.display = "none";
+        })
+        .catch(error => {
+          console.error("Error fetching Loans:", error);
+          loading.style.display = "none";
+        });
     }
 
     function loadPayments() {
       const loading = document.getElementById("paymentLoading");
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
-      fetchData("Payments", (data) => {
-        if (!data || data.length === 0) {
-          data = [["P001", "0001", "L001", "2025-07-15", "500", "400", "100", "4100"]]; // Dummy data
-        }
-        updateTable("paymentTable", data, ["PaymentId", "MemberNumber", "LoanNumber", "Date", "Amount", "Principal", "Interest", "NewBalance"]);
-        loading.style.display = "none";
-      });
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=adminGetAllData&sheetName=Payments`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            updateTable("paymentTable", data.data, ["PaymentId", "MemberNumber", "LoanNumber", "Date", "Amount", "Principal", "Interest", "NewBalance"]);
+          } else {
+            console.error("Payments fetch error:", data.message);
+          }
+          loading.style.display = "none";
+        })
+        .catch(error => {
+          console.error("Error fetching Payments:", error);
+          loading.style.display = "none";
+        });
     }
 
     function loadShares() {
       const loading = document.getElementById("shareLoading");
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
-      fetchData("Shares", (data) => {
-        if (!data || data.length === 0) {
-          data = [["S001", "0001", "100", "25/07/2025", "July"]]; // Dummy data
-        }
-        updateTable("shareTable", data, ["ShareId", "MemberNumber", "Amount", "Date", "Month"]);
-        loading.style.display = "none";
-      });
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=adminGetAllData&sheetName=Shares`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            updateTable("shareTable", data.data, ["ShareId", "MemberNumber", "Amount", "Date", "Month"]);
+          } else {
+            console.error("Shares fetch error:", data.message);
+          }
+          loading.style.display = "none";
+        })
+        .catch(error => {
+          console.error("Error fetching Shares:", error);
+          loading.style.display = "none";
+        });
     }
 
-    function fetchData(sheetName, callback) {
-      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminGetData&sheetName=${encodeURIComponent(sheetName)}`)
+    function fetchData(url, callback) {
+      fetch(url)
         .then(response => response.json())
         .then(data => callback(data))
-        .catch(error => {
-          console.error(`Error fetching ${sheetName}:`, error);
-          callback([]); // Fallback to empty data
-        });
+        .catch(error => console.error("Fetch error:", error));
     }
 
     function updateTable(tableId, data, headers) {
@@ -463,11 +489,11 @@
       loading.style.display = "block";
       loading.scrollIntoView({ behavior: "smooth", block: "center" });
       const data = Array.from(form.getElementsByTagName("input")).map(input => input.value);
-      fetch(`https://script.google.com/macros/s/AKfycbxGIlmqXOS-GjTT-C0hS5aEmX6XvC__UEUdCag1CBQLu5X46zkd7V6AjfQekzmjXYOY/exec?action=adminUpdate&isAdmin=true&sheetName=${encodeURIComponent(sheetName)}&operation=${data.some(item => !item) ? "edit" : "add"}&data=${encodeURIComponent(JSON.stringify([data]))}`)
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=adminUpdate&isAdmin=true&sheetName=${encodeURIComponent(sheetName)}&operation=${data.some(item => !item) ? "edit" : "add"}&data=${encodeURIComponent(JSON.stringify([data]))}&idColumn=0&idValue=${data[0] || ""}`)
         .then(response => response.json())
         .then(result => {
           alert(result.message || "Data submitted successfully!");
-          if (result.status === "success" || !result.message) {
+          if (result.status === "success") {
             clearForm(sheetName);
             window[`load${sheetName}`]();
           }
