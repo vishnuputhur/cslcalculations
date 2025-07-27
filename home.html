@@ -7,43 +7,37 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 40px;
       background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
     }
     .container {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      max-width: 480px;
-      width: 100%;
+      max-width: 500px;
+      margin: 50px auto;
       padding: 30px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       text-align: center;
     }
     h1 {
       margin-bottom: 20px;
-      font-size: 24px;
       color: #333;
     }
     p {
       margin: 10px 0;
+      font-size: 1rem;
       color: #555;
-      font-size: 16px;
     }
     button {
-      display: block;
       width: 100%;
       padding: 12px;
-      margin: 12px 0;
+      margin: 10px 0;
       background: #4CAF50;
-      color: #fff;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 5px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
@@ -51,92 +45,90 @@
       background: #45a049;
     }
     #error {
-      color: red;
-      font-size: 14px;
       margin-top: 15px;
-    }
-    .loading {
-      font-style: italic;
-      color: #888;
+      color: #e74c3c;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Welcome to Society App</h1>
-    <p id="userInfo" class="loading">Loading user info...</p>
-    <p id="loanDetails" class="loading">Loading loan details...</p>
-    <p id="shareDetails" class="loading">Loading share details...</p>
+    <p id="userInfo">Loading user info...</p>
+    <p id="loanDetails">Loan Details: Loading...</p>
+    <p id="shareDetails">Share Details: Loading...</p>
+
     <button onclick="window.location.href='profile.html'">View Profile</button>
     <button onclick="window.location.href='loan-details.html'">View Loan Details</button>
     <button onclick="window.location.href='applications.html'">View Applications</button>
-    <button id="logoutBtn">Logout</button>
+    <button onclick="logout()">Logout</button>
+
     <p id="error"></p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/ 10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  <!-- Firebase SDKs -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-      authDomain: "probanker-2bce7.firebaseapp.com",
-      projectId: "probanker-2bce7",
-      storageBucket: "probanker-2bce7.firebasestorage.app",
-      messagingSenderId: "27106244956",
-      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-      measurementId: "G-31138VCDFZ"
-    };
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof firebase === 'undefined') {
+        document.getElementById('error').innerText = 'Firebase SDK load ആകുന്നില്ല.';
+        return;
+      }
 
-    try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+      // Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+        authDomain: "probanker-2bce7.firebaseapp.com",
+        projectId: "probanker-2bce7",
+        storageBucket: "probanker-2bce7.appspot.com",
+        messagingSenderId: "27106244956",
+        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+        measurementId: "G-31138VCDFZ"
+      };
 
-      onAuthStateChanged(auth, async (user) => {
-        const userInfoEl = document.getElementById('userInfo');
-        const loanDetailsEl = document.getElementById('loanDetails');
-        const shareDetailsEl = document.getElementById('shareDetails');
-        const errorEl = document.getElementById('error');
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
 
+      auth.onAuthStateChanged(async (user) => {
         if (user) {
           try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              userInfoEl.innerText = `Welcome, ${userDoc.data().name}`;
-              const loanDoc = await getDoc(doc(db, 'loans', user.uid));
-              const shareDoc = await getDoc(doc(db, 'shares', user.uid));
-              loanDetailsEl.innerText = loanDoc.exists()
-                ? `Loan Amount: ${userDoc.data().currency || '₹'}${loanDoc.data().amount}`
-                : 'No loan details found';
-              shareDetailsEl.innerText = shareDoc.exists()
-                ? `Share Amount: ${userDoc.data().currency || '₹'}${shareDoc.data().amount}`
-                : 'No share details found';
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+              document.getElementById('userInfo').innerText = `Welcome, ${userDoc.data().name}`;
             } else {
-              errorEl.innerText = 'User record not found!';
-              await signOut(auth);
-              window.location.href = 'index.html';
+              document.getElementById('userInfo').innerText = 'User info not found.';
             }
-          } catch (error) {
-            errorEl.innerText = 'Error loading data: ' + error.message;
+
+            const loanDoc = await db.collection('loans').doc(user.uid).get();
+            if (loanDoc.exists) {
+              document.getElementById('loanDetails').innerText = `Loan Balance: ₹${loanDoc.data().balance}`;
+            } else {
+              document.getElementById('loanDetails').innerText = 'Loan Details: NA';
+            }
+
+            const shareDoc = await db.collection('shares').doc(user.uid).get();
+            if (shareDoc.exists) {
+              document.getElementById('shareDetails').innerText = `Shares: ₹${shareDoc.data().amount}`;
+            } else {
+              document.getElementById('shareDetails').innerText = 'Share Details: NA';
+            }
+
+          } catch (err) {
+            document.getElementById('error').innerText = `Error: ${err.message}`;
           }
         } else {
-          window.location.href = 'index.html';
+          window.location.href = 'index.html'; // redirect to login
         }
       });
 
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-          await signOut(auth);
-          window.location.href = 'index.html';
-        } catch (error) {
-          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
-        }
-      });
-    } catch (error) {
-      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
-    }
+      window.logout = async function() {
+        await auth.signOut();
+        window.location.href = 'index.html';
+      };
+    });
   </script>
 </body>
 </html>
