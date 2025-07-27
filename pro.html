@@ -23,7 +23,7 @@
     <p id="error"></p>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase CDN SDK -->
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
@@ -52,7 +52,7 @@
         const db = firebase.firestore();
 
         // Login function
-        swewindow.login = async function() {
+        window.login = async function() {
           const email = document.getElementById('email').value;
           const memberNumber = document.getElementById('memberNumber').value;
           const password = document.getElementById('password').value;
