@@ -24,11 +24,16 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      if (typeof firebase === 'undefined') {
+        document.getElementById('error').innerText = 'Firebase SDK load ആകുന്നില്ല. Network അല്ലെങ്കിൽ CDN URL check ചെയ്യൂ.';
+        return;
+      }
+
       // Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -47,7 +52,7 @@
         const db = firebase.firestore();
 
         // Login function
-        window.login = async function() {
+        swewindow.login = async function() {
           const email = document.getElementById('email').value;
           const memberNumber = document.getElementById('memberNumber').value;
           const password = document.getElementById('password').value;
@@ -56,17 +61,17 @@
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
             if (userDoc.exists && userDoc.data().memberNumber === memberNumber) {
-              alert('Login successful!');
+              alert('Login വിജയകരം!');
               window.location.href = 'home.html';
             } else {
-              errorElement.innerText = 'Invalid Member Number';
+              errorElement.innerText = 'Member Number തെറ്റാണ്';
             }
           } catch (error) {
-            errorElement.innerText = 'Login failed: ' + error.message;
+            errorElement.innerText = 'Login പരാജയപ്പെട്ടു: ' + error.message;
           }
         };
       } catch (error) {
-        document.getElementById('error').innerText = 'Firebase initialization failed: ' + error.message;
+        document.getElementById('error').innerText = 'Firebase initialization പരാജയപ്പെട്ടു: ' + error.message;
       }
     });
   </script>
