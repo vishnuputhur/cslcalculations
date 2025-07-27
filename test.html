@@ -8,21 +8,40 @@
   <h1>Testing Firebase</h1>
   <p id="status">Loading...</p>
 
+  <!-- ✅ Firebase SDKs WITHOUT defer -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
+
+  <!-- ✅ Firebase Config & Test -->
   <script>
+    // ✅ Firebase Config - Thangalude actual config use cheyyuka
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
       authDomain: "probanker-2bce7.firebaseapp.com",
       projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.appspot.com",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
     };
 
+    // ✅ Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
+    // ✅ Test Firebase Loaded
     if (typeof firebase === 'undefined') {
       document.getElementById('status').innerText = "Firebase NOT Loaded!";
     } else {
       document.getElementById('status').innerText = "Firebase Loaded ✅";
+
+      // Optional: Test Firestore Read
+      const db = firebase.firestore();
+      db.collection("messages").get().then((snap) => {
+        document.getElementById('status').innerText += ` | Found ${snap.size} docs`;
+      }).catch((err) => {
+        document.getElementById('status').innerText += ` | Firestore Error: ${err.message}`;
+      });
     }
   </script>
 </body>
