@@ -70,17 +70,20 @@
 
   <script>
     function login(event) {
-      event.preventDefault(); // Prevent form submission
+      event.preventDefault();
       const userId = document.getElementById("userId").value.trim();
       const password = document.getElementById("password").value.trim();
-      console.log("Login attempt:", { userId, password }); // Debug log
-      if (userId === "admin" && password === "admin123") {
-        sessionStorage.setItem("isAdmin", "true");
-        console.log("Login successful, redirecting..."); // Debug log
-        window.location.href = "admin_dashboard.html";
-      } else {
-        alert("Invalid credentials. Please use 'admin' and 'admin123'.");
-      }
+      fetch(`https://script.google.com/macros/s/1d9wSyZVM9DM0JMd6ZA7JNcB77uA-QEpu-IUfY_QBiyY/exec?action=login&userId=${userId}&password=${password}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            sessionStorage.setItem("isAdmin", data.isAdmin);
+            window.location.href = "admin_dashboard.html";
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch(error => alert("Login error: " + error.message));
     }
   </script>
 </body>
