@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Firestore Test</title>
+  <title>Firebase CDN Test</title>
 </head>
 <body>
-  <h1>Test Firestore Read</h1>
-  <pre id="result">Loading...</pre>
+  <h1>Test Firebase</h1>
+  <pre id="output">Loading...</pre>
 
+  <!-- UMD Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
 
@@ -17,17 +18,18 @@
       authDomain: "probanker-2bce7.firebaseapp.com",
       projectId: "probanker-2bce7",
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    db.collection('shares').get().then(snap => {
-      let out = '';
+    db.collection("shares").get().then((snap) => {
+      let text = '';
       snap.forEach(doc => {
-        out += JSON.stringify(doc.data()) + '\n';
+        text += JSON.stringify(doc.data()) + '\n';
       });
-      document.getElementById('result').innerText = out || 'No docs found.';
+      document.getElementById('output').innerText = text || 'No data.';
     }).catch(err => {
-      document.getElementById('result').innerText = 'ERROR: ' + err.message;
+      document.getElementById('output').innerText = err.message;
     });
   </script>
 </body>
