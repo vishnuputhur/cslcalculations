@@ -15,7 +15,6 @@
       align-items: center;
       min-height: 100vh;
     }
-
     .container {
       background: #fff;
       border-radius: 12px;
@@ -25,19 +24,16 @@
       padding: 30px;
       text-align: center;
     }
-
     h1 {
       margin-bottom: 20px;
       font-size: 24px;
       color: #333;
     }
-
     p {
       margin: 10px 0;
       color: #555;
       font-size: 16px;
     }
-
     button {
       display: block;
       width: 100%;
@@ -51,17 +47,14 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-
     button:hover {
       background: #45a049;
     }
-
     #error {
       color: red;
       font-size: 14px;
       margin-top: 15px;
     }
-
     .loading {
       font-style: italic;
       color: #888;
@@ -74,88 +67,76 @@
     <p id="userInfo" class="loading">Loading user info...</p>
     <p id="loanDetails" class="loading">Loading loan details...</p>
     <p id="shareDetails" class="loading">Loading share details...</p>
-
     <button onclick="window.location.href='profile.html'">View Profile</button>
     <button onclick="window.location.href='loan-details.html'">View Loan Details</button>
     <button onclick="window.location.href='applications.html'">View Applications</button>
-    <button onclick="logout()">Logout</button>
-
+    <button id="logoutBtn">Logout</button>
     <p id="error"></p>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/ 10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      const errorEl = document.getElementById('error');
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+      storageBucket: "probanker-2bce7.firebasestorage.app",
+      messagingSenderId: "27106244956",
+      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
+      measurementId: "G-31138VCDFZ"
+    };
 
-      if (typeof firebase === 'undefined') {
-        errorEl.innerText = 'Firebase SDK load ആകുന്നില്ല.';
-        return;
-      }
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-        authDomain: "probanker-2bce7.firebaseapp.com",
-        projectId: "probanker-2bce7",
-        storageBucket: "probanker-2bce7.firebasestorage.app",
-        messagingSenderId: "27106244956",
-        appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-        measurementId: "G-31138VCDFZ"
-      };
+      onAuthStateChanged(auth, async (user) => {
+        const userInfoEl = document.getElementById('userInfo');
+        const loanDetailsEl = document.getElementById('loanDetails');
+        const shareDetailsEl = document.getElementById('shareDetails');
+        const errorEl = document.getElementById('error');
 
-      try {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        auth.onAuthStateChanged(async (user) => {
-          if (user) {
-            try {
-              const userDoc = await db.collection('users').doc(user.uid).get();
-              if (userDoc.exists) {
-                document.getElementById('userInfo').innerText = `Welcome, ${userDoc.data().name}`;
-
-                const loanDoc = await db.collection('loans').doc(user.uid).get();
-                document.getElementById('loanDetails').innerText = loanDoc.exists
-                  ? `Loan Amount: ₹${loanDoc.data().amount}`
-                  : 'No loan details found';
-
-                const shareDoc = await db.collection('shares').doc(user.uid).get();
-                document.getElementById('shareDetails').innerText = shareDoc.exists
-                  ? `Share Amount: ₹${shareDoc.data().amount}`
-                  : 'No share details found';
-              } else {
-                errorEl.innerText = 'User record not found!';
-                auth.signOut();
-                window.location.href = 'index.html';
-              }
-            } catch (e) {
-              errorEl.innerText = 'Error loading data: ' + e.message;
-            }
-          } else {
-            window.location.href = 'index.html';
-          }
-        });
-
-        window.logout = async function() {
+        if (user) {
           try {
-            await auth.signOut();
-            window.location.href = 'index.html';
-          } catch (e) {
-            errorEl.innerText = 'Error logging out: ' + e.message;
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              userInfoEl.innerText = `Welcome, ${userDoc.data().name}`;
+              const loanDoc = await getDoc(doc(db, 'loans', user.uid));
+              const shareDoc = await getDoc(doc(db, 'shares', user.uid));
+              loanDetailsEl.innerText = loanDoc.exists()
+                ? `Loan Amount: ${userDoc.data().currency || '₹'}${loanDoc.data().amount}`
+                : 'No loan details found';
+              shareDetailsEl.innerText = shareDoc.exists()
+                ? `Share Amount: ${userDoc.data().currency || '₹'}${shareDoc.data().amount}`
+                : 'No share details found';
+            } else {
+              errorEl.innerText = 'User record not found!';
+              await signOut(auth);
+              window.location.href = 'index.html';
+            }
+          } catch (error) {
+            errorEl.innerText = 'Error loading data: ' + error.message;
           }
-        };
-      } catch (err) {
-        errorEl.innerText = 'Firebase init failed: ' + err.message;
-      }
-    });
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          window.location.href = 'index.html';
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+        }
+      });
+    } catch (error) {
+      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
+    }
   </script>
 </body>
 </html>
