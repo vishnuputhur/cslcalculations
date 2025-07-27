@@ -5,15 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Society App - Admin Panel</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .container { background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); max-width: 600px; width: 100%; padding: 30px; text-align: center; }
-    h1 { margin-bottom: 20px; font-size: 24px; color: #333; }
-    p { margin: 10px 0; color: #555; font-size: 16px; }
-    button { display: block; width: 100%; padding: 12px; margin: 12px 0; background: #4CAF50; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.3s ease; }
-    button:hover { background: #45a049; }
-    #error { color: red; font-size: 14px; margin-top: 15px; }
-    .loading { font-style: italic; color: #888; }
-    .user-list { text-align: left; margin: 20px 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+    p {
+      margin: 10px 0;
+      color: #555;
+      font-size: 16px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #error {
+      color: red;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    .loading {
+      font-style: italic;
+      color: #888;
+    }
+    .user-list {
+      text-align: left;
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -58,10 +107,10 @@
               adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
               const usersSnapshot = await getDocs(collection(db, 'users'));
               let usersHtml = '<h3>Users</h3>';
-              for (const doc of usersSnapshot.docs) {
-                const data = doc.data();
-                const loanDoc = await getDoc(doc(db, 'loans', doc.id));
-                const shareDoc = await getDoc(doc(db, 'shares', doc.id));
+              for (const userDocSnap of usersSnapshot.docs) {
+                const data = userDocSnap.data();
+                const loanDoc = await getDoc(doc(db, 'loans', userDocSnap.id));
+                const shareDoc = await getDoc(doc(db, 'shares', userDocSnap.id));
                 usersHtml += `
                   <p>
                     Name: ${data.name}<br>
@@ -69,7 +118,7 @@
                     Member Number: ${data.memberNumber}<br>
                     Loan Balance: ${loanDoc.exists() ? `₹${loanDoc.data().balance || 'N/A'}` : 'No loan'}<br>
                     Share Amount: ${shareDoc.exists() ? `₹${shareDoc.data().amount || 'N/A'}` : 'No shares'}<br>
-                    <button onclick="viewUserDetails('${doc.id}')">View Details</button>
+                    <button onclick="viewUserDetails('${userDocSnap.id}')">View Details</button>
                   </p>
                 `;
               }
@@ -96,7 +145,7 @@
           const shareDoc = await getDoc(doc(db, 'shares', userId));
           let details = `User Details:\nName: ${userDoc.data().name}\nEmail: ${userDoc.data().email}`;
           details += `\nMember Number: ${userDoc.data().memberNumber}`;
-          details += loanDoc.exists() ? `\nLoan Balance: ₹${loanDoc.data().balance}\nGuarantors: ${loanDoc.data().guarantors.join(', ')}` : '\nNo loan details';
+          details += loanDoc.exists() ? `\nLoan Balance: ₹${loanDoc.data().balance}\nGuarantors: ${loanDoc.data().guarantors ? loanDoc.data().guarantors.join(', ') : 'N/A'}` : '\nNo loan details';
           details += shareDoc.exists() ? `\nShare Amount: ₹${shareDoc.data().amount}` : '\nNo share details';
           alert(details);
         } catch (error) {
