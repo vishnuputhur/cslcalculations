@@ -7,196 +7,228 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #e0f7fa, #fff);
+      margin: 0; padding: 20px; background: #f0f8ff;
+      display: flex; flex-direction: column; align-items: center;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     .container {
-      flex: 1;
-      padding: 10px;
-      max-width: 100%;
-      box-sizing: border-box;
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
     }
     h1 {
+      color: #1c8fed;
+      font-size: 22px;
       text-align: center;
-      color: #2c3e50;
-      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    #userName {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1c8fed;
+      text-align: center;
       margin: 10px 0;
-      white-space: normal;
-      line-height: 1.2;
     }
-    .message {
+    #memberNumber {
+      font-size: 12px;
+      color: #555;
       text-align: center;
-      color: #34495e;
-      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    #messageSection {
+      display: none;
+      background: #ffe6e6;
+      border-left: 4px solid #b30000;
+      padding: 10px;
+      border-radius: 6px;
       margin: 10px 0;
-      padding: 10px;
-      background: #ecf0f1;
-      border-radius: 5px;
     }
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
+    #messageSection.active {
+      display: block;
     }
-    .card {
-      background: #f8f9fa;
-      border-radius: 5px;
-      padding: 10px;
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-3px);
-    }
-    .card h3 {
-      color: #34495e;
+    #messages {
+      color: darkred;
       font-size: 14px;
-      margin-bottom: 5px;
+      text-align: center;
     }
-    .card button {
-      width: 80%;
-      padding: 6px;
-      margin: 3px 0;
-      background: #3498db;
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      position: relative;
+    }
+    .share-btn {
+      background: #1c8fed;
       color: #fff;
       border: none;
-      border-radius: 3px;
-      font-size: 12px;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       cursor: pointer;
+      position: relative;
       transition: background 0.3s ease;
     }
-    .card button:hover {
-      background: #2980b9;
+    .share-btn:hover {
+      background: #136fc0;
     }
-    #error {
-      color: red;
-      font-size: 12px;
-      margin-top: 5px;
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      padding: 10px;
       text-align: center;
+      min-width: 150px;
+      z-index: 1;
+    }
+    .dropdown.active {
+      display: block;
+    }
+    .dropdown div {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #333;
     }
     #logoutBtn {
-      width: 80%;
-      padding: 6px;
+      display: block;
+      width: 100%;
       background: #e74c3c;
       color: #fff;
       border: none;
-      border-radius: 3px;
-      font-size: 12px;
+      padding: 10px;
+      border-radius: 50px;
+      font-size: 14px;
+      margin-top: 20px;
       cursor: pointer;
-      margin: 10px auto;
-      display: block;
+      transition: background 0.3s ease;
     }
     #logoutBtn:hover {
       background: #c0392b;
     }
-    .footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #2c3e50;
-      color: #fff;
+    #error {
+      color: red;
+      font-size: 12px;
       text-align: center;
-      padding: 5px 0;
-      font-size: 10px;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Cochin Shipyard staff<br>cooperative House Construction Society</h1>
-    <div class="message" id="welcomeMsg">Loading...</div>
-    <div class="dashboard-grid" id="dashboardGrid">
-      <div class="card">
-        <h3>Profile</h3>
-        <button onclick="showProfile()">View</button>
-      </div>
-      <div class="card">
-        <h3>Loan Details</h3>
-        <button onclick="showLoanDetails()">View</button>
-      </div>
-      <div class="card">
-        <h3>Applications</h3>
-        <button onclick="showApplications()">View</button>
+    <h1>Welcome</h1>
+    <div id="userName">Loading...</div>
+    <div id="memberNumber"></div>
+    <div id="messageSection">
+      <div id="messages"></div>
+    </div>
+    <div class="actions">
+      <button class="share-btn" onclick="toggleDropdown()">View Balance</button>
+      <div id="dropdown" class="dropdown">
+        <div id="shareBalance">Share: ₹0</div>
+        <div id="loanBalance">Loan: ₹0</div>
       </div>
     </div>
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
   </div>
-  <div class="footer">Powered by VT Soft 2025</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
       authDomain: "probanker-2bce7.firebaseapp.com",
       projectId: "probanker-2bce7",
-      storageBucket: "probanker-2bce7.firebasestorage.app",
+      storageBucket: "probanker-2bce7.appspot.com",
       messagingSenderId: "27106244956",
       appId: "1:27106244956:web:59792c9dc94aa8e5232999",
       measurementId: "G-31138VCDFZ"
     };
 
-    try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      onAuthStateChanged(auth, async (user) => {
-        const welcomeMsg = document.getElementById('welcomeMsg');
-        const errorEl = document.getElementById('error');
-        const dashboardGrid = document.getElementById('dashboardGrid');
+    let shareAmount = 0;
+    let loanAmount = 0;
 
-        if (user) {
-          try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              welcomeMsg.innerText = `Welcome, ${userDoc.data().name}! Your member number is ${userDoc.data().memberNumber || 'N/A'}.`;
-              dashboardGrid.style.display = 'grid';
-            } else {
-              errorEl.innerText = 'User not found in database! Please contact admin.';
-              dashboardGrid.style.display = 'none';
-            }
-          } catch (error) {
-            errorEl.innerText = 'Error loading data: ' + error.message;
-            dashboardGrid.style.display = 'none';
-          }
-        } else {
-          window.location.href = 'index.html';
-        }
-      });
+    onAuthStateChanged(auth, async (user) => {
+      const userNameEl = document.getElementById('userName');
+      const memberNumberEl = document.getElementById('memberNumber');
+      const messageSection = document.getElementById('messageSection');
+      const messagesEl = document.getElementById('messages');
+      const shareEl = document.getElementById('shareBalance');
+      const loanEl = document.getElementById('loanBalance');
+      const errorEl = document.getElementById('error');
 
-      window.showProfile = () => {
-        window.location.href = 'profile.html';
-      };
-
-      window.showLoanDetails = () => {
-        window.location.href = 'loan-details.html';
-      };
-
-      window.showApplications = () => {
-        window.location.href = 'applications.html';
-      };
-
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (user) {
         try {
-          await signOut(auth);
-          window.location.href = 'index.html';
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            userNameEl.innerText = `${userData.name || 'User'}`;
+            memberNumberEl.innerText = `${userData.memberNumber || ''}`;
+
+            // Fetch share balance
+            const shareSnapshot = await getDocs(query(collection(db, 'shares'), where('userId', '==', user.uid)));
+            shareAmount = 0;
+            shareSnapshot.forEach(doc => { shareAmount += doc.data().amount || 0; });
+            shareEl.innerText = `Share: ₹${shareAmount}`;
+
+            // Fetch loan balance
+            const loanSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', user.uid)));
+            loanAmount = 0;
+            loanSnapshot.forEach(doc => { loanAmount += doc.data().amount || 0; });
+            loanEl.innerText = `Loan: ₹${loanAmount}`;
+
+            // Fetch messages
+            const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
+            const msgSnapshot = await getDocs(msgQuery);
+            if (!msgSnapshot.empty) {
+              messageSection.classList.add('active');
+              messagesEl.innerHTML = '';
+              msgSnapshot.forEach(doc => {
+                const data = doc.data();
+                messagesEl.innerHTML += `<div><strong>${data.title}</strong><p>${data.content}</p></div>`;
+              });
+            } else {
+              messageSection.classList.remove('active');
+            }
+
+          } else {
+            userNameEl.innerText = 'User data not found!';
+          }
         } catch (error) {
-          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+          errorEl.innerText = 'Error loading data: ' + error.message;
         }
-      });
-    } catch (error) {
-      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
-    }
+      } else {
+        userNameEl.innerText = 'Please log in.';
+        messageSection.classList.remove('active');
+      }
+    });
+
+    window.toggleDropdown = () => {
+      const dropdown = document.getElementById('dropdown');
+      dropdown.classList.toggle('active');
+    };
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = 'index.html';
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+      }
+    });
   </script>
 </body>
 </html>
