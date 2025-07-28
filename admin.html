@@ -5,7 +5,135 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Society App - Admin Dashboard</title>
   <style>
-    /* Existing styles remain same */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0f7fa, #fff);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 {
+      color: #34495e;
+      margin-bottom: 15px;
+    }
+    .card button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .card button:hover {
+      background: #2980b9;
+    }
+    .form-section {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: #ecf0f1;
+      border-radius: 10px;
+    }
+    .form-section.active {
+      display: block;
+    }
+    .login-section {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: #ecf0f1;
+      border-radius: 10px;
+    }
+    .login-section.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    #error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    #logoutBtn {
+      margin-top: 20px;
+      background: #e74c3c;
+    }
+    #logoutBtn:hover {
+      background: #c0392b;
+    }
+    .user-list {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .user-item {
+      padding: 5px 0;
+      cursor: pointer;
+    }
+    .user-item:hover {
+      background: #f0f0f0;
+    }
+    .copy-btn {
+      margin-left: 10px;
+      background: #2ecc71;
+      padding: 2px 6px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: #27ae60;
+    }
+    .instructions {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -13,7 +141,29 @@
     <h1>Admin Dashboard</h1>
     <p id="adminInfo" class="loading">Loading admin data...</p>
     <div class="dashboard-grid" id="dashboardGrid">
-      <!-- Cards remain same -->
+      <div class="card">
+        <h3>Manage Members</h3>
+        <button onclick="showForm('memberForm')">Add Member</button>
+        <button onclick="showForm('editMemberForm')">Edit Member</button>
+      </div>
+      <div class="card">
+        <h3>Manage Loans</h3>
+        <button onclick="showForm('loanForm')">Add Loan</button>
+        <button onclick="showForm('editLoanForm')">Edit Loan</button>
+      </div>
+      <div class="card">
+        <h3>Loan Payments</h3>
+        <button onclick="showForm('paymentForm')">Add Payment</button>
+      </div>
+      <div class="card">
+        <h3>Send Message</h3>
+        <button onclick="showForm('messageForm')">Send Message</button>
+      </div>
+      <div class="card">
+        <h3>Manage Shares</h3>
+        <button onclick="showForm('shareForm')">Add Share</button>
+        <button onclick="showForm('editShareForm')">Edit Share</button>
+      </div>
     </div>
 
     <!-- Login Section -->
@@ -28,7 +178,52 @@
       <button onclick="adminLogin()">Login</button>
     </div>
 
-    <!-- Forms remain same -->
+    <!-- Member Form -->
+    <div id="memberForm" class="form-section">
+      <h3>Add New Member</h3>
+      <div class="form-group">
+        <label>Email:</label><input type="email" id="memberEmail" placeholder="Enter email">
+      </div>
+      <div class="form-group">
+        <label>Password:</label><input type="password" id="memberPassword" placeholder="Enter password">
+      </div>
+      <div class="form-group">
+        <label>Name:</label><input type="text" id="memberName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Member Number:</label><input type="text" id="memberNumber" placeholder="Enter member number">
+      </div>
+      <div class="form-group">
+        <label>Address:</label><textarea id="memberAddress" placeholder="Enter address"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Pincode:</label><input type="text" id="memberPincode" placeholder="Enter pincode">
+      </div>
+      <div class="form-group">
+        <label>Phone:</label><input type="text" id="memberPhone" placeholder="Enter phone">
+      </div>
+      <button onclick="addMember()">Submit</button>
+      <div class="instructions">
+        <p>Note: Use Firebase Console for bulk adds if rate limits apply.</p>
+      </div>
+    </div>
+
+    <!-- Edit Member Form -->
+    <div id="editMemberForm" class="form-section">
+      <h3>Edit Member</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="editMemberId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Name:</label><input type="text" id="editMemberName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Address:</label><textarea id="editMemberAddress" placeholder="Enter address"></textarea>
+      </div>
+      <button onclick="editMember()">Update</button>
+    </div>
+
+    <!-- Other forms remain same -->
 
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
@@ -37,7 +232,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -84,7 +279,13 @@
               let usersHtml = '<h3>Users List</h3>';
               for (const doc of usersSnapshot.docs) {
                 const data = doc.data();
-                usersHtml += `<p>User ID: ${doc.id} | Name: ${data.name || 'N/A'} | Email: ${data.email || 'N/A'} | Member Number: ${data.memberNumber || 'N/A'}</p>`;
+                usersHtml += `
+                  <div class="user-item" onclick="selectUser('${doc.id}')">
+                    User ID: <span id="uid-${doc.id}">${doc.id}</span>
+                    <button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy</button>
+                    | Name: ${data.name || 'N/A'} | Email: ${data.email || 'N/A'} | Member Number: ${data.memberNumber || 'N/A'}
+                  </div>
+                `;
               }
               userListEl.innerHTML = usersHtml;
             } else {
@@ -116,7 +317,68 @@
         }
       };
 
-      // Form functions remain same (addMember, editMember, etc.)
+      window.selectUser = function(userId) {
+        console.log('Selected user:', userId);
+        document.getElementById('editMemberId').value = userId;
+        showForm('editMemberForm');
+      };
+
+      window.copyToClipboard = function(userId) {
+        const uidElement = document.getElementById(`uid-${userId}`);
+        navigator.clipboard.writeText(uidElement.innerText).then(() => {
+          alert('User ID copied to clipboard!');
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+      };
+
+      async function addMember() {
+        const email = document.getElementById('memberEmail').value;
+        const password = document.getElementById('memberPassword').value;
+        const name = document.getElementById('memberName').value;
+        const memberNumber = document.getElementById('memberNumber').value;
+        const address = document.getElementById('memberAddress').value;
+        const pincode = document.getElementById('memberPincode').value;
+        const phone = document.getElementById('memberPhone').value;
+        const errorEl = document.getElementById('error');
+
+        try {
+          // Create user in Authentication
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = userCredential.user.uid;
+
+          // Add user data to Firestore
+          await setDoc(doc(db, 'users', uid), {
+            email,
+            name,
+            memberNumber,
+            address,
+            pincode,
+            phone,
+            isAdmin: false
+          });
+
+          alert('Member added successfully!');
+          showForm(null);
+        } catch (error) {
+          errorEl.innerText = 'Error adding member: ' + error.message;
+        }
+      }
+
+      async function editMember() {
+        const userId = document.getElementById('editMemberId').value;
+        const name = document.getElementById('editMemberName').value;
+        const address = document.getElementById('editMemberAddress').value;
+        try {
+          await updateDoc(doc(db, 'users', userId), { name, address });
+          alert('Member updated successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error editing member: ' + error.message;
+        }
+      }
+
+      // Other form functions remain same (addLoan, editLoan, etc.)
 
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
