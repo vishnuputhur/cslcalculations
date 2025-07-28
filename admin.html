@@ -69,6 +69,16 @@
     .form-section.active {
       display: block;
     }
+    .login-section {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: #ecf0f1;
+      border-radius: 10px;
+    }
+    .login-section.active {
+      display: block;
+    }
     .form-group {
       margin-bottom: 15px;
       text-align: left;
@@ -138,6 +148,18 @@
       </div>
     </div>
 
+    <!-- Login Section -->
+    <div id="loginSection" class="login-section">
+      <h3>Admin Login</h3>
+      <div class="form-group">
+        <label>Email:</label><input type="email" id="adminEmail" placeholder="Enter admin email">
+      </div>
+      <div class="form-group">
+        <label>Password:</label><input type="password" id="adminPassword" placeholder="Enter password">
+      </div>
+      <button onclick="adminLogin()">Login</button>
+    </div>
+
     <!-- Member Form -->
     <div id="memberForm" class="form-section">
       <h3>Add New Member</h3>
@@ -161,7 +183,7 @@
       </div>
       <button onclick="addMember()">Submit</button>
       <div class="instructions">
-        <p>Note: Use Firebase Console > Authentication > Import Users for bulk adds (CSV).</p>
+        <p>Note: Use Firebase Console > Authentication > Import Users (CSV) for bulk adds.</p>
       </div>
     </div>
 
@@ -274,7 +296,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -296,12 +318,16 @@
         const adminInfoEl = document.getElementById('adminInfo');
         const userListEl = document.getElementById('userList');
         const errorEl = document.getElementById('error');
+        const loginSection = document.getElementById('loginSection');
+        const dashboardGrid = document.getElementById('dashboardGrid');
 
         if (user) {
           try {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists() && userDoc.data().isAdmin) {
               adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
+              loginSection.style.display = 'none';
+              dashboardGrid.style.display = 'grid';
               const usersSnapshot = await getDocs(collection(db, 'users'));
               let usersHtml = '<h3>Users List</h3>';
               for (const doc of usersSnapshot.docs) {
@@ -312,38 +338,41 @@
             } else {
               adminInfoEl.innerText = 'Access denied: Not an admin';
               errorEl.innerText = 'You are not authorized to access this page!';
-              await signOut(auth);
-              window.location.href = 'index.html';
+              dashboardGrid.style.display = 'none';
+              loginSection.classList.add('active');
             }
           } catch (error) {
             errorEl.innerText = 'Error loading admin data: ' + error.message;
+            dashboardGrid.style.display = 'none';
+            loginSection.classList.add('active');
           }
         } else {
-          // No redirect, just show error since admin can login directly
-          errorEl.innerText = 'Please log in as an admin!';
+          adminInfoEl.innerText = 'Please log in as admin';
+          dashboardGrid.style.display = 'none';
+          loginSection.classList.add('active');
         }
       });
+
+      window.adminLogin = async () => {
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        const errorEl = document.getElementById('error');
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          // On success, auth state change will handle dashboard load
+        } catch (error) {
+          errorEl.innerText = 'Login failed: ' + error.message;
+        }
+      };
 
       function showForm(formId) {
         document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
         document.getElementById(formId).classList.add('active');
       }
 
-      // Note: Client-side auth.createUserWithEmailAndPassword is restricted in free tier
       async function addMember() {
-        const email = document.getElementById('memberEmail').value;
-        const name = document.getElementById('memberName').value;
-        const memberNumber = document.getElementById('memberNumber').value;
-        const address = document.getElementById('memberAddress').value;
-        const pincode = document.getElementById('memberPincode').value;
-        const phone = document.getElementById('memberPhone').value;
-        try {
-          // Manual addition recommended due to free tier limits
-          alert('Add member via Firebase Console > Authentication > Import Users (CSV) for bulk adds.');
-          showForm(null);
-        } catch (error) {
-          document.getElementById('error').innerText = 'Error: Use Console for member addition. ' + error.message;
-        }
+        alert('Add member via Firebase Console > Authentication > Import Users (CSV) for bulk adds.');
+        showForm(null);
       }
 
       async function editMember() {
