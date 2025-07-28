@@ -314,6 +314,17 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
+      window.showForm = function(formId) { // Ensure global access
+        console.log('Showing form:', formId); // Debug log
+        document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
+        const form = document.getElementById(formId);
+        if (form) {
+          form.classList.add('active');
+        } else {
+          console.error('Form ID not found:', formId);
+        }
+      };
+
       onAuthStateChanged(auth, async (user) => {
         const adminInfoEl = document.getElementById('adminInfo');
         const userListEl = document.getElementById('userList');
@@ -364,11 +375,6 @@
           errorEl.innerText = 'Login failed: ' + error.message;
         }
       };
-
-      function showForm(formId) {
-        document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
-        document.getElementById(formId).classList.add('active');
-      }
 
       async function addMember() {
         alert('Add member via Firebase Console > Authentication > Import Users (CSV) for bulk adds.');
