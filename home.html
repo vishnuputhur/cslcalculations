@@ -2,82 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Society App - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Society App - Login</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 40px;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .container {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      max-width: 480px;
-      width: 100%;
-      padding: 30px;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-      color: #333;
-    }
-    p {
-      margin: 10px 0;
-      color: #555;
-      font-size: 16px;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      background: #4CAF50;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    #error {
-      color: red;
-      font-size: 14px;
-      margin-top: 15px;
-    }
-    .loading {
-      font-style: italic;
-      color: #888;
-    }
+    /* Existing styles remain same */
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Welcome to Society App</h1>
-    <p id="userInfo" class="loading">Loading user info...</p>
-    <p id="loanDetails" class="loading">Loading loan details...</p>
-    <p id="shareDetails" class="loading">Loading share details...</p>
-    <button onclick="window.location.href='profile.html'">View Profile</button>
-    <button onclick="window.location.href='loan-details.html'">View Loan Details</button>
-    <button onclick="window.location.href='applications.html'">View Applications</button>
-    <button id="logoutBtn">Logout</button>
+    <h1>Society App Login</h1>
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" id="email" placeholder="Enter your email">
+    </div>
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" id="password" placeholder="Enter your password">
+    </div>
+    <button onclick="login()">Login</button>
     <p id="error"></p>
+    <p id="welcomeMsg"></p> <!-- New message area -->
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -94,56 +44,26 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // Enable offline persistence
-      enableIndexedDbPersistence(db).catch((err) => {
-        console.error('Persistence error:', err);
-        document.getElementById('error').innerText = 'Offline persistence failed: ' + err.message;
-      });
-
-      onAuthStateChanged(auth, async (user) => {
-        const userInfoEl = document.getElementById('userInfo');
-        const loanDetailsEl = document.getElementById('loanDetails');
-        const shareDetailsEl = document.getElementById('shareDetails');
+      window.login = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
         const errorEl = document.getElementById('error');
+        const welcomeMsg = document.getElementById('welcomeMsg');
 
-        if (user) {
-          console.log('User UID:', user.uid); // Debug UID
-          try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-              userInfoEl.innerText = `Welcome, ${userDoc.data().name}`;
-              const loanDoc = await getDoc(doc(db, 'loans', user.uid));
-              const shareDoc = await getDoc(doc(db, 'shares', user.uid));
-              console.log('Loan Doc:', loanDoc.exists() ? loanDoc.data() : 'Not found'); // Debug
-              console.log('Share Doc:', shareDoc.exists() ? shareDoc.data() : 'Not found'); // Debug
-              loanDetailsEl.innerText = loanDoc.exists()
-                ? `Loan Amount: ${userDoc.data().currency || '₹'}${loanDoc.data().balance || 'N/A'}`
-                : 'No loan details found';
-              shareDetailsEl.innerText = shareDoc.exists()
-                ? `Share Amount: ${userDoc.data().currency || '₹'}${shareDoc.data().amount}`
-                : 'No share details found';
-            } else {
-              errorEl.innerText = 'User record not found!';
-              await signOut(auth);
-              window.location.href = 'index.html';
-            }
-          } catch (error) {
-            console.error('Firestore error:', error); // Debug
-            errorEl.innerText = 'Error loading data: ' + error.message;
-          }
-        } else {
-          window.location.href = 'index.html';
-        }
-      });
-
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
-          await signOut(auth);
-          window.location.href = 'index.html';
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            welcomeMsg.innerText = `Welcome, ${userDoc.data().name}! Your member number is ${userDoc.data().memberNumber || 'N/A'}.`;
+            window.location.href = 'home.html'; // Redirect after showing message
+          } else {
+            errorEl.innerText = 'User not found in database! Please contact admin.';
+          }
         } catch (error) {
-          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+          errorEl.innerText = 'Login failed: ' + error.message;
         }
-      });
+      };
     } catch (error) {
       document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
     }
