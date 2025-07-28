@@ -3,269 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Society App - Admin Dashboard</title>
+  <title>Society Admin Dashboard</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #e0f7fa, #fff);
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 30px;
-      font-size: 28px;
-    }
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: #f8f9fa;
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    .card h3 {
-      color: #34495e;
-      margin-bottom: 15px;
-    }
-    .card button {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      background: #3498db;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .card button:hover {
-      background: #2980b9;
-    }
-    .form-section {
-      display: none;
-      margin-top: 20px;
-      padding: 20px;
-      background: #ecf0f1;
-      border-radius: 10px;
-    }
-    .form-section.active {
-      display: block;
-    }
-    .login-section {
-      display: none;
-      margin-top: 20px;
-      padding: 20px;
-      background: #ecf0f1;
-      border-radius: 10px;
-    }
-    .login-section.active {
-      display: block;
-    }
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
-    .form-group label {
-      display: block;
-      color: #2c3e50;
-      margin-bottom: 5px;
-    }
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    #error {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-    #logoutBtn {
-      margin-top: 20px;
-      background: #e74c3c;
-    }
-    #logoutBtn:hover {
-      background: #c0392b;
-    }
-    .user-list {
-      text-align: left;
-      margin-top: 30px;
-    }
-    .user-item {
-      padding: 5px 0;
-      cursor: pointer;
-    }
-    .user-item:hover {
-      background: #f0f0f0;
-    }
-    .copy-btn {
-      margin-left: 10px;
-      background: #2ecc71;
-      padding: 2px 6px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .copy-btn:hover {
-      background: #27ae60;
-    }
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 30px; }
+    .container { max-width: 1000px; margin: auto; background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 0 10px #ccc; }
+    h1 { text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+    .card { background: #eaf4f4; border-radius: 8px; padding: 20px; text-align: center; }
+    .card button { margin-top: 10px; }
+    .form { display: none; margin-top: 20px; background: #f9f9f9; padding: 20px; border-radius: 8px; }
+    .form.active { display: block; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea { width: 100%; padding: 6px; }
+    #userList { margin-top: 30px; }
+    .user-item { background: #f0f0f0; margin: 5px 0; padding: 8px; border-radius: 5px; }
+    .copy-btn { margin-left: 10px; cursor: pointer; }
+    #error { color: red; margin-top: 10px; }
+    #logoutBtn { margin-top: 20px; background: #d9534f; color: #fff; padding: 10px 20px; border: none; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Admin Dashboard</h1>
-    <p id="adminInfo" class="loading">Loading admin data...</p>
+    <p id="adminInfo">Loading...</p>
 
-    <div class="dashboard-grid" id="dashboardGrid">
+    <div class="grid" id="dashboard">
       <div class="card">
-        <h3>Manage Members</h3>
+        <h3>Members</h3>
         <button onclick="showForm('memberForm')">Add Member</button>
-        <button onclick="showForm('editMemberForm')">Edit Member</button>
       </div>
       <div class="card">
-        <h3>Manage Loans</h3>
+        <h3>Loans</h3>
         <button onclick="showForm('loanForm')">Add Loan</button>
       </div>
       <div class="card">
-        <h3>Manage Shares</h3>
+        <h3>Shares</h3>
         <button onclick="showForm('shareForm')">Add Share</button>
       </div>
     </div>
 
-    <div id="loginSection" class="login-section">
-      <h3>Admin Login</h3>
-      <div class="form-group">
-        <label>Email:</label><input type="email" id="adminEmail">
-      </div>
-      <div class="form-group">
-        <label>Password:</label><input type="password" id="adminPassword">
-      </div>
-      <button onclick="adminLogin()">Login</button>
-    </div>
-
-    <!-- Member Form -->
-    <div id="memberForm" class="form-section">
+    <!-- Add Member -->
+    <div id="memberForm" class="form">
       <h3>Add Member</h3>
       <div class="form-group"><label>Email:</label><input id="memberEmail"></div>
-      <div class="form-group"><label>Password:</label><input id="memberPassword"></div>
+      <div class="form-group"><label>Password:</label><input id="memberPassword" type="password"></div>
       <div class="form-group"><label>Name:</label><input id="memberName"></div>
       <div class="form-group"><label>Member No:</label><input id="memberNumber"></div>
       <button onclick="addMember()">Submit</button>
     </div>
 
-    <!-- Edit Member -->
-    <div id="editMemberForm" class="form-section">
-      <h3>Edit Member</h3>
-      <div class="form-group"><label>User ID:</label><input id="editMemberId"></div>
-      <div class="form-group"><label>Name:</label><input id="editMemberName"></div>
-      <button onclick="editMember()">Update</button>
-    </div>
-
-    <!-- Loan Form -->
-    <div id="loanForm" class="form-section">
+    <!-- Add Loan -->
+    <div id="loanForm" class="form">
       <h3>Add Loan</h3>
       <div class="form-group"><label>User ID:</label><input id="loanUserId"></div>
       <div class="form-group"><label>Amount:</label><input id="loanAmount"></div>
-      <button onclick="addLoan()">Submit Loan</button>
+      <button onclick="addLoan()">Submit</button>
     </div>
 
-    <!-- Share Form -->
-    <div id="shareForm" class="form-section">
+    <!-- Add Share -->
+    <div id="shareForm" class="form">
       <h3>Add Share</h3>
       <div class="form-group"><label>User ID:</label><input id="shareUserId"></div>
       <div class="form-group"><label>Amount:</label><input id="shareAmount"></div>
-      <button onclick="addShare()">Submit Share</button>
+      <button onclick="addShare()">Submit</button>
     </div>
 
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
-
-    <div id="userList" class="user-list"></div>
+    <div id="userList"></div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* YOUR CONFIG */ };
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
+      authDomain: "probanker-2bce7.firebaseapp.com",
+      projectId: "probanker-2bce7",
+    };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    window.showForm = function(id) {
-      document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-      document.getElementById(id)?.classList.add('active');
+    window.showForm = (id) => {
+      document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     };
 
     onAuthStateChanged(auth, async (user) => {
       const adminInfo = document.getElementById('adminInfo');
-      const login = document.getElementById('loginSection');
-      const grid = document.getElementById('dashboardGrid');
-      const list = document.getElementById('userList');
+      const dashboard = document.getElementById('dashboard');
+      const userList = document.getElementById('userList');
       if (user) {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists() && snap.data().isAdmin) {
-          adminInfo.innerText = `Welcome Admin: ${snap.data().name}`;
-          login.style.display = 'none'; grid.style.display = 'grid';
-          const all = await getDocs(collection(db, 'users'));
-          let html = '<h3>All Users</h3>';
-          all.forEach(d => {
-            const data = d.data();
-            html += `<div class="user-item">ID: ${d.id} <button class="copy-btn" onclick="navigator.clipboard.writeText('${d.id}')">Copy</button> | Name: ${data.name}</div>`;
+        const docSnap = await getDoc(doc(db, 'users', user.uid));
+        if (docSnap.exists() && docSnap.data().isAdmin) {
+          adminInfo.innerText = `Welcome, Admin ${docSnap.data().name}`;
+          const snapshot = await getDocs(collection(db, 'users'));
+          let html = `<h3>All Users</h3>`;
+          snapshot.forEach(d => {
+            html += `<div class="user-item">ID: ${d.id} <button class="copy-btn" onclick="navigator.clipboard.writeText('${d.id}')">Copy</button> | ${d.data().name}</div>`;
           });
-          list.innerHTML = html;
+          userList.innerHTML = html;
         } else {
-          adminInfo.innerText = 'Access Denied!';
-          login.classList.add('active');
-          grid.style.display = 'none';
+          adminInfo.innerText = `Access Denied`;
+          dashboard.style.display = 'none';
         }
       } else {
-        login.classList.add('active'); grid.style.display = 'none';
+        adminInfo.innerText = `Not Logged In`;
+        dashboard.style.display = 'none';
       }
     });
 
-    window.adminLogin = async () => {
-      await signInWithEmailAndPassword(auth, adminEmail.value, adminPassword.value);
-    };
     window.addMember = async () => {
-      const c = await createUserWithEmailAndPassword(auth, memberEmail.value, memberPassword.value);
-      await setDoc(doc(db, 'users', c.user.uid), { name: memberName.value, memberNumber: memberNumber.value, isAdmin: false });
-      alert('Member Added!');
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, memberEmail.value, memberPassword.value);
+        await setDoc(doc(db, 'users', userCred.user.uid), { name: memberName.value, memberNumber: memberNumber.value, isAdmin: false });
+        alert('Member Added!');
+      } catch (err) {
+        document.getElementById('error').innerText = err.message;
+      }
     };
-    window.editMember = async () => {
-      await updateDoc(doc(db, 'users', editMemberId.value), { name: editMemberName.value });
-      alert('Updated!');
-    };
+
     window.addLoan = async () => {
       await setDoc(doc(db, 'loans', loanUserId.value), { amount: loanAmount.value });
       alert('Loan Added!');
     };
+
     window.addShare = async () => {
       await setDoc(doc(db, 'shares', shareUserId.value), { amount: shareAmount.value });
       alert('Share Added!');
     };
-    logoutBtn.onclick = () => signOut(auth);
+
+    logoutBtn.onclick = async () => { await signOut(auth); location.reload(); };
   </script>
 </body>
 </html>
