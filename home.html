@@ -3,30 +3,136 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Society App - Login</title>
+  <title>Society App - Home</title>
   <style>
-    /* Existing styles remain same */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e0f7fa, #fff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      flex: 1;
+      padding: 10px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 18px;
+      margin: 10px 0;
+      white-space: normal;
+      line-height: 1.2;
+    }
+    .message {
+      text-align: center;
+      color: #34495e;
+      font-size: 14px;
+      margin: 10px 0;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 5px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .card {
+      background: #f8f9fa;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+    }
+    .card h3 {
+      color: #34495e;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .card button {
+      width: 80%;
+      padding: 6px;
+      margin: 3px 0;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .card button:hover {
+      background: #2980b9;
+    }
+    #error {
+      color: red;
+      font-size: 12px;
+      margin-top: 5px;
+      text-align: center;
+    }
+    #logoutBtn {
+      width: 80%;
+      padding: 6px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 10px auto;
+      display: block;
+    }
+    #logoutBtn:hover {
+      background: #c0392b;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 10px;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Society App Login</h1>
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="email" id="email" placeholder="Enter your email">
+    <h1>Cochin Shipyard staff<br>cooperative House Construction Society</h1>
+    <div class="message" id="welcomeMsg">Loading...</div>
+    <div class="dashboard-grid" id="dashboardGrid">
+      <div class="card">
+        <h3>Profile</h3>
+        <button onclick="showProfile()">View</button>
+      </div>
+      <div class="card">
+        <h3>Loan Details</h3>
+        <button onclick="showLoanDetails()">View</button>
+      </div>
+      <div class="card">
+        <h3>Applications</h3>
+        <button onclick="showApplications()">View</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Password:</label>
-      <input type="password" id="password" placeholder="Enter your password">
-    </div>
-    <button onclick="login()">Login</button>
+    <button id="logoutBtn">Logout</button>
     <p id="error"></p>
-    <p id="welcomeMsg"></p> <!-- New message area -->
   </div>
+  <div class="footer">Powered by VT Soft 2025</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -44,26 +150,50 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      window.login = async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorEl = document.getElementById('error');
+      onAuthStateChanged(auth, async (user) => {
         const welcomeMsg = document.getElementById('welcomeMsg');
+        const errorEl = document.getElementById('error');
+        const dashboardGrid = document.getElementById('dashboardGrid');
 
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            welcomeMsg.innerText = `Welcome, ${userDoc.data().name}! Your member number is ${userDoc.data().memberNumber || 'N/A'}.`;
-            window.location.href = 'home.html'; // Redirect after showing message
-          } else {
-            errorEl.innerText = 'User not found in database! Please contact admin.';
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              welcomeMsg.innerText = `Welcome, ${userDoc.data().name}! Your member number is ${userDoc.data().memberNumber || 'N/A'}.`;
+              dashboardGrid.style.display = 'grid';
+            } else {
+              errorEl.innerText = 'User not found in database! Please contact admin.';
+              dashboardGrid.style.display = 'none';
+            }
+          } catch (error) {
+            errorEl.innerText = 'Error loading data: ' + error.message;
+            dashboardGrid.style.display = 'none';
           }
-        } catch (error) {
-          errorEl.innerText = 'Login failed: ' + error.message;
+        } else {
+          window.location.href = 'index.html';
         }
+      });
+
+      window.showProfile = () => {
+        window.location.href = 'profile.html';
       };
+
+      window.showLoanDetails = () => {
+        window.location.href = 'loan-details.html';
+      };
+
+      window.showApplications = () => {
+        window.location.href = 'applications.html';
+      };
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          window.location.href = 'index.html';
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+        }
+      });
     } catch (error) {
       document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
     }
