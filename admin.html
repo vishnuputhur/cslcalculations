@@ -38,7 +38,6 @@
       padding: 10px;
       text-align: center;
       transition: transform 0.3s ease;
-      /* Debug: Check card layout */
     }
     .card:hover {
       transform: translateY(-3px);
@@ -69,7 +68,6 @@
       padding: 10px;
       background: #ecf0f1;
       border-radius: 5px;
-      /* Debug: Ensure forms are hidden by default */
     }
     .form-section.active {
       display: block;
@@ -164,6 +162,26 @@
       padding: 5px 0;
       font-size: 10px;
       box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 24px;
+      }
+      .card button {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .form-group label {
+        font-size: 14px;
+      }
+      .form-group input, .form-group textarea {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
     }
   </style>
 </head>
@@ -314,8 +332,6 @@
       <button onclick="addPayment()">Submit</button>
     </div>
 
-    <!-- Other forms remain same -->
-
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
     <div id="userList" class="user-list"></div>
@@ -324,7 +340,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -341,6 +357,15 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
+
+      // Set persistence to maintain session
+      setPersistence(auth, browserSessionPersistence)
+        .then(() => {
+          console.log('Persistence set to session');
+        })
+        .catch((error) => {
+          console.error('Error setting persistence:', error);
+        });
 
       window.showForm = function(formId) {
         console.log('Showing form:', formId);
@@ -458,8 +483,15 @@
           });
           console.log('User data added to Firestore');
 
-          alert('Member added successfully!');
-          showForm(null);
+          // Refresh admin state
+          const adminDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+          if (adminDoc.exists() && adminDoc.data().isAdmin) {
+            alert('Member added successfully!');
+            showForm(null);
+            window.location.reload(); // Force reload to reset auth state
+          } else {
+            throw new Error('Admin status lost after operation');
+          }
         } catch (error) {
           console.error('Add member error:', error);
           errorEl.innerText = 'Error adding member: ' + error.message;
