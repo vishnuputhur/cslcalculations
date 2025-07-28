@@ -146,24 +146,7 @@
         <button onclick="showForm('memberForm')">Add Member</button>
         <button onclick="showForm('editMemberForm')">Edit Member</button>
       </div>
-      <div class="card">
-        <h3>Manage Loans</h3>
-        <button onclick="showForm('loanForm')">Add Loan</button>
-        <button onclick="showForm('editLoanForm')">Edit Loan</button>
-      </div>
-      <div class="card">
-        <h3>Loan Payments</h3>
-        <button onclick="showForm('paymentForm')">Add Payment</button>
-      </div>
-      <div class="card">
-        <h3>Send Message</h3>
-        <button onclick="showForm('messageForm')">Send Message</button>
-      </div>
-      <div class="card">
-        <h3>Manage Shares</h3>
-        <button onclick="showForm('shareForm')">Add Share</button>
-        <button onclick="showForm('editShareForm')">Edit Share</button>
-      </div>
+      <!-- Add more cards if needed -->
     </div>
 
     <!-- Login Section -->
@@ -223,8 +206,6 @@
       <button onclick="editMember()">Update</button>
     </div>
 
-    <!-- Other forms remain same -->
-
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
     <div id="userList" class="user-list"></div>
@@ -245,152 +226,97 @@
       measurementId: "G-31138VCDFZ"
     };
 
-    try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      window.showForm = function(formId) {
-        console.log('Showing form:', formId);
-        document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
-        const form = document.getElementById(formId);
-        if (form) {
-          form.classList.add('active');
+    window.showForm = function(formId) {
+      document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
+      const form = document.getElementById(formId);
+      if (form) form.classList.add('active');
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      const adminInfoEl = document.getElementById('adminInfo');
+      const errorEl = document.getElementById('error');
+      const loginSection = document.getElementById('loginSection');
+      const dashboardGrid = document.getElementById('dashboardGrid');
+
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().isAdmin) {
+          adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
+          loginSection.style.display = 'none';
+          dashboardGrid.style.display = 'grid';
         } else {
-          console.error('Form ID not found:', formId);
-        }
-      };
-
-      onAuthStateChanged(auth, async (user) => {
-        const adminInfoEl = document.getElementById('adminInfo');
-        const userListEl = document.getElementById('userList');
-        const errorEl = document.getElementById('error');
-        const loginSection = document.getElementById('loginSection');
-        const dashboardGrid = document.getElementById('dashboardGrid');
-
-        if (user) {
-          try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists() && userDoc.data().isAdmin) {
-              adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
-              loginSection.style.display = 'none';
-              dashboardGrid.style.display = 'grid';
-              const usersSnapshot = await getDocs(collection(db, 'users'));
-              let usersHtml = '<h3>Users List</h3>';
-              for (const doc of usersSnapshot.docs) {
-                const data = doc.data();
-                usersHtml += `
-                  <div class="user-item" onclick="selectUser('${doc.id}')">
-                    User ID: <span id="uid-${doc.id}">${doc.id}</span>
-                    <button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy</button>
-                    | Name: ${data.name || 'N/A'} | Email: ${data.email || 'N/A'} | Member Number: ${data.memberNumber || 'N/A'}
-                  </div>
-                `;
-              }
-              userListEl.innerHTML = usersHtml;
-            } else {
-              adminInfoEl.innerText = 'Access denied: Not an admin';
-              errorEl.innerText = 'You are not authorized to access this page!';
-              dashboardGrid.style.display = 'none';
-              loginSection.classList.add('active');
-            }
-          } catch (error) {
-            errorEl.innerText = 'Error loading admin data: ' + error.message;
-            dashboardGrid.style.display = 'none';
-            loginSection.classList.add('active');
-          }
-        } else {
-          adminInfoEl.innerText = 'Please log in as admin';
+          adminInfoEl.innerText = 'Access denied';
+          errorEl.innerText = 'Not an admin';
           dashboardGrid.style.display = 'none';
           loginSection.classList.add('active');
         }
-      });
+      } else {
+        loginSection.classList.add('active');
+        dashboardGrid.style.display = 'none';
+      }
+    });
 
-      window.adminLogin = async () => {
-        const email = document.getElementById('adminEmail').value;
-        const password = document.getElementById('adminPassword').value;
-        const errorEl = document.getElementById('error');
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-          errorEl.innerText = 'Login failed: ' + error.message;
-        }
-      };
+    window.adminLogin = async function() {
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const errorEl = document.getElementById('error');
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        errorEl.innerText = 'Login failed: ' + error.message;
+      }
+    };
 
-      window.selectUser = function(userId) {
-        console.log('Selected user:', userId);
-        document.getElementById('editMemberId').value = userId;
-        showForm('editMemberForm');
-      };
+    window.addMember = async function() {
+      const email = document.getElementById('memberEmail').value;
+      const password = document.getElementById('memberPassword').value;
+      const name = document.getElementById('memberName').value;
+      const memberNumber = document.getElementById('memberNumber').value;
+      const address = document.getElementById('memberAddress').value;
+      const pincode = document.getElementById('memberPincode').value;
+      const phone = document.getElementById('memberPhone').value;
+      const errorEl = document.getElementById('error');
 
-      window.copyToClipboard = function(userId) {
-        const uidElement = document.getElementById(`uid-${userId}`);
-        navigator.clipboard.writeText(uidElement.innerText).then(() => {
-          alert('User ID copied to clipboard!');
-        }).catch(err => {
-          console.error('Failed to copy: ', err);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        await setDoc(doc(db, 'users', uid), {
+          email, name, memberNumber, address, pincode, phone, isAdmin: false
         });
-      };
 
-      async function addMember() {
-        const email = document.getElementById('memberEmail').value;
-        const password = document.getElementById('memberPassword').value;
-        const name = document.getElementById('memberName').value;
-        const memberNumber = document.getElementById('memberNumber').value;
-        const address = document.getElementById('memberAddress').value;
-        const pincode = document.getElementById('memberPincode').value;
-        const phone = document.getElementById('memberPhone').value;
-        const errorEl = document.getElementById('error');
-
-        try {
-          // Create user in Authentication
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const uid = userCredential.user.uid;
-
-          // Add user data to Firestore
-          await setDoc(doc(db, 'users', uid), {
-            email,
-            name,
-            memberNumber,
-            address,
-            pincode,
-            phone,
-            isAdmin: false
-          });
-
-          alert('Member added successfully!');
-          showForm(null);
-        } catch (error) {
-          errorEl.innerText = 'Error adding member: ' + error.message;
-        }
+        alert('Member added successfully!');
+        showForm(null);
+      } catch (error) {
+        errorEl.innerText = 'Error adding member: ' + error.message;
       }
+    };
 
-      async function editMember() {
-        const userId = document.getElementById('editMemberId').value;
-        const name = document.getElementById('editMemberName').value;
-        const address = document.getElementById('editMemberAddress').value;
-        try {
-          await updateDoc(doc(db, 'users', userId), { name, address });
-          alert('Member updated successfully!');
-          showForm(null);
-        } catch (error) {
-          document.getElementById('error').innerText = 'Error editing member: ' + error.message;
-        }
+    window.editMember = async function() {
+      const userId = document.getElementById('editMemberId').value;
+      const name = document.getElementById('editMemberName').value;
+      const address = document.getElementById('editMemberAddress').value;
+      try {
+        await updateDoc(doc(db, 'users', userId), { name, address });
+        alert('Member updated successfully!');
+        showForm(null);
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error editing member: ' + error.message;
       }
+    };
 
-      // Other form functions remain same (addLoan, editLoan, etc.)
-
-      document.getElementById('logoutBtn').addEventListener('click', async () => {
-        try {
-          await signOut(auth);
-          window.location.href = 'index.html';
-        } catch (error) {
-          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
-        }
-      });
-    } catch (error) {
-      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
-    }
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = 'index.html';
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+      }
+    });
   </script>
 </body>
 </html>
