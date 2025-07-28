@@ -8,38 +8,44 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
-      background: linear-gradient(135deg, #e0f7fa, #fff);
+      background: linear-gradient(135deg, #f0f8ff, #e6f3fa);
       min-height: 100vh;
       display: flex; flex-direction: column;
+      color: #2c3e50;
     }
-    .container { flex: 1; padding: 10px; max-width: 100%; box-sizing: border-box; }
-    h1 { text-align: center; color: #2c3e50; font-size: 18px; margin: 10px 0; }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
-    .card { background: #f8f9fa; border-radius: 5px; padding: 10px; text-align: center; transition: transform 0.3s ease; }
-    .card:hover { transform: translateY(-3px); }
-    .card h3 { color: #34495e; font-size: 14px; margin-bottom: 5px; }
-    .card button { width: 80%; padding: 6px; margin: 3px 0; background: #3498db; color: #fff; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; transition: background 0.3s ease; }
+    .container { flex: 1; padding: 15px; max-width: 100%; box-sizing: border-box; }
+    h1 { text-align: center; color: #1a252f; font-size: 20px; margin: 15px 0; font-weight: 600; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-top: 15px; }
+    .card { background: #ffffff; border-radius: 8px; padding: 12px; text-align: center; transition: transform 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card:hover { transform: translateY(-4px); }
+    .card h3 { color: #1a252f; font-size: 15px; margin-bottom: 8px; font-weight: 500; }
+    .card button { width: 70%; padding: 4px; margin: 2px 0; background: #3498db; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; transition: background 0.3s ease; }
     .card button:hover { background: #2980b9; }
-    .form-section, .login-section { display: none; margin-top: 10px; padding: 10px; background: #ecf0f1; border-radius: 5px; }
+    .form-section, .login-section { display: none; margin-top: 15px; padding: 15px; background: #f9fbfd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .form-section.active, .login-section.active { display: block; }
-    .form-group { margin-bottom: 10px; text-align: left; }
-    .form-group label { display: block; color: #2c3e50; font-size: 12px; margin-bottom: 3px; }
-    .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; box-sizing: border-box; }
-    #error { color: red; font-size: 12px; margin-top: 5px; text-align: center; }
-    #logoutBtn { width: 80%; padding: 6px; background: #e74c3c; color: #fff; border: none; border-radius: 3px; font-size: 12px; cursor: pointer; margin: 10px auto; display: block; }
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; color: #1a252f; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
+    .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; background: #fff; }
+    #error { color: #e74c3c; font-size: 13px; margin-top: 10px; text-align: center; }
+    #logoutBtn { width: 70%; padding: 4px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; margin: 15px auto; display: block; }
     #logoutBtn:hover { background: #c0392b; }
-    .user-list { text-align: left; margin-top: 10px; font-size: 12px; }
-    .user-item { padding: 5px 0; cursor: pointer; }
-    .user-item:hover { background: #f0f0f0; }
+    .user-list { margin-top: 15px; }
+    .user-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .user-table th, .user-table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+    .user-table th { background: #3498db; color: #fff; font-size: 13px; }
+    .user-table td { font-size: 12px; }
+    .user-table tr:hover { background: #f5f6fa; }
     .copy-btn { margin-left: 5px; background: #2ecc71; padding: 2px 4px; border: none; border-radius: 3px; font-size: 10px; cursor: pointer; }
     .copy-btn:hover { background: #27ae60; }
-    .footer { position: fixed; bottom: 0; width: 100%; background: #2c3e50; color: #fff; text-align: center; padding: 5px 0; font-size: 10px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
+    #searchInput { width: 100%; padding: 6px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
+    .footer { position: fixed; bottom: 0; width: 100%; background: #1a252f; color: #fff; text-align: center; padding: 5px 0; font-size: 11px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
     @media (min-width: 768px) {
-      h1 { font-size: 24px; }
-      .card button { font-size: 14px; padding: 8px; }
+      h1 { font-size: 26px; }
+      .card button { font-size: 13px; padding: 6px; }
       .form-group label { font-size: 14px; }
       .form-group input, .form-group textarea { font-size: 14px; padding: 8px; }
       .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .user-table th, .user-table td { font-size: 14px; padding: 10px; }
     }
   </style>
 </head>
@@ -119,9 +125,6 @@
       <label>Phone:</label><input type="text" id="memberPhone" placeholder="Enter phone">
     </div>
     <button onclick="addMember()">Submit</button>
-    <div class="instructions">
-      <p>Note: Use Firebase Console for bulk adds if rate limits apply.</p>
-    </div>
   </div>
 
   <!-- Edit Member Form -->
@@ -194,6 +197,9 @@
   <div id="messageForm" class="form-section">
     <h3>Send Message</h3>
     <div class="form-group">
+      <label>User ID:</label><input type="text" id="messageUserId" placeholder="Enter user ID (optional)">
+    </div>
+    <div class="form-group">
       <label>Title:</label><input type="text" id="messageTitle" placeholder="Enter title">
     </div>
     <div class="form-group">
@@ -214,9 +220,11 @@
     <button onclick="addShare()">Add Share</button>
   </div>
 
+  <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchUsers()">
+  <div class="user-list" id="userList"></div>
+
   <button id="logoutBtn">Logout</button>
   <p id="error"></p>
-  <div id="userList" class="user-list"></div>
 </div>
 
 <div class="footer">Powered by VT Soft 2025</div>
@@ -224,7 +232,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -264,19 +272,7 @@
           adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name || 'Admin'}`;
           loginSection.style.display = 'none';
           dashboardGrid.style.display = 'grid';
-          const usersSnapshot = await getDocs(collection(db, 'users'));
-          let usersHtml = '<h3>Users List</h3>';
-          for (const doc of usersSnapshot.docs) {
-            const data = doc.data();
-            usersHtml += `
-              <div class="user-item" onclick="selectUser('${doc.id}')">
-                User ID: <span id="uid-${doc.id}">${doc.id}</span>
-                <button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy</button>
-                | Name: ${data.name || 'N/A'} | Email: ${data.email || 'N/A'} | Member Number: ${data.memberNumber || 'N/A'}
-              </div>
-            `;
-          }
-          userListEl.innerHTML = usersHtml;
+          await loadUsers();
         } else {
           adminInfoEl.innerText = 'Access denied: Not an admin';
           errorEl.innerText = 'You are not authorized to access this page!';
@@ -306,6 +302,65 @@
     }
   };
 
+  async function loadUsers() {
+    const userListEl = document.getElementById('userList');
+    try {
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      let tableHtml = `
+        <table class="user-table">
+          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <tbody>
+      `;
+      usersSnapshot.forEach(doc => {
+        const data = doc.data();
+        tableHtml += `
+          <tr>
+            <td>${doc.id}</td>
+            <td>${data.name || 'N/A'}</td>
+            <td>${data.email || 'N/A'}</td>
+            <td>${data.memberNumber || 'N/A'}</td>
+            <td><button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button></td>
+          </tr>
+        `;
+      });
+      tableHtml += '</tbody></table>';
+      userListEl.innerHTML = tableHtml;
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  }
+
+  window.searchUsers = async function() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const userListEl = document.getElementById('userList');
+    try {
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      let tableHtml = `
+        <table class="user-table">
+          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <tbody>
+      `;
+      usersSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.name && data.name.toLowerCase().includes(searchInput)) {
+          tableHtml += `
+            <tr>
+              <td>${doc.id}</td>
+              <td>${data.name || 'N/A'}</td>
+              <td>${data.email || 'N/A'}</td>
+              <td>${data.memberNumber || 'N/A'}</td>
+              <td><button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button></td>
+            </tr>
+          `;
+        }
+      });
+      tableHtml += '</tbody></table>';
+      userListEl.innerHTML = tableHtml;
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
   window.selectUser = function(userId) {
     console.log('Selected user:', userId);
     document.getElementById('editMemberId').value = userId;
@@ -313,7 +368,7 @@
   };
 
   window.copyToClipboard = function(userId) {
-    const uidElement = document.getElementById(`uid-${userId}`);
+    const uidElement = document.getElementById(`uid-${userId}`) || { innerText: userId };
     navigator.clipboard.writeText(uidElement.innerText).then(() => {
       alert('User ID copied to clipboard!');
     }).catch(err => console.error('Failed to copy:', err));
@@ -345,6 +400,7 @@
       });
       alert('Member added successfully!');
       showForm(null);
+      await loadUsers();
     } catch (error) {
       console.error('Add member error:', error);
       errorEl.innerText = 'Error adding member: ' + error.message;
@@ -366,6 +422,7 @@
       await updateDoc(doc(db, 'users', userId), { name, address });
       alert('Member updated successfully!');
       showForm(null);
+      await loadUsers();
     } catch (error) {
       errorEl.innerText = 'Error editing member: ' + error.message;
     }
@@ -441,6 +498,7 @@
   };
 
   window.addMessage = async function() {
+    const userId = document.getElementById('messageUserId').value || null;
     const title = document.getElementById('messageTitle').value;
     const content = document.getElementById('messageContent').value;
     const errorEl = document.getElementById('error');
@@ -451,7 +509,7 @@
     }
 
     try {
-      await setDoc(doc(db, 'messages', `${Date.now()}`), { title, content, createdAt: new Date().toISOString() });
+      await setDoc(doc(db, 'messages', `${userId || 'global'}_${Date.now()}`), { userId, title, content, createdAt: new Date().toISOString() });
       alert('Message sent!');
       showForm(null);
     } catch (error) {
