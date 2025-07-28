@@ -9,12 +9,11 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #e6f4fc; /* Light version of #1c8fed */
+      background: #ffffff; /* base background white */
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      box-sizing: border-box;
     }
 
     .cover-image {
@@ -24,28 +23,52 @@
     }
 
     .card {
-      background: #ffffff;
+      background: #e6f4fc; /* light blue card */
       border-radius: 12px;
       padding: 20px;
-      width: 85%;
-      max-width: 400px;
+      width: calc(100% - 14mm); /* 7mm gap each side */
+      max-width: 500px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      border: 2px solid #1c8fed33;
-      margin-top: 7mm; /* reduced gap after image */
+      margin-top: 7mm;
       flex: 1 0 auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    }
+
+    .card-content {
+      background: #fff; /* inner white */
+      border-radius: 10px;
+      padding: 20px;
     }
 
     #welcomeMsg {
       text-align: center;
-      font-size: 15px;
+      font-size: 16px;
       color: #1c8fed;
-      background: #f1f9ff;
-      padding: 10px;
-      border-radius: 6px;
+      margin-bottom: 5px;
+    }
+
+    #memberNo {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      margin: 0 0 10px 0;
+    }
+
+    #centerMsg {
+      text-align: center;
+      font-size: 14px;
+      color: #1c8fed;
       margin: 10px 0;
+    }
+
+    .amounts {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .amounts p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #333;
     }
 
     .dashboard-grid {
@@ -122,24 +145,34 @@
 
   <div class="card-container">
     <div class="card">
-      <div id="welcomeMsg">Loading...</div>
+      <div class="card-content">
+        <div id="welcomeMsg">Loading...</div>
+        <div id="memberNo"></div>
 
-      <div class="dashboard-grid" id="dashboardGrid">
-        <div class="card-item">
-          <h3>Profile</h3>
-          <button onclick="showProfile()">View</button>
+        <div id="centerMsg"></div>
+
+        <div class="amounts">
+          <p id="loanBalance">Loan Balance: --</p>
+          <p id="shareAmount">Share Amount: --</p>
         </div>
-        <div class="card-item">
-          <h3>Loan Details</h3>
-          <button onclick="showLoanDetails()">View</button>
+
+        <div class="dashboard-grid" id="dashboardGrid">
+          <div class="card-item">
+            <h3>Profile</h3>
+            <button onclick="showProfile()">View</button>
+          </div>
+          <div class="card-item">
+            <h3>Loan Details</h3>
+            <button onclick="showLoanDetails()">View</button>
+          </div>
+          <div class="card-item">
+            <h3>Applications</h3>
+            <button onclick="showApplications()">View</button>
+          </div>
         </div>
-        <div class="card-item">
-          <h3>Applications</h3>
-          <button onclick="showApplications()">View</button>
-        </div>
+
+        <p id="error"></p>
       </div>
-
-      <p id="error"></p>
     </div>
   </div>
 
@@ -148,7 +181,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -166,22 +199,40 @@
 
     onAuthStateChanged(auth, async (user) => {
       const welcomeMsg = document.getElementById('welcomeMsg');
+      const memberNo = document.getElementById('memberNo');
+      const loanBalance = document.getElementById('loanBalance');
+      const shareAmount = document.getElementById('shareAmount');
+      const centerMsg = document.getElementById('centerMsg');
       const errorEl = document.getElementById('error');
-      const dashboardGrid = document.getElementById('dashboardGrid');
 
       if (user) {
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
-            welcomeMsg.innerText = `Hi, ${userDoc.data().name} (No: ${userDoc.data().memberNumber || 'N/A'})`;
-            dashboardGrid.style.display = 'grid';
+            const data = userDoc.data();
+            welcomeMsg.innerText = `Hi, ${data.name}`;
+            memberNo.innerText = `${data.memberNumber ? "Member No: " + data.memberNumber : ""}`;
+
+            loanBalance.innerText = `Loan Balance: ₹${data.loanBalance || '0'}`;
+            shareAmount.innerText = `Share Amount: ₹${data.shareAmount || '0'}`;
+
+            // Load any special message
+            const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
+            const msgSnap = await getDocs(msgQuery);
+            if (!msgSnap.empty) {
+              msgSnap.forEach(doc => {
+                const m = doc.data();
+                centerMsg.innerText = m.content;
+              });
+            } else {
+              centerMsg.innerText = '';
+            }
+
           } else {
             errorEl.innerText = 'User not found! Contact admin.';
-            dashboardGrid.style.display = 'none';
           }
         } catch (error) {
           errorEl.innerText = 'Error loading data: ' + error.message;
-          dashboardGrid.style.display = 'none';
         }
       } else {
         window.location.href = 'index.html';
