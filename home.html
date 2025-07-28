@@ -26,7 +26,7 @@
       background: #e6f4fc; /* light blue card */
       border-radius: 12px;
       padding: 20px;
-      width: calc(100% - 14mm); /* 7mm gap each side */
+      width: calc(100% - 12mm); /* 6mm gap each side */
       max-width: 500px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       margin-top: 7mm;
@@ -159,15 +159,15 @@
         <div class="dashboard-grid" id="dashboardGrid">
           <div class="card-item">
             <h3>Profile</h3>
-            <button onclick="showProfile()">View</button>
+            <button onclick="window.location.href='profile.html'">View</button>
           </div>
           <div class="card-item">
             <h3>Loan Details</h3>
-            <button onclick="showLoanDetails()">View</button>
+            <button onclick="window.location.href='loan-details.html'">View</button>
           </div>
           <div class="card-item">
             <h3>Applications</h3>
-            <button onclick="showApplications()">View</button>
+            <button onclick="window.location.href='applications.html'">View</button>
           </div>
         </div>
 
@@ -210,20 +210,29 @@
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
-            welcomeMsg.innerText = `Hi, ${data.name}`;
-            memberNo.innerText = `${data.memberNumber ? "Member No: " + data.memberNumber : ""}`;
+            welcomeMsg.innerText = `Hi, ${data.name || 'User'}`;
+            memberNo.innerText = `${data.memberNumber ? 'Member No: ' + data.memberNumber : ''}`;
 
-            loanBalance.innerText = `Loan Balance: ₹${data.loanBalance || '0'}`;
-            shareAmount.innerText = `Share Amount: ₹${data.shareAmount || '0'}`;
+            // Fetch Loan Balance
+            const loansQuery = query(collection(db, 'loans'), where('userId', '==', user.uid));
+            const loansSnapshot = await getDocs(loansQuery);
+            let totalLoanBalance = 0;
+            if (!loansSnapshot.empty) {
+              loansSnapshot.forEach(doc => {
+                totalLoanBalance += doc.data().balance || 0;
+              });
+            }
+            loanBalance.innerText = `Loan Balance: ₹${totalLoanBalance.toFixed(2)}`;
 
-            // Load any special message
+            // Fetch Share Amount (from users collection)
+            shareAmount.innerText = `Share Amount: ₹${(data.shareAmount || 0).toFixed(2)}`;
+
+            // Load Messages
             const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
             const msgSnap = await getDocs(msgQuery);
             if (!msgSnap.empty) {
-              msgSnap.forEach(doc => {
-                const m = doc.data();
-                centerMsg.innerText = m.content;
-              });
+              const latestMsg = msgSnap.docs.sort((a, b) => new Date(b.data().createdAt) - new Date(a.data().createdAt))[0];
+              centerMsg.innerText = latestMsg.data().content || '';
             } else {
               centerMsg.innerText = '';
             }
@@ -239,6 +248,7 @@
       }
     });
 
+    // Functions for navigation (already defined in your code)
     window.showProfile = () => {
       window.location.href = 'profile.html';
     };
