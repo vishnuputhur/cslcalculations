@@ -1,70 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Society App - Loan Details</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
     }
     p {
+      margin: 10px 0;
+      color: #555;
       font-size: 16px;
-      margin: 10px 0;
     }
-    .transaction {
-      border-bottom: 1px solid #ddd;
-      padding: 5px 0;
-    }
-    a {
+    button {
       display: block;
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
-      text-align: center;
-      border-radius: 5px;
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-    a:hover {
-      background-color: #45a049;
+    button:hover {
+      background: #45a049;
     }
     #error {
       color: red;
-      text-align: center;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    .loading {
+      font-style: italic;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Loan Details</h1>
-    <p>Loan Number: <span id="loanNumber">N/A</span></p>
-    <p>Current Balance: ₹<span id="balance">0</span></p>
-    <p>Start Date: <span id="startDate">N/A</span></p>
-    <p>Interest: <span id="interest">0%</span></p>
-    <p>Guarantors: <span id="guarantors">N/A</span></p>
-    <h3>Last Transactions</h3>
-    <div id="transactions"></div>
+    <p id="loanInfo" class="loading">Loading loan details...</p>
+    <p id="balance">Balance: Loading...</p>
+    <p id="guarantors">Guarantors: Loading...</p>
+    <p id="interest">Interest: Loading...</p>
+    <p id="loanNumber">Loan Number: Loading...</p>
+    <p id="startDate">Start Date: Loading...</p>
+    <button onclick="window.location.href='home.html'">Back to Home</button>
+    <button id="logoutBtn">Logout</button>
     <p id="error"></p>
-    <a href="home.html">Back to Home</a>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-  <script>
-    // Firebase configuration
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
       authDomain: "probanker-2bce7.firebaseapp.com",
@@ -75,47 +90,53 @@
       measurementId: "G-31138VCDFZ"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    // Check authentication and fetch loan data
-    auth.onAuthStateChanged(async (user) => {
-      const errorElement = document.getElementById('error');
-      if (user) {
-        try {
-          const loanDoc = await db.collection('loans').where('userId', '==', user.uid).get();
-          if (!loanDoc.empty) {
-            const loanData = loanDoc.docs[0].data();
-            document.getElementById('loanNumber').innerText = loanData.loanNumber || 'N/A';
-            document.getElementById('balance').innerText = loanData.balance || '0';
-            document.getElementById('startDate').innerText = loanData.startDate || 'N/A';
-            document.getElementById('interest').innerText = loanData.interest ? `${loanData.interest}%` : '0%';
-            document.getElementById('guarantors').innerText = loanData.guarantors?.join(', ') || 'N/A';
+      onAuthStateChanged(auth, async (user) => {
+        const loanInfoEl = document.getElementById('loanInfo');
+        const balanceEl = document.getElementById('balance');
+        const guarantorsEl = document.getElementById('guarantors');
+        const interestEl = document.getElementById('interest');
+        const loanNumberEl = document.getElementById('loanNumber');
+        const startDateEl = document.getElementById('startDate');
+        const errorEl = document.getElementById('error');
 
-            // Display transactions
-            const transactionsDiv = document.getElementById('transactions');
-            if (loanData.transactions && loanData.transactions.length > 0) {
-              loanData.transactions.forEach(tx => {
-                const txDiv = document.createElement('div');
-                txDiv.className = 'transaction';
-                txDiv.innerText = `Date: ${tx.date}, Amount: ₹${tx.amount}`;
-                transactionsDiv.appendChild(txDiv);
-              });
+        if (user) {
+          try {
+            const loanDoc = await getDoc(doc(db, 'loans', user.uid));
+            if (loanDoc.exists()) {
+              const data = loanDoc.data();
+              loanInfoEl.innerText = `Loan Details for ${user.email}`;
+              balanceEl.innerText = `Balance: ₹${data.balance || 'N/A'}`;
+              guarantorsEl.innerText = `Guarantors: ${data.guarantors ? data.guarantors.join(', ') : 'N/A'}`;
+              interestEl.innerText = `Interest: ${data.interest || 'N/A'}%`;
+              loanNumberEl.innerText = `Loan Number: ${data.loanNumber || 'N/A'}`;
+              startDateEl.innerText = `Start Date: ${data.startDate || 'N/A'}`;
             } else {
-              transactionsDiv.innerText = 'No transactions';
+              errorEl.innerText = 'No loan details found!';
             }
-          } else {
-            errorElement.innerText = 'No loan data found';
+          } catch (error) {
+            errorEl.innerText = 'Error loading loan details: ' + error.message;
           }
-        } catch (error) {
-          errorElement.innerText = 'Error fetching loan data: ' + error.message;
+        } else {
+          window.location.href = 'index.html';
         }
-      } else {
-        window.location.href = 'index.html'; // Redirect to login if not authenticated
-      }
-    });
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          window.location.href = 'index.html';
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+        }
+      });
+    } catch (error) {
+      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
+    }
   </script>
 </body>
 </html>
