@@ -2,10 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Society App - Admin Dashboard</title>
   <style>
-    /* Existing styles remain same */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e0f7fa, #fff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      flex: 1;
+      padding: 10px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .card {
+      background: #f8f9fa;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      /* Debug: Check card layout */
+    }
+    .card:hover {
+      transform: translateY(-3px);
+    }
+    .card h3 {
+      color: #34495e;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .card button {
+      width: 80%;
+      padding: 6px;
+      margin: 3px 0;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .card button:hover {
+      background: #2980b9;
+    }
+    .form-section {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 5px;
+      /* Debug: Ensure forms are hidden by default */
+    }
+    .form-section.active {
+      display: block;
+    }
+    .login-section {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 5px;
+    }
+    .login-section.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      color: #2c3e50;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    #error {
+      color: red;
+      font-size: 12px;
+      margin-top: 5px;
+      text-align: center;
+    }
+    #logoutBtn {
+      width: 80%;
+      padding: 6px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 10px auto;
+      display: block;
+    }
+    #logoutBtn:hover {
+      background: #c0392b;
+    }
+    .user-list {
+      text-align: left;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .user-item {
+      padding: 5px 0;
+      cursor: pointer;
+    }
+    .user-item:hover {
+      background: #f0f0f0;
+    }
+    .copy-btn {
+      margin-left: 5px;
+      background: #2ecc71;
+      padding: 2px 4px;
+      border: none;
+      border-radius: 3px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: #27ae60;
+    }
+    .instructions {
+      margin-top: 10px;
+      padding: 5px;
+      background: #f9f9f9;
+      border-radius: 3px;
+      font-size: 10px;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 10px;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -161,6 +320,7 @@
     <p id="error"></p>
     <div id="userList" class="user-list"></div>
   </div>
+  <div class="footer">Powered by VT Soft 2025</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -366,7 +526,6 @@
         const errorEl = document.getElementById('error');
 
         try {
-          // Fetch loan to update balance
           const loansSnapshot = await getDocs(collection(db, 'loans'));
           let loanDoc;
           for (const doc of loansSnapshot.docs) {
@@ -398,8 +557,6 @@
           errorEl.innerText = 'Error adding payment: ' + error.message;
         }
       };
-
-      // Other form functions remain same
 
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
