@@ -197,13 +197,13 @@
   <div id="messageForm" class="form-section">
     <h3>Send Message</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="messageUserId" placeholder="Enter user ID (optional)">
+      <label>User ID <span style="color: red;">*</span>:</label><input type="text" id="messageUserId" placeholder="Enter user ID" required>
     </div>
     <div class="form-group">
-      <label>Title:</label><input type="text" id="messageTitle" placeholder="Enter title">
+      <label>Title <span style="color: red;">*</span>:</label><input type="text" id="messageTitle" placeholder="Enter title" required>
     </div>
     <div class="form-group">
-      <label>Message:</label><textarea id="messageContent" placeholder="Enter message"></textarea>
+      <label>Message <span style="color: red;">*</span>:</label><textarea id="messageContent" placeholder="Enter message" required></textarea>
     </div>
     <button onclick="addMessage()">Send</button>
   </div>
@@ -498,7 +498,7 @@
   };
 
   window.addMessage = async function() {
-    const userId = document.getElementById('messageUserId').value || null;
+    const userId = document.getElementById('messageUserId').value.trim();
     const title = document.getElementById('messageTitle').value;
     const content = document.getElementById('messageContent').value;
     const errorEl = document.getElementById('error');
@@ -508,9 +508,14 @@
       return;
     }
 
+    if (!userId || !title || !content) {
+      errorEl.innerText = 'User ID, Title, and Message are required!';
+      return;
+    }
+
     try {
-      await setDoc(doc(db, 'messages', `${userId || 'global'}_${Date.now()}`), { userId, title, content, createdAt: new Date().toISOString() });
-      alert('Message sent!');
+      await setDoc(doc(db, 'messages', `${userId}_${Date.now()}`), { userId, title, content, createdAt: new Date().toISOString() });
+      alert('Message sent to user!');
       showForm(null);
     } catch (error) {
       errorEl.innerText = 'Error sending message: ' + error.message;
