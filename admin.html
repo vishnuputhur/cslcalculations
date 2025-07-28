@@ -298,10 +298,11 @@
     const loginSection = document.getElementById('loginSection');
     const dashboardGrid = document.getElementById('dashboardGrid');
 
+    console.log('Auth state changed, user:', user ? user.uid : 'null');
     if (user) {
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-        console.log('Checking user:', user.uid, 'Doc exists:', userDoc.exists(), 'isAdmin:', userDoc.data()?.isAdmin);
+        console.log('User doc exists:', userDoc.exists(), 'Data:', userDoc.data());
         if (userDoc.exists() && userDoc.data().isAdmin) {
           adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name || 'Admin'}`;
           loginSection.style.display = 'none';
@@ -309,11 +310,12 @@
           await loadUsers();
         } else {
           adminInfoEl.innerText = 'Access denied: Not an admin';
-          errorEl.innerText = 'You are not authorized to access this page!';
+          errorEl.innerText = 'You are not authorized to access this page! Check if isAdmin is true in Firestore.';
           dashboardGrid.style.display = 'none';
           loginSection.classList.add('active');
         }
       } catch (error) {
+        console.error('Error loading admin data:', error);
         errorEl.innerText = 'Error loading admin data: ' + error.message;
         dashboardGrid.style.display = 'none';
         loginSection.classList.add('active');
@@ -331,7 +333,9 @@
     const errorEl = document.getElementById('error');
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      console.log('Admin login successful for:', email);
     } catch (error) {
+      console.error('Login error:', error);
       errorEl.innerText = 'Login failed: ' + error.message;
     }
   };
