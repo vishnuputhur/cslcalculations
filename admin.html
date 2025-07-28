@@ -108,7 +108,7 @@
     }
     .user-list {
       text-align: left;
-      margin-top: 20px;
+      margin-top: 30px;
     }
     .user-item {
       padding: 5px 0;
@@ -128,195 +128,144 @@
     .copy-btn:hover {
       background: #27ae60;
     }
-    .instructions {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f9f9f9;
-      border-radius: 6px;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Admin Dashboard</h1>
     <p id="adminInfo" class="loading">Loading admin data...</p>
+
     <div class="dashboard-grid" id="dashboardGrid">
       <div class="card">
         <h3>Manage Members</h3>
         <button onclick="showForm('memberForm')">Add Member</button>
         <button onclick="showForm('editMemberForm')">Edit Member</button>
       </div>
-      <!-- Add more cards if needed -->
+      <div class="card">
+        <h3>Manage Loans</h3>
+        <button onclick="showForm('loanForm')">Add Loan</button>
+      </div>
+      <div class="card">
+        <h3>Manage Shares</h3>
+        <button onclick="showForm('shareForm')">Add Share</button>
+      </div>
     </div>
 
-    <!-- Login Section -->
     <div id="loginSection" class="login-section">
       <h3>Admin Login</h3>
       <div class="form-group">
-        <label>Email:</label><input type="email" id="adminEmail" placeholder="Enter admin email">
+        <label>Email:</label><input type="email" id="adminEmail">
       </div>
       <div class="form-group">
-        <label>Password:</label><input type="password" id="adminPassword" placeholder="Enter password">
+        <label>Password:</label><input type="password" id="adminPassword">
       </div>
       <button onclick="adminLogin()">Login</button>
     </div>
 
     <!-- Member Form -->
     <div id="memberForm" class="form-section">
-      <h3>Add New Member</h3>
-      <div class="form-group">
-        <label>Email:</label><input type="email" id="memberEmail" placeholder="Enter email">
-      </div>
-      <div class="form-group">
-        <label>Password:</label><input type="password" id="memberPassword" placeholder="Enter password">
-      </div>
-      <div class="form-group">
-        <label>Name:</label><input type="text" id="memberName" placeholder="Enter name">
-      </div>
-      <div class="form-group">
-        <label>Member Number:</label><input type="text" id="memberNumber" placeholder="Enter member number">
-      </div>
-      <div class="form-group">
-        <label>Address:</label><textarea id="memberAddress" placeholder="Enter address"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Pincode:</label><input type="text" id="memberPincode" placeholder="Enter pincode">
-      </div>
-      <div class="form-group">
-        <label>Phone:</label><input type="text" id="memberPhone" placeholder="Enter phone">
-      </div>
+      <h3>Add Member</h3>
+      <div class="form-group"><label>Email:</label><input id="memberEmail"></div>
+      <div class="form-group"><label>Password:</label><input id="memberPassword"></div>
+      <div class="form-group"><label>Name:</label><input id="memberName"></div>
+      <div class="form-group"><label>Member No:</label><input id="memberNumber"></div>
       <button onclick="addMember()">Submit</button>
-      <div class="instructions">
-        <p>Note: Use Firebase Console for bulk adds if rate limits apply.</p>
-      </div>
     </div>
 
-    <!-- Edit Member Form -->
+    <!-- Edit Member -->
     <div id="editMemberForm" class="form-section">
       <h3>Edit Member</h3>
-      <div class="form-group">
-        <label>User ID:</label><input type="text" id="editMemberId" placeholder="Enter user ID">
-      </div>
-      <div class="form-group">
-        <label>Name:</label><input type="text" id="editMemberName" placeholder="Enter name">
-      </div>
-      <div class="form-group">
-        <label>Address:</label><textarea id="editMemberAddress" placeholder="Enter address"></textarea>
-      </div>
+      <div class="form-group"><label>User ID:</label><input id="editMemberId"></div>
+      <div class="form-group"><label>Name:</label><input id="editMemberName"></div>
       <button onclick="editMember()">Update</button>
+    </div>
+
+    <!-- Loan Form -->
+    <div id="loanForm" class="form-section">
+      <h3>Add Loan</h3>
+      <div class="form-group"><label>User ID:</label><input id="loanUserId"></div>
+      <div class="form-group"><label>Amount:</label><input id="loanAmount"></div>
+      <button onclick="addLoan()">Submit Loan</button>
+    </div>
+
+    <!-- Share Form -->
+    <div id="shareForm" class="form-section">
+      <h3>Add Share</h3>
+      <div class="form-group"><label>User ID:</label><input id="shareUserId"></div>
+      <div class="form-group"><label>Amount:</label><input id="shareAmount"></div>
+      <button onclick="addShare()">Submit Share</button>
     </div>
 
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
+
     <div id="userList" class="user-list"></div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
-      authDomain: "probanker-2bce7.firebaseapp.com",
-      projectId: "probanker-2bce7",
-      storageBucket: "probanker-2bce7.firebasestorage.app",
-      messagingSenderId: "27106244956",
-      appId: "1:27106244956:web:59792c9dc94aa8e5232999",
-      measurementId: "G-31138VCDFZ"
-    };
+    const firebaseConfig = { /* YOUR CONFIG */ };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    window.showForm = function(formId) {
-      document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
-      const form = document.getElementById(formId);
-      if (form) form.classList.add('active');
+    window.showForm = function(id) {
+      document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+      document.getElementById(id)?.classList.add('active');
     };
 
     onAuthStateChanged(auth, async (user) => {
-      const adminInfoEl = document.getElementById('adminInfo');
-      const errorEl = document.getElementById('error');
-      const loginSection = document.getElementById('loginSection');
-      const dashboardGrid = document.getElementById('dashboardGrid');
-
+      const adminInfo = document.getElementById('adminInfo');
+      const login = document.getElementById('loginSection');
+      const grid = document.getElementById('dashboardGrid');
+      const list = document.getElementById('userList');
       if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists() && userDoc.data().isAdmin) {
-          adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
-          loginSection.style.display = 'none';
-          dashboardGrid.style.display = 'grid';
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists() && snap.data().isAdmin) {
+          adminInfo.innerText = `Welcome Admin: ${snap.data().name}`;
+          login.style.display = 'none'; grid.style.display = 'grid';
+          const all = await getDocs(collection(db, 'users'));
+          let html = '<h3>All Users</h3>';
+          all.forEach(d => {
+            const data = d.data();
+            html += `<div class="user-item">ID: ${d.id} <button class="copy-btn" onclick="navigator.clipboard.writeText('${d.id}')">Copy</button> | Name: ${data.name}</div>`;
+          });
+          list.innerHTML = html;
         } else {
-          adminInfoEl.innerText = 'Access denied';
-          errorEl.innerText = 'Not an admin';
-          dashboardGrid.style.display = 'none';
-          loginSection.classList.add('active');
+          adminInfo.innerText = 'Access Denied!';
+          login.classList.add('active');
+          grid.style.display = 'none';
         }
       } else {
-        loginSection.classList.add('active');
-        dashboardGrid.style.display = 'none';
+        login.classList.add('active'); grid.style.display = 'none';
       }
     });
 
-    window.adminLogin = async function() {
-      const email = document.getElementById('adminEmail').value;
-      const password = document.getElementById('adminPassword').value;
-      const errorEl = document.getElementById('error');
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (error) {
-        errorEl.innerText = 'Login failed: ' + error.message;
-      }
+    window.adminLogin = async () => {
+      await signInWithEmailAndPassword(auth, adminEmail.value, adminPassword.value);
     };
-
-    window.addMember = async function() {
-      const email = document.getElementById('memberEmail').value;
-      const password = document.getElementById('memberPassword').value;
-      const name = document.getElementById('memberName').value;
-      const memberNumber = document.getElementById('memberNumber').value;
-      const address = document.getElementById('memberAddress').value;
-      const pincode = document.getElementById('memberPincode').value;
-      const phone = document.getElementById('memberPhone').value;
-      const errorEl = document.getElementById('error');
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = userCredential.user.uid;
-
-        await setDoc(doc(db, 'users', uid), {
-          email, name, memberNumber, address, pincode, phone, isAdmin: false
-        });
-
-        alert('Member added successfully!');
-        showForm(null);
-      } catch (error) {
-        errorEl.innerText = 'Error adding member: ' + error.message;
-      }
+    window.addMember = async () => {
+      const c = await createUserWithEmailAndPassword(auth, memberEmail.value, memberPassword.value);
+      await setDoc(doc(db, 'users', c.user.uid), { name: memberName.value, memberNumber: memberNumber.value, isAdmin: false });
+      alert('Member Added!');
     };
-
-    window.editMember = async function() {
-      const userId = document.getElementById('editMemberId').value;
-      const name = document.getElementById('editMemberName').value;
-      const address = document.getElementById('editMemberAddress').value;
-      try {
-        await updateDoc(doc(db, 'users', userId), { name, address });
-        alert('Member updated successfully!');
-        showForm(null);
-      } catch (error) {
-        document.getElementById('error').innerText = 'Error editing member: ' + error.message;
-      }
+    window.editMember = async () => {
+      await updateDoc(doc(db, 'users', editMemberId.value), { name: editMemberName.value });
+      alert('Updated!');
     };
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        window.location.href = 'index.html';
-      } catch (error) {
-        document.getElementById('error').innerText = 'Error logging out: ' + error.message;
-      }
-    });
+    window.addLoan = async () => {
+      await setDoc(doc(db, 'loans', loanUserId.value), { amount: loanAmount.value });
+      alert('Loan Added!');
+    };
+    window.addShare = async () => {
+      await setDoc(doc(db, 'shares', shareUserId.value), { amount: shareAmount.value });
+      alert('Share Added!');
+    };
+    logoutBtn.onclick = () => signOut(auth);
   </script>
 </body>
 </html>
