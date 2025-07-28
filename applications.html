@@ -1,64 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Society App - Application Status</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Society App - Applications</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
     }
     p {
+      margin: 10px 0;
+      color: #555;
       font-size: 16px;
-      margin: 10px 0;
     }
-    .application {
-      border-bottom: 1px solid #ddd;
-      padding: 5px 0;
-    }
-    a {
+    button {
       display: block;
-      margin: 10px 0;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
-      text-align: center;
-      border-radius: 5px;
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-    a:hover {
-      background-color: #45a049;
+    button:hover {
+      background: #45a049;
     }
     #error {
       color: red;
-      text-align: center;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    .loading {
+      font-style: italic;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Application Status</h1>
-    <div id="applications"></div>
+    <h1>Applications</h1>
+    <p id="appInfo" class="loading">Loading applications...</p>
+    <p id="status">Status: Loading...</p>
+    <p id="type">Type: Loading...</p>
+    <button onclick="window.location.href='home.html'">Back to Home</button>
+    <button id="logoutBtn">Logout</button>
     <p id="error"></p>
-    <a href="home.html">Back to Home</a>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-  <script>
-    // Firebase configuration
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
       authDomain: "probanker-2bce7.firebaseapp.com",
@@ -69,36 +87,47 @@
       measurementId: "G-31138VCDFZ"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    // Check authentication and fetch application data
-    auth.onAuthStateChanged(async (user) => {
-      const errorElement = document.getElementById('error');
-      if (user) {
-        try {
-          const appDocs = await db.collection('applications').where('userId', '==', user.uid).get();
-          const applicationsDiv = document.getElementById('applications');
-          if (!appDocs.empty) {
-            appDocs.forEach(doc => {
-              const appData = doc.data();
-              const appDiv = document.createElement('div');
-              appDiv.className = 'application';
-              appDiv.innerText = `Application ID: ${doc.id}, Status: ${appData.status}`;
-              applicationsDiv.appendChild(appDiv);
-            });
-          } else {
-            applicationsDiv.innerText = 'No applications found';
+      onAuthStateChanged(auth, async (user) => {
+        const appInfoEl = document.getElementById('appInfo');
+        const statusEl = document.getElementById('status');
+        const typeEl = document.getElementById('type');
+        const errorEl = document.getElementById('error');
+
+        if (user) {
+          try {
+            const appDoc = await getDoc(doc(db, 'applications', user.uid));
+            if (appDoc.exists()) {
+              const data = appDoc.data();
+              appInfoEl.innerText = `Applications for ${user.email}`;
+              statusEl.innerText = `Status: ${data.status || 'N/A'}`;
+              typeEl.innerText = `Type: ${data.type || 'N/A'}`;
+            } else {
+              errorEl.innerText = 'No applications found!';
+            }
+          } catch (error) {
+            errorEl.innerText = 'Error loading applications: ' + error.message;
           }
-        } catch (error) {
-          errorElement.innerText = 'Error fetching applications: ' + error.message;
+        } else {
+          window.location.href = 'index.html';
         }
-      } else {
-        window.location.href = 'index.html'; // Redirect to login if not authenticated
-      }
-    });
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          window.location.href = 'index.html';
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error logging out: ' + error.message;
+        }
+      });
+    } catch (error) {
+      document.getElementById('error').innerText = 'Firebase init failed: ' + error.message;
+    }
   </script>
 </body>
 </html>
