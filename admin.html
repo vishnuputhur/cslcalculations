@@ -3,82 +3,270 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Society App - Admin Panel</title>
+  <title>Society App - Admin Dashboard</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 40px;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0f7fa, #fff);
       min-height: 100vh;
     }
     .container {
+      max-width: 1200px;
+      margin: 0 auto;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
-      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       padding: 30px;
-      text-align: center;
     }
     h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-      color: #333;
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 28px;
     }
-    p {
-      margin: 10px 0;
-      color: #555;
-      font-size: 16px;
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
     }
-    button {
-      display: block;
+    .card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 {
+      color: #34495e;
+      margin-bottom: 15px;
+    }
+    .card button {
       width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      background: #4CAF50;
+      padding: 10px;
+      margin: 5px 0;
+      background: #3498db;
       color: #fff;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 5px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
-    button:hover {
-      background: #45a049;
+    .card button:hover {
+      background: #2980b9;
+    }
+    .form-section {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: #ecf0f1;
+      border-radius: 10px;
+    }
+    .form-section.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
     }
     #error {
       color: red;
       font-size: 14px;
-      margin-top: 15px;
+      margin-top: 10px;
     }
-    .loading {
-      font-style: italic;
-      color: #888;
+    #logoutBtn {
+      margin-top: 20px;
+      background: #e74c3c;
+    }
+    #logoutBtn:hover {
+      background: #c0392b;
     }
     .user-list {
       text-align: left;
-      margin: 20px 0;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Admin Panel</h1>
+    <h1>Admin Dashboard</h1>
     <p id="adminInfo" class="loading">Loading admin data...</p>
-    <div id="userList" class="user-list"></div>
-    <button id="addUserBtn">Add New User</button>
+    <div class="dashboard-grid" id="dashboardGrid">
+      <div class="card">
+        <h3>Manage Members</h3>
+        <button onclick="showForm('memberForm')">Add Member</button>
+        <button onclick="showForm('editMemberForm')">Edit Member</button>
+      </div>
+      <div class="card">
+        <h3>Manage Loans</h3>
+        <button onclick="showForm('loanForm')">Add Loan</button>
+        <button onclick="showForm('editLoanForm')">Edit Loan</button>
+      </div>
+      <div class="card">
+        <h3>Loan Payments</h3>
+        <button onclick="showForm('paymentForm')">Add Payment</button>
+      </div>
+      <div class="card">
+        <h3>Send Message</h3>
+        <button onclick="showForm('messageForm')">Send Message</button>
+      </div>
+      <div class="card">
+        <h3>Manage Shares</h3>
+        <button onclick="showForm('shareForm')">Add Share</button>
+        <button onclick="showForm('editShareForm')">Edit Share</button>
+      </div>
+    </div>
+
+    <!-- Member Form -->
+    <div id="memberForm" class="form-section">
+      <h3>Add New Member</h3>
+      <div class="form-group">
+        <label>Email:</label><input type="email" id="memberEmail" placeholder="Enter email">
+      </div>
+      <div class="form-group">
+        <label>Name:</label><input type="text" id="memberName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Member Number:</label><input type="text" id="memberNumber" placeholder="Enter member number">
+      </div>
+      <div class="form-group">
+        <label>Address:</label><textarea id="memberAddress" placeholder="Enter address"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Pincode:</label><input type="text" id="memberPincode" placeholder="Enter pincode">
+      </div>
+      <div class="form-group">
+        <label>Phone:</label><input type="text" id="memberPhone" placeholder="Enter phone">
+      </div>
+      <button onclick="addMember()">Submit</button>
+    </div>
+
+    <!-- Edit Member Form -->
+    <div id="editMemberForm" class="form-section">
+      <h3>Edit Member</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="editMemberId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Name:</label><input type="text" id="editMemberName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label>Address:</label><textarea id="editMemberAddress" placeholder="Enter address"></textarea>
+      </div>
+      <button onclick="editMember()">Update</button>
+    </div>
+
+    <!-- Loan Form -->
+    <div id="loanForm" class="form-section">
+      <h3>Add New Loan</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="loanUserId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Balance:</label><input type="number" id="loanBalance" placeholder="Enter balance">
+      </div>
+      <div class="form-group">
+        <label>Guarantors:</label><input type="text" id="loanGuarantors" placeholder="Enter guarantors (comma-separated)">
+      </div>
+      <div class="form-group">
+        <label>Interest:</label><input type="number" id="loanInterest" placeholder="Enter interest (%)">
+      </div>
+      <div class="form-group">
+        <label>Loan Number:</label><input type="text" id="loanNumber" placeholder="Enter loan number">
+      </div>
+      <div class="form-group">
+        <label>Start Date:</label><input type="date" id="loanStartDate">
+      </div>
+      <button onclick="addLoan()">Submit</button>
+    </div>
+
+    <!-- Edit Loan Form -->
+    <div id="editLoanForm" class="form-section">
+      <h3>Edit Loan</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Balance:</label><input type="number" id="editLoanBalance" placeholder="Enter balance">
+      </div>
+      <button onclick="editLoan()">Update</button>
+    </div>
+
+    <!-- Payment Form -->
+    <div id="paymentForm" class="form-section">
+      <h3>Add Loan Payment</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="paymentUserId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Amount:</label><input type="number" id="paymentAmount" placeholder="Enter amount">
+      </div>
+      <div class="form-group">
+        <label>Date:</label><input type="date" id="paymentDate">
+      </div>
+      <button onclick="addPayment()">Submit</button>
+    </div>
+
+    <!-- Message Form -->
+    <div id="messageForm" class="form-section">
+      <h3>Send Message</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="messageUserId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Message:</label><textarea id="messageContent" placeholder="Enter message"></textarea>
+      </div>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Share Form -->
+    <div id="shareForm" class="form-section">
+      <h3>Add Share</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="shareUserId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Amount:</label><input type="number" id="shareAmount" placeholder="Enter amount">
+      </div>
+      <button onclick="addShare()">Submit</button>
+    </div>
+
+    <!-- Edit Share Form -->
+    <div id="editShareForm" class="form-section">
+      <h3>Edit Share</h3>
+      <div class="form-group">
+        <label>User ID:</label><input type="text" id="editShareId" placeholder="Enter user ID">
+      </div>
+      <div class="form-group">
+        <label>Amount:</label><input type="number" id="editShareAmount" placeholder="Enter amount">
+      </div>
+      <button onclick="editShare()">Update</button>
+    </div>
+
     <button id="logoutBtn">Logout</button>
     <p id="error"></p>
+    <div id="userList" class="user-list"></div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -106,21 +294,10 @@
             if (userDoc.exists() && userDoc.data().isAdmin) {
               adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name}`;
               const usersSnapshot = await getDocs(collection(db, 'users'));
-              let usersHtml = '<h3>Users</h3>';
-              for (const userDocSnap of usersSnapshot.docs) {
-                const data = userDocSnap.data();
-                const loanDoc = await getDoc(doc(db, 'loans', userDocSnap.id));
-                const shareDoc = await getDoc(doc(db, 'shares', userDocSnap.id));
-                usersHtml += `
-                  <p>
-                    Name: ${data.name}<br>
-                    Email: ${data.email}<br>
-                    Member Number: ${data.memberNumber}<br>
-                    Loan Balance: ${loanDoc.exists() ? `₹${loanDoc.data().balance || 'N/A'}` : 'No loan'}<br>
-                    Share Amount: ${shareDoc.exists() ? `₹${shareDoc.data().amount || 'N/A'}` : 'No shares'}<br>
-                    <button onclick="viewUserDetails('${userDocSnap.id}')">View Details</button>
-                  </p>
-                `;
+              let usersHtml = '<h3>Users List</h3>';
+              for (const doc of usersSnapshot.docs) {
+                const data = doc.data();
+                usersHtml += `<p>User ID: ${doc.id} | Name: ${data.name} | Email: ${data.email}</p>`;
               }
               userListEl.innerHTML = usersHtml;
             } else {
@@ -131,37 +308,125 @@
             }
           } catch (error) {
             errorEl.innerText = 'Error loading admin data: ' + error.message;
-            console.error('Admin error:', error);
           }
         } else {
           window.location.href = 'index.html';
         }
       });
 
-      window.viewUserDetails = async (userId) => {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', userId));
-          const loanDoc = await getDoc(doc(db, 'loans', userId));
-          const shareDoc = await getDoc(doc(db, 'shares', userId));
-          let details = `User Details:\nName: ${userDoc.data().name}\nEmail: ${userDoc.data().email}`;
-          details += `\nMember Number: ${userDoc.data().memberNumber}`;
-          details += loanDoc.exists() ? `\nLoan Balance: ₹${loanDoc.data().balance}\nGuarantors: ${loanDoc.data().guarantors ? loanDoc.data().guarantors.join(', ') : 'N/A'}` : '\nNo loan details';
-          details += shareDoc.exists() ? `\nShare Amount: ₹${shareDoc.data().amount}` : '\nNo share details';
-          alert(details);
-        } catch (error) {
-          document.getElementById('error').innerText = 'Error fetching details: ' + error.message;
-        }
-      };
+      function showForm(formId) {
+        document.querySelectorAll('.form-section').forEach(form => form.classList.remove('active'));
+        document.getElementById(formId).classList.add('active');
+      }
 
-      document.getElementById('addUserBtn').addEventListener('click', () => {
-        const email = prompt('Enter new user email:');
-        const name = prompt('Enter user name:');
-        const memberNumber = prompt('Enter member number:');
-        if (email && name && memberNumber) {
-          alert('User creation not implemented. Add via Firebase Console.');
-          // Future: Implement with Firebase Admin SDK
+      async function addMember() {
+        const email = document.getElementById('memberEmail').value;
+        const name = document.getElementById('memberName').value;
+        const memberNumber = document.getElementById('memberNumber').value;
+        const address = document.getElementById('memberAddress').value;
+        const pincode = document.getElementById('memberPincode').value;
+        const phone = document.getElementById('memberPhone').value;
+        try {
+          const { user } = await auth.createUserWithEmailAndPassword(email, '1234'); // Default password
+          await setDoc(doc(db, 'users', user.uid), {
+            name, memberNumber, email, address, pincode, phone, isAdmin: false
+          });
+          alert('Member added successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error adding member: ' + error.message;
         }
-      });
+      }
+
+      async function editMember() {
+        const userId = document.getElementById('editMemberId').value;
+        const name = document.getElementById('editMemberName').value;
+        const address = document.getElementById('editMemberAddress').value;
+        try {
+          await updateDoc(doc(db, 'users', userId), { name, address });
+          alert('Member updated successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error editing member: ' + error.message;
+        }
+      }
+
+      async function addLoan() {
+        const userId = document.getElementById('loanUserId').value;
+        const balance = Number(document.getElementById('loanBalance').value);
+        const guarantors = document.getElementById('loanGuarantors').value.split(',').map(g => g.trim());
+        const interest = Number(document.getElementById('loanInterest').value);
+        const loanNumber = document.getElementById('loanNumber').value;
+        const startDate = document.getElementById('loanStartDate').value;
+        try {
+          await setDoc(doc(db, 'loans', userId), { balance, guarantors, interest, loanNumber, startDate });
+          alert('Loan added successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error adding loan: ' + error.message;
+        }
+      }
+
+      async function editLoan() {
+        const userId = document.getElementById('editLoanId').value;
+        const balance = Number(document.getElementById('editLoanBalance').value);
+        try {
+          await updateDoc(doc(db, 'loans', userId), { balance });
+          alert('Loan updated successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error editing loan: ' + error.message;
+        }
+      }
+
+      async function addPayment() {
+        const userId = document.getElementById('paymentUserId').value;
+        const amount = Number(document.getElementById('paymentAmount').value);
+        const date = document.getElementById('paymentDate').value;
+        try {
+          await setDoc(doc(db, 'payments', `${userId}_${Date.now()}`), { userId, amount, date });
+          alert('Payment added successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error adding payment: ' + error.message;
+        }
+      }
+
+      async function sendMessage() {
+        const userId = document.getElementById('messageUserId').value;
+        const content = document.getElementById('messageContent').value;
+        try {
+          await setDoc(doc(db, 'messages', `${userId}_${Date.now()}`), { userId, content, timestamp: new Date().toISOString() });
+          alert('Message sent successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error sending message: ' + error.message;
+        }
+      }
+
+      async function addShare() {
+        const userId = document.getElementById('shareUserId').value;
+        const amount = Number(document.getElementById('shareAmount').value);
+        try {
+          await setDoc(doc(db, 'shares', userId), { amount });
+          alert('Share added successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error adding share: ' + error.message;
+        }
+      }
+
+      async function editShare() {
+        const userId = document.getElementById('editShareId').value;
+        const amount = Number(document.getElementById('editShareAmount').value);
+        try {
+          await updateDoc(doc(db, 'shares', userId), { amount });
+          alert('Share updated successfully!');
+          showForm(null);
+        } catch (error) {
+          document.getElementById('error').innerText = 'Error editing share: ' + error.message;
+        }
+      }
 
       document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
