@@ -111,7 +111,7 @@
           const user = userCredential.user;
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
-            window.location.href = 'user/home.html'; // Redirect to user home
+            window.location.href = 'home.html'; // Changed to relative path
           } else {
             errorEl.innerText = 'User not found in database! Please contact admin.';
           }
