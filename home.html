@@ -6,137 +6,72 @@
   <title>Society App - Home</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #ffffff; /* base background white */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .cover-image {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+.card {
+  background: #d0eafd; /* darker light blue */
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%; /* slight reduce */
+  max-width: 550px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  margin: 7mm auto; /* auto center horizontally */
+  flex: 1 0 auto;
+}
 
-    .card {
-      background: #e6f4fc; /* light blue card */
-      border-radius: 12px;
-      padding: 20px;
-      width: 95%; /* 85% of screen width */
-      max-width: 550px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      margin: 7mm 6mm; /* 6mm gap on left and right */
-      flex: 1 0 auto;
-    }
+#welcomeMsg {
+  text-align: center;
+  font-size: 16px;
+  color: #0f6fc1; /* darker blue */
+  margin-bottom: 5px;
+}
 
-    .card-content {
-      background: #fff; /* inner white */
-      border-radius: 10px;
-      padding: 20px;
-    }
+#centerMsg {
+  text-align: center;
+  font-size: 14px;
+  color: #0f6fc1; /* darker blue */
+  margin: 10px 0;
+}
 
-    #welcomeMsg {
-      text-align: center;
-      font-size: 16px;
-      color: #1c8fed;
-      margin-bottom: 5px;
-    }
+.card-item h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #0f6fc1; /* darker blue */
+}
 
-    #memberNo {
-      text-align: center;
-      font-size: 12px;
-      color: #666;
-      margin: 0 0 10mm 0;
-    }
+.card-item button {
+  background: #0f6fc1;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
-    #centerMsg {
-      text-align: center;
-      font-size: 14px;
-      color: #1c8fed;
-      margin: 10px 0;
-    }
+.card-item button:hover {
+  background: #0c5797; /* darker on hover */
+}
 
-    .amounts {
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .amounts p {
-      margin: 5px 0;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .card-item {
-      background: #f9fbfd;
-      border-radius: 8px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-    }
-
-    .card-item:hover {
-      transform: translateY(-3px);
-    }
-
-    .card-item h3 {
-      margin: 0 0 8px 0;
-      font-size: 14px;
-      color: #1c8fed;
-    }
-
-    .card-item button {
-      background: #1c8fed;
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      padding: 6px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .card-item button:hover {
-      background: #136cbf;
-    }
-
-    #error {
-      color: red;
-      font-size: 12px;
-      text-align: center;
-      margin-top: 8px;
-    }
-
-    .footer {
-      width: 100%;
-      background: #1c8fed; /* Changed to button color */
-      color: #fff;
-      text-align: center;
-      padding: 5px 0;
-      font-size: 10px;
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-      flex-shrink: 0;
-    }
-
-    .card-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      margin-bottom: 10mm; /* 10mm above footer */
-    }
+.footer {
+  width: 100%;
+  background: #0f6fc1; /* footer same darker blue */
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
   </style>
 </head>
 <body>
