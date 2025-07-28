@@ -25,7 +25,7 @@
     .form-section.active, .login-section.active { display: block; }
     .form-group { margin-bottom: 12px; text-align: left; }
     .form-group label { display: block; color: #1a252f; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
-    .form-group input, .form-group textarea { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; background: #fff; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; background: #fff; }
     #error { color: #e74c3c; font-size: 13px; margin-top: 10px; text-align: center; }
     #logoutBtn { width: 70%; padding: 4px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; margin: 15px auto; display: block; }
     #logoutBtn:hover { background: #c0392b; }
@@ -35,15 +35,17 @@
     .user-table th { background: #3498db; color: #fff; font-size: 13px; }
     .user-table td { font-size: 12px; }
     .user-table tr:hover { background: #f5f6fa; }
-    .copy-btn { margin-left: 5px; background: #2ecc71; padding: 2px 4px; border: none; border-radius: 3px; font-size: 10px; cursor: pointer; }
+    .copy-btn, .select-btn { margin-left: 5px; background: #2ecc71; padding: 2px 4px; border: none; border-radius: 3px; font-size: 10px; cursor: pointer; }
     .copy-btn:hover { background: #27ae60; }
+    .select-btn { background: #e67e22; }
+    .select-btn:hover { background: #d35400; }
     #searchInput { width: 100%; padding: 6px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
     .footer { position: fixed; bottom: 0; width: 100%; background: #1a252f; color: #fff; text-align: center; padding: 5px 0; font-size: 11px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
     @media (min-width: 768px) {
       h1 { font-size: 26px; }
       .card button { font-size: 13px; padding: 6px; }
       .form-group label { font-size: 14px; }
-      .form-group input, .form-group textarea { font-size: 14px; padding: 8px; }
+      .form-group input, .form-group textarea, .form-group select { font-size: 14px; padding: 8px; }
       .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
       .user-table th, .user-table td { font-size: 14px; padding: 10px; }
     }
@@ -191,10 +193,10 @@
   <div id="editLoanForm" class="form-section">
     <h3>Edit Loan</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID" readonly>
+      <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID">
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="editLoanNumber" placeholder="Enter loan number" readonly>
+      <label>Loan Number:</label><input type="text" id="editLoanNumber" placeholder="Enter loan number">
     </div>
     <div class="form-group">
       <label>Balance:</label><input type="number" id="editLoanBalance" placeholder="Enter balance">
@@ -206,13 +208,21 @@
   <div id="paymentForm" class="form-section">
     <h3>Add Loan Payment</h3>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="paymentLoanNumber" placeholder="Enter loan number">
+      <label>User ID:</label><input type="text" id="paymentUserId" placeholder="Enter user ID" oninput="loadUserLoans()">
+    </div>
+    <div class="form-group">
+      <label>Loan Number:</label><select id="paymentLoanNumber" onchange="loadLoanBalance()">
+        <option value="">Select Loan Number</option>
+      </select>
     </div>
     <div class="form-group">
       <label>Amount:</label><input type="number" id="paymentAmount" placeholder="Enter amount">
     </div>
     <div class="form-group">
       <label>Date:</label><input type="date" id="paymentDate">
+    </div>
+    <div class="form-group">
+      <label>Current Balance:</label><input type="number" id="currentBalance" readonly>
     </div>
     <button onclick="addPayment()">Submit</button>
   </div>
@@ -332,18 +342,25 @@
       const usersSnapshot = await getDocs(collection(db, 'users'));
       let tableHtml = `
         <table class="user-table">
-          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Message</th><th>Share Amount</th><th>Action</th></tr></thead>
           <tbody>
       `;
       usersSnapshot.forEach(doc => {
         const data = doc.data();
+        const latestMessage = await getLatestMessage(doc.id);
+        const shareAmount = data.shareAmount || 0;
         tableHtml += `
           <tr>
             <td>${doc.id}</td>
             <td>${data.name || 'N/A'}</td>
             <td>${data.email || 'N/A'}</td>
             <td>${data.memberNumber || 'N/A'}</td>
-            <td><button class="copy-btn" onclick="selectUser('${doc.id}')">Select</button></td>
+            <td>${latestMessage || 'N/A'}</td>
+            <td>₹${shareAmount.toFixed(2)}</td>
+            <td>
+              <button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button>
+              <button class="select-btn" onclick="selectUser('${doc.id}')">Select</button>
+            </td>
           </tr>
         `;
       });
@@ -354,6 +371,16 @@
     }
   }
 
+  async function getLatestMessage(userId) {
+    const msgQuery = query(collection(db, 'messages'), where('userId', '==', userId));
+    const msgSnap = await getDocs(msgQuery);
+    if (!msgSnap.empty) {
+      const latestMsg = msgSnap.docs.sort((a, b) => new Date(b.data().createdAt) - new Date(a.data().createdAt))[0];
+      return latestMsg.data().content || 'N/A';
+    }
+    return 'N/A';
+  }
+
   window.searchUsers = async function() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     const userListEl = document.getElementById('userList');
@@ -361,19 +388,26 @@
       const usersSnapshot = await getDocs(collection(db, 'users'));
       let tableHtml = `
         <table class="user-table">
-          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Message</th><th>Share Amount</th><th>Action</th></tr></thead>
           <tbody>
       `;
       usersSnapshot.forEach(doc => {
         const data = doc.data();
         if (data.name && data.name.toLowerCase().includes(searchInput)) {
+          const latestMessage = await getLatestMessage(doc.id);
+          const shareAmount = data.shareAmount || 0;
           tableHtml += `
             <tr>
               <td>${doc.id}</td>
               <td>${data.name || 'N/A'}</td>
               <td>${data.email || 'N/A'}</td>
               <td>${data.memberNumber || 'N/A'}</td>
-              <td><button class="copy-btn" onclick="selectUser('${doc.id}')">Select</button></td>
+              <td>${latestMessage || 'N/A'}</td>
+              <td>₹${shareAmount.toFixed(2)}</td>
+              <td>
+                <button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button>
+                <button class="select-btn" onclick="selectUser('${doc.id}')">Select</button>
+              </td>
             </tr>
           `;
         }
@@ -410,6 +444,10 @@
         // Load into Share Form
         document.getElementById('shareUserId').value = userId;
         await loadUserShareData();
+
+        // Load into Payment Form
+        document.getElementById('paymentUserId').value = userId;
+        await loadUserLoans();
       } else {
         document.getElementById('error').innerText = 'User not found!';
       }
@@ -459,8 +497,7 @@
   }
 
   window.copyToClipboard = function(userId) {
-    const uidElement = document.getElementById(`uid-${userId}`) || { innerText: userId };
-    navigator.clipboard.writeText(uidElement.innerText).then(() => {
+    navigator.clipboard.writeText(userId).then(() => {
       alert('User ID copied to clipboard!');
     }).catch(err => console.error('Failed to copy:', err));
   };
@@ -576,7 +613,44 @@
     }
   };
 
+  async function loadUserLoans() {
+    const userId = document.getElementById('paymentUserId').value;
+    const loanSelect = document.getElementById('paymentLoanNumber');
+    if (userId) {
+      try {
+        const loansQuery = query(collection(db, 'loans'), where('userId', '==', userId));
+        const loansSnapshot = await getDocs(loansQuery);
+        loanSelect.innerHTML = '<option value="">Select Loan Number</option>';
+        loansSnapshot.forEach(doc => {
+          const data = doc.data();
+          loanSelect.innerHTML += `<option value="${data.loanNumber}">${data.loanNumber}</option>`;
+        });
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error loading loans: ' + error.message;
+      }
+    }
+  }
+
+  async function loadLoanBalance() {
+    const loanNumber = document.getElementById('paymentLoanNumber').value;
+    if (loanNumber) {
+      try {
+        const loansSnapshot = await getDocs(collection(db, 'loans'));
+        let loanDoc;
+        for (const doc of loansSnapshot.docs) if (doc.data().loanNumber === loanNumber) { loanDoc = doc; break; }
+        if (loanDoc) {
+          document.getElementById('currentBalance').value = loanDoc.data().balance || 0;
+        } else {
+          document.getElementById('currentBalance').value = '';
+        }
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error loading balance: ' + error.message;
+      }
+    }
+  }
+
   window.addPayment = async function() {
+    const userId = document.getElementById('paymentUserId').value;
     const loanNumber = document.getElementById('paymentLoanNumber').value;
     const amount = parseFloat(document.getElementById('paymentAmount').value) || 0;
     const date = document.getElementById('paymentDate').value;
@@ -590,14 +664,18 @@
     try {
       const loansSnapshot = await getDocs(collection(db, 'loans'));
       let loanDoc;
-      for (const doc of loansSnapshot.docs) if (doc.data().loanNumber === loanNumber) { loanDoc = doc; break; }
+      for (const doc of loansSnapshot.docs) if (doc.data().loanNumber === loanNumber && doc.data().userId === userId) { loanDoc = doc; break; }
       if (loanDoc) {
         const newBalance = loanDoc.data().balance - amount;
         await updateDoc(doc(db, 'loans', loanDoc.id), { balance: newBalance, lastUpdated: new Date().toISOString() });
-        await setDoc(doc(db, 'payments', `${loanNumber}_${Date.now()}`), { loanNumber, amount, date, timestamp: new Date().toISOString() });
+        await setDoc(doc(db, 'payments', `${loanNumber}_${Date.now()}`), { userId, loanNumber, amount, date, timestamp: new Date().toISOString() });
         alert('Payment added and balance updated successfully!');
         showForm(null);
-      } else throw new Error('Loan number not found');
+        // Update home screen balance (assuming home.html is open in another tab)
+        if (window.opener && window.opener.location.pathname.includes('home.html')) {
+          window.opener.location.reload();
+        }
+      } else throw new Error('Loan number not found for this user');
     } catch (error) {
       errorEl.innerText = 'Error adding payment: ' + error.message;
     }
@@ -623,6 +701,7 @@
       await setDoc(doc(db, 'messages', `${userId}_${Date.now()}`), { userId, title, content, createdAt: new Date().toISOString() });
       alert('Message sent to user!');
       showForm(null);
+      await loadUsers(); // Refresh user list to show updated message
     } catch (error) {
       errorEl.innerText = 'Error sending message: ' + error.message;
     }
@@ -639,9 +718,10 @@
     }
 
     try {
-      await setDoc(doc(db, 'shares', `${userId}_${Date.now()}`), { userId, amount, createdAt: new Date().toISOString() });
-      alert('Share added!');
+      await updateDoc(doc(db, 'users', userId), { shareAmount: amount, lastUpdated: new Date().toISOString() });
+      alert('Share updated!');
       showForm(null);
+      await loadUsers(); // Refresh user list to show updated share
     } catch (error) {
       errorEl.innerText = 'Error adding share: ' + error.message;
     }
