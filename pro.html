@@ -84,6 +84,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -98,6 +99,7 @@
     try {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
+      const db = getFirestore(app);
 
       window.login = async () => {
         const email = document.getElementById('email').value;
@@ -105,12 +107,13 @@
         const errorEl = document.getElementById('error');
 
         try {
-          await signInWithEmailAndPassword(auth, email, password);
-          const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
-            window.location.href = 'user/home.html'; // Default user redirect
+            window.location.href = 'user/home.html'; // Redirect to user home
           } else {
-            errorEl.innerText = 'User not found in database!';
+            errorEl.innerText = 'User not found in database! Please contact admin.';
           }
         } catch (error) {
           errorEl.innerText = 'Login failed: ' + error.message;
