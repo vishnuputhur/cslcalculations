@@ -100,6 +100,12 @@
       text-align: left;
       margin-top: 20px;
     }
+    .instructions {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -154,6 +160,9 @@
         <label>Phone:</label><input type="text" id="memberPhone" placeholder="Enter phone">
       </div>
       <button onclick="addMember()">Submit</button>
+      <div class="instructions">
+        <p>Note: Use Firebase Console > Authentication > Import Users for bulk adds (CSV).</p>
+      </div>
     </div>
 
     <!-- Edit Member Form -->
@@ -302,7 +311,7 @@
               userListEl.innerHTML = usersHtml;
             } else {
               adminInfoEl.innerText = 'Access denied: Not an admin';
-              errorEl.innerText = 'You are not authorized';
+              errorEl.innerText = 'You are not authorized to access this page!';
               await signOut(auth);
               window.location.href = 'index.html';
             }
@@ -310,7 +319,8 @@
             errorEl.innerText = 'Error loading admin data: ' + error.message;
           }
         } else {
-          window.location.href = 'index.html';
+          // No redirect, just show error since admin can login directly
+          errorEl.innerText = 'Please log in as an admin!';
         }
       });
 
@@ -319,6 +329,7 @@
         document.getElementById(formId).classList.add('active');
       }
 
+      // Note: Client-side auth.createUserWithEmailAndPassword is restricted in free tier
       async function addMember() {
         const email = document.getElementById('memberEmail').value;
         const name = document.getElementById('memberName').value;
@@ -327,14 +338,11 @@
         const pincode = document.getElementById('memberPincode').value;
         const phone = document.getElementById('memberPhone').value;
         try {
-          const { user } = await auth.createUserWithEmailAndPassword(email, '1234'); // Default password
-          await setDoc(doc(db, 'users', user.uid), {
-            name, memberNumber, email, address, pincode, phone, isAdmin: false
-          });
-          alert('Member added successfully!');
+          // Manual addition recommended due to free tier limits
+          alert('Add member via Firebase Console > Authentication > Import Users (CSV) for bulk adds.');
           showForm(null);
         } catch (error) {
-          document.getElementById('error').innerText = 'Error adding member: ' + error.message;
+          document.getElementById('error').innerText = 'Error: Use Console for member addition. ' + error.message;
         }
       }
 
