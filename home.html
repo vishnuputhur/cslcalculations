@@ -26,10 +26,10 @@
       background: #e6f4fc; /* light blue card */
       border-radius: 12px;
       padding: 20px;
-      width: calc(100% - 12mm); /* 6mm gap each side */
+      width: 85%; /* 85% of screen width */
       max-width: 500px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      margin-top: 7mm;
+      margin: 7mm 6mm; /* 6mm gap on left and right */
       flex: 1 0 auto;
     }
 
@@ -50,7 +50,7 @@
       text-align: center;
       font-size: 12px;
       color: #666;
-      margin: 0 0 10px 0;
+      margin: 0 0 10mm 0;
     }
 
     #centerMsg {
@@ -121,7 +121,7 @@
 
     .footer {
       width: 100%;
-      background: #2c3e50;
+      background: #1c8fed; /* Changed to button color */
       color: #fff;
       text-align: center;
       padding: 5px 0;
@@ -225,7 +225,8 @@
             loanBalance.innerText = `Loan Balance: ₹${totalLoanBalance.toFixed(2)}`;
 
             // Fetch Share Amount (from users collection)
-            shareAmount.innerText = `Share Amount: ₹${(data.shareAmount || 0).toFixed(2)}`;
+            const shareValue = data.shareAmount !== undefined ? data.shareAmount : 0; // Ensure defined value
+            shareAmount.innerText = `Share Amount: ₹${shareValue.toFixed(2)}`;
 
             // Load Messages
             const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
@@ -248,7 +249,6 @@
       }
     });
 
-    // Functions for navigation (already defined in your code)
     window.showProfile = () => {
       window.location.href = 'profile.html';
     };
