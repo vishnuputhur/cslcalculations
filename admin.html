@@ -131,22 +131,43 @@
   <div id="editMemberForm" class="form-section">
     <h3>Edit Member</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="editMemberId" placeholder="Enter user ID">
+      <label>User ID:</label><input type="text" id="editMemberId" placeholder="Enter user ID" readonly>
+    </div>
+    <div class="form-group">
+      <label>Email:</label><input type="email" id="editMemberEmail" placeholder="Enter email">
     </div>
     <div class="form-group">
       <label>Name:</label><input type="text" id="editMemberName" placeholder="Enter name">
     </div>
     <div class="form-group">
+      <label>Member Number:</label><input type="text" id="editMemberNumber" placeholder="Enter member number">
+    </div>
+    <div class="form-group">
+      <label>CSL Code:</label><input type="text" id="editMemberCslCode" placeholder="Enter CSL code">
+    </div>
+    <div class="form-group">
+      <label>Share:</label><input type="text" id="editMemberShare" placeholder="Enter share">
+    </div>
+    <div class="form-group">
+      <label>Share Amount:</label><input type="number" id="editMemberShareAmount" placeholder="Enter share amount">
+    </div>
+    <div class="form-group">
       <label>Address:</label><textarea id="editMemberAddress" placeholder="Enter address"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Pincode:</label><input type="text" id="editMemberPincode" placeholder="Enter pincode">
+    </div>
+    <div class="form-group">
+      <label>Phone:</label><input type="text" id="editMemberPhone" placeholder="Enter phone">
     </div>
     <button onclick="editMember()">Update</button>
   </div>
 
   <!-- Loan Form -->
   <div id="loanForm" class="form-section">
-    <h3>Add New Loan</h3>
+    <h3>Add/Edit Loan</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="loanUserId" placeholder="Enter user ID">
+      <label>User ID:</label><input type="text" id="loanUserId" placeholder="Enter user ID" oninput="loadUserLoanData()">
     </div>
     <div class="form-group">
       <label>Balance:</label><input type="number" id="loanBalance" placeholder="Enter balance">
@@ -158,24 +179,27 @@
       <label>Interest (%):</label><input type="number" id="loanInterest" placeholder="Enter interest">
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="loanNumber" placeholder="Enter loan number">
+      <label>Loan Number:</label><input type="text" id="loanNumber" placeholder="Enter loan number" oninput="loadUserLoanData()">
     </div>
     <div class="form-group">
       <label>Start Date:</label><input type="date" id="loanStartDate">
     </div>
-    <button onclick="addLoan()">Submit</button>
+    <button onclick="saveLoan()">Save</button>
   </div>
 
   <!-- Edit Loan Form -->
   <div id="editLoanForm" class="form-section">
     <h3>Edit Loan</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID">
+      <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID" readonly>
+    </div>
+    <div class="form-group">
+      <label>Loan Number:</label><input type="text" id="editLoanNumber" placeholder="Enter loan number" readonly>
     </div>
     <div class="form-group">
       <label>Balance:</label><input type="number" id="editLoanBalance" placeholder="Enter balance">
     </div>
-    <button onclick="editLoan()">Update</button>
+    <button onclick="updateLoan()">Update</button>
   </div>
 
   <!-- Payment Form -->
@@ -212,7 +236,7 @@
   <div id="shareForm" class="form-section">
     <h3>Add Share</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="shareUserId" placeholder="Enter user ID">
+      <label>User ID:</label><input type="text" id="shareUserId" placeholder="Enter user ID" oninput="loadUserShareData()">
     </div>
     <div class="form-group">
       <label>Amount:</label><input type="number" id="shareAmount" placeholder="Enter share amount">
@@ -319,7 +343,7 @@
             <td>${data.name || 'N/A'}</td>
             <td>${data.email || 'N/A'}</td>
             <td>${data.memberNumber || 'N/A'}</td>
-            <td><button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button></td>
+            <td><button class="copy-btn" onclick="selectUser('${doc.id}')">Select</button></td>
           </tr>
         `;
       });
@@ -349,7 +373,7 @@
               <td>${data.name || 'N/A'}</td>
               <td>${data.email || 'N/A'}</td>
               <td>${data.memberNumber || 'N/A'}</td>
-              <td><button class="copy-btn" onclick="copyToClipboard('${doc.id}')">Copy ID</button></td>
+              <td><button class="copy-btn" onclick="selectUser('${doc.id}')">Select</button></td>
             </tr>
           `;
         }
@@ -361,11 +385,78 @@
     }
   };
 
-  window.selectUser = function(userId) {
-    console.log('Selected user:', userId);
-    document.getElementById('editMemberId').value = userId;
-    showForm('editMemberForm');
+  window.selectUser = async function(userId) {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        // Load into Edit Member Form
+        document.getElementById('editMemberId').value = userId;
+        document.getElementById('editMemberEmail').value = data.email || '';
+        document.getElementById('editMemberName').value = data.name || '';
+        document.getElementById('editMemberNumber').value = data.memberNumber || '';
+        document.getElementById('editMemberCslCode').value = data.cslCode || '';
+        document.getElementById('editMemberShare').value = data.share || '';
+        document.getElementById('editMemberShareAmount').value = data.shareAmount || 0;
+        document.getElementById('editMemberAddress').value = data.address || '';
+        document.getElementById('editMemberPincode').value = data.pincode || '';
+        document.getElementById('editMemberPhone').value = data.phone || '';
+        showForm('editMemberForm');
+
+        // Load into Loan Form
+        document.getElementById('loanUserId').value = userId;
+        await loadUserLoanData();
+
+        // Load into Share Form
+        document.getElementById('shareUserId').value = userId;
+        await loadUserShareData();
+      } else {
+        document.getElementById('error').innerText = 'User not found!';
+      }
+    } catch (error) {
+      document.getElementById('error').innerText = 'Error loading user data: ' + error.message;
+    }
   };
+
+  async function loadUserLoanData() {
+    const userId = document.getElementById('loanUserId').value;
+    const loanNumber = document.getElementById('loanNumber').value;
+    if (userId && loanNumber) {
+      try {
+        const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
+        if (loanDoc.exists()) {
+          const data = loanDoc.data();
+          document.getElementById('loanBalance').value = data.balance || 0;
+          document.getElementById('loanGuarantors').value = data.guarantors ? data.guarantors.join(', ') : '';
+          document.getElementById('loanInterest').value = data.interest || 0;
+          document.getElementById('loanStartDate').value = data.startDate || '';
+        } else {
+          document.getElementById('loanBalance').value = '';
+          document.getElementById('loanGuarantors').value = '';
+          document.getElementById('loanInterest').value = '';
+          document.getElementById('loanStartDate').value = '';
+        }
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error loading loan data: ' + error.message;
+      }
+    }
+  }
+
+  async function loadUserShareData() {
+    const userId = document.getElementById('shareUserId').value;
+    if (userId) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        if (userDoc.exists()) {
+          document.getElementById('shareAmount').value = userDoc.data().shareAmount || 0;
+        } else {
+          document.getElementById('shareAmount').value = '';
+        }
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error loading share data: ' + error.message;
+      }
+    }
+  }
 
   window.copyToClipboard = function(userId) {
     const uidElement = document.getElementById(`uid-${userId}`) || { innerText: userId };
@@ -409,8 +500,15 @@
 
   window.editMember = async function() {
     const userId = document.getElementById('editMemberId').value;
+    const email = document.getElementById('editMemberEmail').value;
     const name = document.getElementById('editMemberName').value;
+    const memberNumber = document.getElementById('editMemberNumber').value;
+    const cslCode = document.getElementById('editMemberCslCode').value;
+    const share = document.getElementById('editMemberShare').value;
+    const shareAmount = document.getElementById('editMemberShareAmount').value;
     const address = document.getElementById('editMemberAddress').value;
+    const pincode = document.getElementById('editMemberPincode').value;
+    const phone = document.getElementById('editMemberPhone').value;
     const errorEl = document.getElementById('error');
 
     if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
@@ -419,7 +517,7 @@
     }
 
     try {
-      await updateDoc(doc(db, 'users', userId), { name, address });
+      await updateDoc(doc(db, 'users', userId), { email, name, memberNumber, cslCode, share, shareAmount: parseFloat(shareAmount) || 0, address, pincode, phone });
       alert('Member updated successfully!');
       showForm(null);
       await loadUsers();
@@ -428,7 +526,7 @@
     }
   };
 
-  window.addLoan = async function() {
+  window.saveLoan = async function() {
     const userId = document.getElementById('loanUserId').value;
     const balance = parseFloat(document.getElementById('loanBalance').value) || 0;
     const guarantors = document.getElementById('loanGuarantors').value.split(',').map(g => g.trim());
@@ -443,16 +541,24 @@
     }
 
     try {
-      await setDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { userId, balance, guarantors, interest, loanNumber, startDate, lastUpdated: new Date().toISOString() });
-      alert('Loan added successfully!');
+      const loanDocRef = doc(db, 'loans', `${userId}_${loanNumber}`);
+      const loanDoc = await getDoc(loanDocRef);
+      if (loanDoc.exists()) {
+        await updateDoc(loanDocRef, { balance, guarantors, interest, startDate, lastUpdated: new Date().toISOString() });
+        alert('Loan updated successfully!');
+      } else {
+        await setDoc(loanDocRef, { userId, balance, guarantors, interest, loanNumber, startDate, lastUpdated: new Date().toISOString() });
+        alert('Loan added successfully!');
+      }
       showForm(null);
     } catch (error) {
-      errorEl.innerText = 'Error adding loan: ' + error.message;
+      errorEl.innerText = 'Error saving loan: ' + error.message;
     }
   };
 
-  window.editLoan = async function() {
+  window.updateLoan = async function() {
     const userId = document.getElementById('editLoanId').value;
+    const loanNumber = document.getElementById('editLoanNumber').value;
     const balance = parseFloat(document.getElementById('editLoanBalance').value) || 0;
     const errorEl = document.getElementById('error');
 
