@@ -94,7 +94,7 @@
 
     .icon-button {
       display: inline-block;
-      font-size: 6mm; /* reduced icon size */
+      font-size: 6mm; /* Maintain original icon size */
       text-decoration: none;
       color: #0f6fc1;
       margin-bottom: 2px;
@@ -140,6 +140,66 @@
       padding: 0 6mm; /* 6mm gap on both sides */
       box-sizing: border-box;
     }
+
+    /* Popup Styles */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .popup .form-group {
+      margin-bottom: 12px;
+    }
+    .popup .form-group label {
+      display: block;
+      color: #2c3e50;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+    .popup .form-group input {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+    .popup button {
+      width: 100%;
+      padding: 6px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .popup button:hover {
+      background: #2980b9;
+    }
+    #shareDetails p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -171,6 +231,18 @@
           <a href="applications.html" class="icon-button">📩</a>
           <span class="icon-label">Application Status</span>
         </div>
+        <div class="card-item">
+          <a href="#" class="icon-button" onclick="showPasswordPopup(event)">🔐</a>
+          <span class="icon-label">Change Password</span>
+        </div>
+        <div class="card-item">
+          <a href="msg.html" class="icon-button">📬</a>
+          <span class="icon-label">Messages</span>
+        </div>
+        <div class="card-item">
+          <a href="#" class="icon-button" onclick="showSharePopup(event)">💰</a>
+          <span class="icon-label">Shares</span>
+        </div>
       </div>
 
       <p id="error"></p>
@@ -179,9 +251,39 @@
 
   <div class="footer">Powered by VT Soft 2025</div>
 
+  <!-- Password Change Popup -->
+  <div id="passwordPopup" class="popup">
+    <div class="form-group">
+      <label>Current Password:</label>
+      <input type="password" id="currentPassword" placeholder="Enter current password">
+    </div>
+    <div class="form-group">
+      <label>New Password:</label>
+      <input type="password" id="newPassword" placeholder="Enter new password">
+    </div>
+    <div class="form-group">
+      <label>Confirm New Password:</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm new password">
+    </div>
+    <button onclick="changePassword()">Update</button>
+    <button onclick="hidePopup('passwordPopup')">Cancel</button>
+  </div>
+  <div id="passwordOverlay" class="popup-overlay" onclick="hidePopup('passwordPopup')"></div>
+
+  <!-- Share Details Popup -->
+  <div id="sharePopup" class="popup">
+    <h3>Share Details</h3>
+    <div id="shareDetails">
+      <p>Share: <span id="shareValue">--</span></p>
+      <p>Share Amount: <span id="shareAmountValue">₹--</span></p>
+    </div>
+    <button onclick="hidePopup('sharePopup')">Close</button>
+  </div>
+  <div id="shareOverlay" class="popup-overlay" onclick="hidePopup('sharePopup')"></div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, reauthenticateWithCredential, updatePassword, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -205,6 +307,8 @@
       const shareAmount = document.getElementById('shareAmount');
       const centerMsg = document.getElementById('centerMsg');
       const errorEl = document.getElementById('error');
+      const shareValueEl = document.getElementById('shareValue');
+      const shareAmountValueEl = document.getElementById('shareAmountValue');
 
       if (user) {
         try {
@@ -224,8 +328,11 @@
             }
             loanBalance.innerText = `Loan Balance: ₹${totalLoanBalance.toFixed(2)}`;
 
-            const shareValue = data.shareAmount !== undefined ? data.shareAmount : 0;
-            shareAmount.innerText = `Share Amount: ₹${shareValue.toFixed(2)}`;
+            const shareValue = data.share !== undefined ? data.share : '--';
+            const shareAmountValue = data.shareAmount !== undefined ? data.shareAmount : 0;
+            shareAmount.innerText = `Share Amount: ₹${shareAmountValue.toFixed(2)}`;
+            shareValueEl.innerText = shareValue;
+            shareAmountValueEl.innerText = `₹${shareAmountValue.toFixed(2)}`;
 
             const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
             const msgSnap = await getDocs(msgQuery);
@@ -246,6 +353,59 @@
         window.location.href = 'index.html';
       }
     });
+
+    // Popup Functions
+    function showPopup(popupId) {
+      document.getElementById(popupId).style.display = 'block';
+      document.getElementById(popupId + 'Overlay').style.display = 'block';
+    }
+
+    function hidePopup(popupId) {
+      document.getElementById(popupId).style.display = 'none';
+      document.getElementById(popupId + 'Overlay').style.display = 'none';
+    }
+
+    function showPasswordPopup(event) {
+      event.preventDefault();
+      showPopup('passwordPopup');
+    }
+
+    function showSharePopup(event) {
+      event.preventDefault();
+      showPopup('sharePopup');
+    }
+
+    // Password Change Logic
+    window.changePassword = async function() {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorEl = document.getElementById('error');
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        errorEl.innerText = 'All fields are required!';
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        errorEl.innerText = 'New passwords do not match!';
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const credential = EmailAuthProvider.credential(user.email, currentPassword);
+          await reauthenticateWithCredential(user, credential);
+          await updatePassword(user, newPassword);
+          errorEl.innerText = 'Password updated successfully!';
+          hidePopup('passwordPopup');
+          setTimeout(() => errorEl.innerText = '', 3000);
+        } catch (error) {
+          errorEl.innerText = 'Error updating password: ' + error.message;
+        }
+      }
+    };
   </script>
 </body>
 </html>
