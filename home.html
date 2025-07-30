@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Society App - Home</title>
   <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -15,14 +25,16 @@
       align-items: center;
       min-height: 100vh;
       overflow-x: hidden;
+      backdrop-filter: blur(5px); /* Polished screen effect */
     }
 
     .cover-image {
       width: 100%;
       height: auto;
-      max-height: 184px; /* Reduced by 8% from 200px (200 * 0.92) */
+      max-height: 169px; /* Reduced by 8% from 184px (184 * 0.92) */
       object-fit: cover;
       margin-top: 10px;
+      animation: fadeIn 1s ease-in-out;
     }
 
     .card {
@@ -31,31 +43,33 @@
       padding: 20px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 15px 40px rgba(0, 122, 193, 0.3); /* Enhanced 3D effect */
       margin: 20px auto;
       flex: 1 0 auto;
       border: 1px solid #e0e7ff;
+      animation: fadeIn 1.5s ease-in-out;
     }
 
     #welcomeMsg {
       text-align: center;
       font-size: 20px;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       margin-bottom: 10px;
       font-weight: 600;
+      animation: pulse 2s infinite;
     }
 
     #memberNo {
       text-align: center;
       font-size: 14px;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       margin-bottom: 20px;
     }
 
     #centerMsg {
       text-align: center;
       font-size: 16px;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       margin: 15px 0;
       font-weight: 500;
     }
@@ -72,55 +86,56 @@
     .amounts p {
       margin: 8px 0;
       font-size: 16px;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       font-weight: 500;
     }
 
     .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
+      gap: 6mm; /* 6mm gap on both sides */
       margin-top: 25px;
       justify-items: center;
     }
 
     .card-item {
       background: #ffffff;
-      border-radius: 15px;
-      padding: 10px; /* Reduced padding for smaller box */
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      padding: 8px; /* Reduced padding for 20% smaller box */
+      box-shadow: 0 10px 25px rgba(0, 122, 193, 0.2), inset 0 2px 5px rgba(255, 255, 255, 0.5); /* Enhanced 3D effect */
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100px; /* Reduced from 120px for smaller box */
+      height: 80px; /* 20% reduction from 100px (100 * 0.8) */
       width: 100%;
-      border: 1px solid #e0e7ff;
+      border: 2px solid #007AC1; /* Theme color border outside box */
+      animation: fadeIn 1s ease-in-out;
     }
 
     .card-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transform: translateY(-7px);
+      box-shadow: 0 15px 35px rgba(0, 122, 193, 0.3), inset 0 4px 8px rgba(255, 255, 255, 0.7);
     }
 
     .icon-button {
-      font-size: 20px; /* Reduced icon size for smaller box */
+      font-size: 18px; /* Reduced for smaller box */
       text-decoration: none;
-      color: #10589c; /* Theme color */
-      margin-bottom: 8px;
+      color: #007AC1; /* Theme color */
+      margin-bottom: 6px;
       transition: color 0.3s ease, transform 0.3s ease;
     }
 
     .card-item:hover .icon-button {
-      color: #0d4475; /* Darker shade of theme color */
-      transform: scale(1.1);
+      color: #005f99; /* Darker shade */
+      transform: scale(1.15);
     }
 
     .icon-label {
       display: block;
-      font-size: 11px; /* Slightly reduced for smaller box */
-      color: #10589c; /* Theme color */
+      font-size: 10px; /* Reduced for smaller box */
+      color: #007AC1; /* Theme color */
       font-weight: 500;
       text-align: center;
       width: 100%;
@@ -135,13 +150,14 @@
 
     .footer {
       width: 100%;
-      background: #10589c; /* Theme color */
-      color: #ffffff; /* White text as requested */
+      background: #007AC1; /* Theme color */
+      color: #ffffff; /* White text */
       text-align: center;
       padding: 10px 0;
       font-size: 12px;
       box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
       flex-shrink: 0;
+      animation: fadeIn 1.5s ease-in-out;
     }
 
     .card-container {
@@ -164,11 +180,12 @@
       background: #ffffff;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 15px 40px rgba(0, 122, 193, 0.3);
       z-index: 1000;
       max-height: 80vh;
       overflow-y: auto;
       border: 1px solid #c3e8ff;
+      animation: fadeIn 1s ease-in-out;
     }
     .popup-overlay {
       display: none;
@@ -177,7 +194,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(16, 88, 156, 0.3); /* Semi-transparent theme overlay */
+      background: rgba(0, 122, 193, 0.3);
       z-index: 999;
     }
     .popup .form-group {
@@ -185,7 +202,7 @@
     }
     .popup .form-group label {
       display: block;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       font-size: 14px;
       margin-bottom: 5px;
       font-weight: 500;
@@ -202,7 +219,7 @@
     .popup button {
       width: 100%;
       padding: 10px;
-      background: #10589c; /* Theme color */
+      background: #007AC1; /* Theme color */
       color: #ffffff;
       border: none;
       border-radius: 8px;
@@ -211,13 +228,13 @@
       transition: background 0.3s ease, transform 0.3s ease;
     }
     .popup button:hover {
-      background: #0d4475; /* Darker shade */
+      background: #005f99; /* Darker shade */
       transform: translateY(-2px);
     }
     #shareDetails p {
       margin: 10px 0;
       font-size: 16px;
-      color: #10589c; /* Theme color */
+      color: #007AC1; /* Theme color */
       font-weight: 500;
     }
   </style>
@@ -235,7 +252,7 @@
 
       <div class="amounts">
         <p id="loanBalance">Loan Balance: --</p>
-        <p id="shareAmount">Share Amount: --</p>
+        <!-- Removed shareAmount from here -->
       </div>
 
       <div class="dashboard-grid">
@@ -252,7 +269,7 @@
           <span class="icon-label">Application Status</span>
         </div>
         <div class="card-item">
-          <a href="#" class="icon-button" onclick="showPasswordPopup(event)">🔐</a>
+          <a href="pas.html" class="icon-button">🔐</a>
           <span class="icon-label">Change Password</span>
         </div>
         <div class="card-item">
@@ -260,7 +277,7 @@
           <span class="icon-label">Messages</span>
         </div>
         <div class="card-item">
-          <a href="#" class="icon-button" onclick="showSharePopup(event)">💰</a>
+          <a href="share.html" class="icon-button">💰</a>
           <span class="icon-label">Shares</span>
         </div>
       </div>
@@ -271,39 +288,12 @@
 
   <div class="footer">Powered by VT Soft 2025</div>
 
-  <!-- Password Change Popup -->
-  <div id="passwordPopup" class="popup">
-    <div class="form-group">
-      <label>Current Password:</label>
-      <input type="password" id="currentPassword" placeholder="Enter current password">
-    </div>
-    <div class="form-group">
-      <label>New Password:</label>
-      <input type="password" id="newPassword" placeholder="Enter new password">
-    </div>
-    <div class="form-group">
-      <label>Confirm New Password:</label>
-      <input type="password" id="confirmPassword" placeholder="Confirm new password">
-    </div>
-    <button onclick="changePassword()">Update</button>
-    <button onclick="hidePopup('passwordPopup')">Cancel</button>
-  </div>
-  <div id="passwordOverlay" class="popup-overlay" onclick="hidePopup('passwordPopup')"></div>
-
-  <!-- Share Details Popup -->
-  <div id="sharePopup" class="popup">
-    <h3>Share Details</h3>
-    <div id="shareDetails">
-      <p>Share: <span id="shareValue">--</span></p>
-      <p>Share Amount: <span id="shareAmountValue">₹--</span></p>
-    </div>
-    <button onclick="hidePopup('sharePopup')">Close</button>
-  </div>
-  <div id="shareOverlay" class="popup-overlay" onclick="hidePopup('sharePopup')"></div>
+  <!-- Password Change Popup (Removed as linked to pas.html) -->
+  <!-- Share Details Popup (Removed as linked to share.html) -->
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, reauthenticateWithCredential, updatePassword, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -324,11 +314,8 @@
       const welcomeMsg = document.getElementById('welcomeMsg');
       const memberNo = document.getElementById('memberNo');
       const loanBalance = document.getElementById('loanBalance');
-      const shareAmount = document.getElementById('shareAmount');
       const centerMsg = document.getElementById('centerMsg');
       const errorEl = document.getElementById('error');
-      const shareValueEl = document.getElementById('shareValue');
-      const shareAmountValueEl = document.getElementById('shareAmountValue');
 
       if (user) {
         try {
@@ -347,12 +334,6 @@
               });
             }
             loanBalance.innerText = `Loan Balance: ₹${totalLoanBalance.toFixed(2)}`;
-
-            const shareValue = data.share !== undefined ? data.share : '--';
-            const shareAmountValue = data.shareAmount !== undefined ? data.shareAmount : 0;
-            shareAmount.innerText = `Share Amount: ₹${shareAmountValue.toFixed(2)}`;
-            shareValueEl.innerText = shareValue;
-            shareAmountValueEl.innerText = `₹${shareAmountValue.toFixed(2)}`;
 
             const msgQuery = query(collection(db, 'messages'), where('userId', '==', user.uid));
             const msgSnap = await getDocs(msgQuery);
@@ -373,59 +354,6 @@
         window.location.href = 'index.html';
       }
     });
-
-    // Popup Functions
-    function showPopup(popupId) {
-      document.getElementById(popupId).style.display = 'block';
-      document.getElementById(popupId + 'Overlay').style.display = 'block';
-    }
-
-    function hidePopup(popupId) {
-      document.getElementById(popupId).style.display = 'none';
-      document.getElementById(popupId + 'Overlay').style.display = 'none';
-    }
-
-    function showPasswordPopup(event) {
-      event.preventDefault();
-      showPopup('passwordPopup');
-    }
-
-    function showSharePopup(event) {
-      event.preventDefault();
-      showPopup('sharePopup');
-    }
-
-    // Password Change Logic
-    window.changePassword = async function() {
-      const currentPassword = document.getElementById('currentPassword').value;
-      const newPassword = document.getElementById('newPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const errorEl = document.getElementById('error');
-
-      if (!currentPassword || !newPassword || !confirmPassword) {
-        errorEl.innerText = 'All fields are required!';
-        return;
-      }
-
-      if (newPassword !== confirmPassword) {
-        errorEl.innerText = 'New passwords do not match!';
-        return;
-      }
-
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          const credential = EmailAuthProvider.credential(user.email, currentPassword);
-          await reauthenticateWithCredential(user, credential);
-          await updatePassword(user, newPassword);
-          errorEl.innerText = 'Password updated successfully!';
-          hidePopup('passwordPopup');
-          setTimeout(() => errorEl.innerText = '', 3000);
-        } catch (error) {
-          errorEl.innerText = 'Error updating password: ' + error.message;
-        }
-      }
-    };
   </script>
 </body>
 </html>
