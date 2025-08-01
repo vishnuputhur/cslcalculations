@@ -118,10 +118,10 @@
     #logoutBtn:hover {
       background: #c0392b;
     }
-    .user-list, .loan-list {
+    .loan-list, .payment-list {
       margin-top: 15px;
     }
-    .user-table, .loan-table, .payment-table {
+    .loan-table, .payment-table {
       width: 100%;
       border-collapse: collapse;
       background: #fff;
@@ -129,23 +129,23 @@
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .user-table th, .user-table td, .loan-table th, .loan-table td, .payment-table th, .payment-table td {
+    .loan-table th, .loan-table td, .payment-table th, .payment-table td {
       padding: 8px;
       text-align: left;
       border-bottom: 1px solid #ddd;
     }
-    .user-table th, .loan-table th, .payment-table th {
+    .loan-table th, .payment-table th {
       background: #3498db;
       color: #fff;
       font-size: 13px;
     }
-    .user-table td, .loan-table td, .payment-table td {
+    .loan-table td, .payment-table td {
       font-size: 12px;
     }
-    .user-table tr:hover, .loan-table tr:hover, .payment-table tr:hover {
+    .loan-table tr:hover, .payment-table tr:hover {
       background: #f5f6fa;
     }
-    .copy-btn, .select-btn {
+    .select-btn {
       margin-left: 5px;
       background: #2ecc71;
       padding: 2px 4px;
@@ -154,17 +154,8 @@
       font-size: 10px;
       cursor: pointer;
     }
-    .copy-btn:hover, .select-btn:hover {
+    .select-btn:hover {
       background: #27ae60;
-    }
-    #searchMemberNumber {
-      width: 100%;
-      padding: 6px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 13px;
-      box-sizing: border-box;
     }
     .footer {
       position: fixed;
@@ -183,7 +174,7 @@
       .form-group label { font-size: 14px; }
       .form-group input, .form-group textarea, .form-group select { font-size: 14px; padding: 8px; }
       .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-      .user-table th, .user-table td, .loan-table th, .loan-table td, .payment-table th, .payment-table td { font-size: 14px; padding: 10px; }
+      .loan-table th, .loan-table td, .payment-table th, .payment-table td { font-size: 14px; padding: 10px; }
     }
   </style>
 </head>
@@ -225,10 +216,10 @@
     <h3>Create New Loan</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <input type="text" id="searchMemberNumberCreate" placeholder="Search by Member Number..." onkeyup="searchUsers('create')">
+      <input type="text" id="createMemberNumber" placeholder="Enter Member Number" oninput="fetchUserDetails('create')">
     </div>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="createLoanUserId" readonly>
+      <label>Loan Number:</label><input type="text" id="createLoanNumber" placeholder="Enter loan number">
     </div>
     <div class="form-group">
       <label>Loan Amount:</label><input type="number" id="createLoanAmount" placeholder="Enter loan amount">
@@ -256,10 +247,7 @@
     <h3>Edit Loan</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <input type="text" id="searchMemberNumberEdit" placeholder="Search by Member Number..." onkeyup="searchUsers('edit')">
-    </div>
-    <div class="form-group">
-      <label>User ID:</label><input type="text" id="editLoanUserId" readonly>
+      <input type="text" id="editMemberNumber" placeholder="Enter Member Number" oninput="fetchUserDetails('edit')">
     </div>
     <div class="form-group">
       <label>Loan Number:</label><input type="text" id="editLoanNumber" readonly>
@@ -287,10 +275,7 @@
     <h3>Add Loan Repayment</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <input type="text" id="searchMemberNumberRepay" placeholder="Search by Member Number..." onkeyup="searchUsers('repay')">
-    </div>
-    <div class="form-group">
-      <label>User ID:</label><input type="text" id="repayLoanUserId" readonly>
+      <input type="text" id="repayMemberNumber" placeholder="Enter Member Number" oninput="fetchUserDetails('repay')">
     </div>
     <div class="form-group">
       <label>Loan Number:</label>
@@ -299,7 +284,7 @@
       </select>
     </div>
     <div class="form-group">
-      <label>Entry Date:</label><input type="date" id="repayDate" value="">
+      <label>Entry Date:</label><input type="date" id="repayDate" value="" oninput="calculateInterest()">
     </div>
     <div class="form-group">
       <label>Principal Paid:</label><input type="number" id="repayPrincipal" placeholder="Enter principal paid">
@@ -319,7 +304,6 @@
     <button onclick="addRepayment()">Submit</button>
   </div>
 
-  <div class="user-list" id="userList"></div>
   <div class="loan-list" id="loanList"></div>
   <div class="payment-list" id="paymentList"></div>
 
@@ -357,13 +341,12 @@
     if (formId) document.getElementById(formId).classList.add('active');
     if (formId === 'repaymentForm') {
       document.getElementById('repayDate').value = new Date().toISOString().split('T')[0];
-      loadLoanDetails();
+      calculateInterest();
     }
   };
 
   onAuthStateChanged(auth, async (user) => {
     const adminInfoEl = document.getElementById('adminInfo');
-    const userListEl = document.getElementById('userList');
     const errorEl = document.getElementById('error');
     const loginSection = document.getElementById('loginSection');
     const dashboardGrid = document.getElementById('dashboardGrid');
@@ -375,7 +358,6 @@
           adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name || 'Admin'}`;
           loginSection.style.display = 'none';
           dashboardGrid.style.display = 'grid';
-          await loadUsers();
         } else {
           adminInfoEl.innerText = 'Access denied: Not an admin';
           errorEl.innerText = 'You are not authorized to access this page!';
@@ -406,90 +388,61 @@
     }
   };
 
-  async function loadUsers(type = '') {
-    const userListEl = document.getElementById('userList');
-    const searchId = type === 'create' ? 'searchMemberNumberCreate' : type === 'edit' ? 'searchMemberNumberEdit' : 'searchMemberNumberRepay';
-    const searchInput = document.getElementById(searchId);
+  async function fetchUserDetails(type) {
+    const memberNumber = document.getElementById(`${type}MemberNumber`).value;
+    const errorEl = document.getElementById('error');
     try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      let tableHtml = `
-        <table class="user-table">
-          <thead><tr><th>User ID</th><th>Name</th><th>Member Number</th><th>Action</th></tr></thead>
-          <tbody>
-      `;
-      usersSnapshot.forEach(doc => {
-        const data = doc.data();
-        const memberNumber = data.memberNumber || 'N/A';
-        if (!searchInput.value || memberNumber.toLowerCase().includes(searchInput.value.toLowerCase())) {
-          tableHtml += `
-            <tr>
-              <td>${doc.id}</td>
-              <td>${data.name || 'N/A'}</td>
-              <td>${memberNumber}</td>
-              <td><button class="select-btn" onclick="selectUser('${doc.id}', '${type}')">Select</button></td>
-            </tr>
-          `;
+      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+      if (!usersSnapshot.empty) {
+        const userDoc = usersSnapshot.docs[0];
+        const data = userDoc.data();
+        if (type === 'create') {
+          document.getElementById('createLoanNumber').value = ''; // Clear loan number on new user
+        } else if (type === 'edit') {
+          await loadUserLoans('edit');
+        } else if (type === 'repay') {
+          await loadUserLoans('repay');
         }
-      });
-      tableHtml += '</tbody></table>';
-      userListEl.innerHTML = tableHtml;
+      } else {
+        errorEl.innerText = 'User not found with this Member Number!';
+      }
     } catch (error) {
-      console.error('Error loading users:', error);
+      errorEl.innerText = 'Error fetching user details: ' + error.message;
     }
   }
 
-  window.searchUsers = function(type) {
-    loadUsers(type);
-  };
-
-  window.selectUser = async function(userId, type) {
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      if (type === 'create') {
-        document.getElementById('createLoanUserId').value = userId;
-        showForm('createLoanForm');
-      } else if (type === 'edit') {
-        document.getElementById('editLoanUserId').value = userId;
-        await loadUserLoans('edit');
-        showForm('editLoanForm');
-      } else if (type === 'repay') {
-        document.getElementById('repayLoanUserId').value = userId;
-        await loadUserLoans('repay');
-        showForm('repaymentForm');
-      }
-    } else {
-      document.getElementById('error').innerText = 'User not found!';
-    }
-  };
-
   async function loadUserLoans(type = '') {
-    const userId = type === 'edit' ? document.getElementById('editLoanUserId').value : document.getElementById('repayLoanUserId').value;
+    const memberNumber = type === 'edit' ? document.getElementById('editMemberNumber').value : document.getElementById('repayMemberNumber').value;
     const loanListEl = document.getElementById('loanList');
     const repayLoanNumber = document.getElementById('repayLoanNumber');
-    if (userId) {
+    if (memberNumber) {
       try {
-        const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
-        let tableHtml = '<h3>Existing Loans</h3><table class="loan-table"><thead><tr><th>Loan Number</th><th>Amount</th><th>Balance</th><th>Action</th></tr></thead><tbody>';
-        repayLoanNumber.innerHTML = '<option value="">Select Loan Number</option>';
-        if (loansSnapshot.empty) {
-          tableHtml += '<tr><td colspan="4">No loans found.</td></tr>';
-        } else {
-          loansSnapshot.forEach(doc => {
-            const data = doc.data();
-            tableHtml += `
-              <tr>
-                <td>${data.loanNumber}</td>
-                <td>₹${data.amount || 0}</td>
-                <td>₹${data.balance || 0}</td>
-                <td><button class="select-btn" onclick="selectLoan('${doc.id}', '${data.loanNumber}', ${data.amount || 0}, ${data.balance || 0}, ${data.interest || 0}, '${data.startDate || ''}')">Select</button></td>
-              </tr>
-            `;
-            if (type === 'repay') repayLoanNumber.innerHTML += `<option value="${data.loanNumber}">${data.loanNumber}</option>`;
-          });
+        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          const userId = userDoc.id;
+          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          let tableHtml = '<h3>Existing Loans</h3><table class="loan-table"><thead><tr><th>Loan Number</th><th>Amount</th><th>Balance</th><th>Action</th></tr></thead><tbody>';
+          repayLoanNumber.innerHTML = '<option value="">Select Loan Number</option>';
+          if (loansSnapshot.empty) {
+            tableHtml += '<tr><td colspan="4">No loans found.</td></tr>';
+          } else {
+            loansSnapshot.forEach(doc => {
+              const data = doc.data();
+              tableHtml += `
+                <tr>
+                  <td>${data.loanNumber}</td>
+                  <td>₹${data.amount || 0}</td>
+                  <td>₹${data.balance || 0}</td>
+                  <td><button class="select-btn" onclick="selectLoan('${doc.id}', '${data.loanNumber}', ${data.amount || 0}, ${data.balance || 0}, ${data.interest || 0}, '${data.startDate || ''}')">Select</button></td>
+                </tr>
+              `;
+              if (type === 'repay') repayLoanNumber.innerHTML += `<option value="${data.loanNumber}">${data.loanNumber}</option>`;
+            });
+          }
+          tableHtml += '</tbody></table>';
+          loanListEl.innerHTML = tableHtml;
         }
-        tableHtml += '</tbody></table>';
-        loanListEl.innerHTML = tableHtml;
       } catch (error) {
         document.getElementById('error').innerText = 'Error loading loans: ' + error.message;
       }
@@ -497,20 +450,21 @@
   }
 
   window.selectLoan = async function(loanId, loanNumber, amount, balance, interest, startDate) {
-    if (document.getElementById('editLoanUserId') && document.getElementById('editLoanUserId').value) {
+    if (document.getElementById('editMemberNumber') && document.getElementById('editMemberNumber').value) {
       document.getElementById('editLoanNumber').value = loanNumber;
       document.getElementById('editLoanPrincipal').value = balance;
       document.getElementById('editLoanInterestDue').value = 0; // To be calculated
       document.getElementById('editLoanInterest').value = interest;
       showForm('editLoanForm');
-    } else if (document.getElementById('repayLoanUserId') && document.getElementById('repayLoanUserId').value) {
+    } else if (document.getElementById('repayMemberNumber') && document.getElementById('repayMemberNumber').value) {
       document.getElementById('repayLoanNumber').value = loanNumber;
-      loadLoanDetails();
+      calculateInterest();
     }
   };
 
   window.saveLoan = async function() {
-    const userId = document.getElementById('createLoanUserId').value;
+    const memberNumber = document.getElementById('createMemberNumber').value;
+    const loanNumber = document.getElementById('createLoanNumber').value;
     const amount = parseFloat(document.getElementById('createLoanAmount').value) || 0;
     const interest = parseFloat(document.getElementById('createLoanInterest').value) || 0;
     const installments = parseInt(document.getElementById('createLoanInstallments').value) || 0;
@@ -524,27 +478,33 @@
       return;
     }
 
-    if (!userId || !amount || !interest || !installments || !startDate || !guarantor1 || !guarantor2) {
+    if (!memberNumber || !loanNumber || !amount || !interest || !installments || !startDate || !guarantor1 || !guarantor2) {
       errorEl.innerText = 'All fields are required!';
       return;
     }
 
     try {
-      const loanNumber = `LN-${Date.now()}`;
-      await setDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
-        userId, loanNumber, amount, balance: amount, interest, installments, startDate,
-        guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
-      });
-      alert('Loan created successfully!');
-      showForm(null);
-      await loadUserLoans('edit');
+      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+      if (!usersSnapshot.empty) {
+        const userDoc = usersSnapshot.docs[0];
+        const userId = userDoc.id;
+        await setDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
+          userId, loanNumber, amount, balance: amount, interest, installments, startDate,
+          guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
+        });
+        alert('Loan created successfully!');
+        showForm(null);
+        await loadUserLoans('edit');
+      } else {
+        errorEl.innerText = 'User not found with this Member Number!';
+      }
     } catch (error) {
       errorEl.innerText = 'Error creating loan: ' + error.message;
     }
   };
 
   window.updateLoan = async function() {
-    const userId = document.getElementById('editLoanUserId').value;
+    const memberNumber = document.getElementById('editMemberNumber').value;
     const loanNumber = document.getElementById('editLoanNumber').value;
     const principal = parseFloat(document.getElementById('editLoanPrincipal').value) || 0;
     const interestDue = parseFloat(document.getElementById('editLoanInterestDue').value) || 0;
@@ -559,38 +519,51 @@
     }
 
     try {
-      await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
-        balance: principal, interestDue, interest, guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
-      });
-      alert('Loan updated successfully!');
-      showForm(null);
-      await loadUserLoans('edit');
+      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+      if (!usersSnapshot.empty) {
+        const userDoc = usersSnapshot.docs[0];
+        const userId = userDoc.id;
+        await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
+          balance: principal, interestDue, interest, guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
+        });
+        alert('Loan updated successfully!');
+        showForm(null);
+        await loadUserLoans('edit');
+      } else {
+        errorEl.innerText = 'User not found with this Member Number!';
+      }
     } catch (error) {
       errorEl.innerText = 'Error updating loan: ' + error.message;
     }
   };
 
-  async function loadLoanDetails() {
+  async function calculateInterest() {
     const loanNumber = document.getElementById('repayLoanNumber').value;
-    const userId = document.getElementById('repayLoanUserId').value;
-    if (loanNumber && userId) {
+    const memberNumber = document.getElementById('repayMemberNumber').value;
+    const repayDate = document.getElementById('repayDate').value;
+    if (loanNumber && memberNumber && repayDate) {
       try {
-        const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
-        if (loanDoc.exists()) {
-          const data = loanDoc.data();
-          const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
-          const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
-          const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
-          const installmentAmount = data.amount / data.installments;
-          const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
+        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          const userId = userDoc.id;
+          const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
+          if (loanDoc.exists()) {
+            const data = loanDoc.data();
+            const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
+            const daysDiff = Math.floor((new Date(repayDate) - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
+            const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
+            const installmentAmount = data.amount / data.installments;
+            const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
 
-          document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
-          document.getElementById('repayInterest').value = interestDue.toFixed(2);
-          document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
-          document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
+            document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
+            document.getElementById('repayInterest').value = interestDue.toFixed(2);
+            document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
+            document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
+          }
         }
       } catch (error) {
-        document.getElementById('error').innerText = 'Error loading loan details: ' + error.message;
+        document.getElementById('error').innerText = 'Error calculating interest: ' + error.message;
       }
     }
   }
@@ -603,8 +576,38 @@
     return null;
   }
 
+  async function loadLoanDetails() {
+    const loanNumber = document.getElementById('repayLoanNumber').value;
+    const memberNumber = document.getElementById('repayMemberNumber').value;
+    if (loanNumber && memberNumber) {
+      try {
+        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          const userId = userDoc.id;
+          const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
+          if (loanDoc.exists()) {
+            const data = loanDoc.data();
+            const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
+            const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
+            const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
+            const installmentAmount = data.amount / data.installments;
+            const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
+
+            document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
+            document.getElementById('repayInterest').value = interestDue.toFixed(2);
+            document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
+            document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
+          }
+        }
+      } catch (error) {
+        document.getElementById('error').innerText = 'Error loading loan details: ' + error.message;
+      }
+    }
+  }
+
   window.addRepayment = async function() {
-    const userId = document.getElementById('repayLoanUserId').value;
+    const memberNumber = document.getElementById('repayMemberNumber').value;
     const loanNumber = document.getElementById('repayLoanNumber').value;
     const date = document.getElementById('repayDate').value;
     const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
@@ -620,19 +623,26 @@
     }
 
     try {
-      const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
-      if (loanDoc.exists()) {
-        await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, interestDue: 0, lastUpdated: new Date().toISOString() });
-        await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
-          userId, loanNumber, date, principal, interest, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
-        });
-        alert('Repayment added successfully!');
-        showForm(null);
-        loadLoanDetails();
-        const paymentListEl = document.getElementById('paymentList');
-        paymentListEl.innerHTML = await generatePaymentStatement(userId, loanNumber);
+      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+      if (!usersSnapshot.empty) {
+        const userDoc = usersSnapshot.docs[0];
+        const userId = userDoc.id;
+        const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
+        if (loanDoc.exists()) {
+          await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, interestDue: 0, lastUpdated: new Date().toISOString() });
+          await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
+            userId, loanNumber, date, principal, interest, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
+          });
+          alert('Repayment added successfully!');
+          showForm(null);
+          loadLoanDetails();
+          const paymentListEl = document.getElementById('paymentList');
+          paymentListEl.innerHTML = await generatePaymentStatement(userId, loanNumber);
+        } else {
+          errorEl.innerText = 'Loan not found!';
+        }
       } else {
-        errorEl.innerText = 'Loan not found!';
+        errorEl.innerText = 'User not found with this Member Number!';
       }
     } catch (error) {
       errorEl.innerText = 'Error adding repayment: ' + error.message;
