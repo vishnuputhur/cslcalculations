@@ -5,41 +5,186 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Admin - Loan Management</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #f0f8ff, #e6f3fa); min-height: 100vh; display: flex; flex-direction: column; color: #2c3e50; }
-    .container { flex: 1; padding: 15px; max-width: 100%; box-sizing: border-box; }
-    h1 { text-align: center; color: #1a252f; font-size: 20px; margin: 15px 0; font-weight: 600; }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-top: 15px; }
-    .card { background: #ffffff; border-radius: 8px; padding: 12px; text-align: center; transition: transform 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .card:hover { transform: translateY(-4px); }
-    .card h3 { color: #1a252f; font-size: 15px; margin-bottom: 8px; font-weight: 500; }
-    .card button { width: 70%; padding: 4px; margin: 2px 0; background: #3498db; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; transition: background 0.3s ease; }
-    .card button:hover { background: #2980b9; }
-    .form-section, .login-section { display: none; margin-top: 15px; padding: 15px; background: #f9fbfd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .form-section.active, .login-section.active { display: block; }
-    .form-group { margin-bottom: 12px; text-align: left; }
-    .form-group label { display: block; color: #1a252f; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; background: #fff; }
-    #error { color: #e74c3c; font-size: 13px; margin-top: 10px; text-align: center; }
-    #logoutBtn { width: 70%; padding: 4px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; margin: 15px auto; display: block; }
-    #logoutBtn:hover { background: #c0392b; }
-    .user-list { margin-top: 15px; }
-    .user-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .user-table th, .user-table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-    .user-table th { background: #3498db; color: #fff; font-size: 13px; }
-    .user-table td { font-size: 12px; }
-    .user-table tr:hover { background: #f5f6fa; }
-    .copy-btn, .select-btn { margin-left: 5px; background: #2ecc71; padding: 2px 4px; border: none; border-radius: 3px; font-size: 10px; cursor: pointer; }
-    .copy-btn:hover { background: #27ae60; }
-    .select-btn:hover { background: #27ae60; }
-    #searchMemberNumber { width: 100%; padding: 6px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; box-sizing: border-box; }
-    .loan-list { margin-top: 15px; }
-    .loan-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .loan-table th, .loan-table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-    .loan-table th { background: #3498db; color: #fff; font-size: 13px; }
-    .loan-table td { font-size: 12px; }
-    .loan-table tr:hover { background: #f5f6fa; }
-    .footer { position: fixed; bottom: 0; width: 100%; background: #1a252f; color: #fff; text-align: center; padding: 5px 0; font-size: 11px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
-    @media (min-width: 768px) { h1 { font-size: 26px; } .card button { font-size: 13px; padding: 6px; } .form-group label { font-size: 14px; } .form-group input, .form-group textarea, .form-group select { font-size: 14px; padding: 8px; } .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } .user-table th, .user-table td { font-size: 14px; padding: 10px; } .loan-table th, .loan-table td { font-size: 14px; padding: 10px; } }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f0f8ff, #e6f3fa);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #2c3e50;
+    }
+    .container {
+      flex: 1;
+      padding: 15px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #1a252f;
+      font-size: 20px;
+      margin: 15px 0;
+      font-weight: 600;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .card h3 {
+      color: #1a252f;
+      font-size: 15px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .card button {
+      width: 70%;
+      padding: 4px;
+      margin: 2px 0;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .card button:hover {
+      background: #2980b9;
+    }
+    .form-section, .login-section {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f9fbfd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .form-section.active, .login-section.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      color: #1a252f;
+      font-size: 13px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 13px;
+      box-sizing: border-box;
+      background: #fff;
+    }
+    #error {
+      color: #e74c3c;
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+    }
+    #logoutBtn {
+      width: 70%;
+      padding: 4px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      cursor: pointer;
+      margin: 15px auto;
+      display: block;
+    }
+    #logoutBtn:hover {
+      background: #c0392b;
+    }
+    .user-list, .loan-list {
+      margin-top: 15px;
+    }
+    .user-table, .loan-table, .payment-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .user-table th, .user-table td, .loan-table th, .loan-table td, .payment-table th, .payment-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .user-table th, .loan-table th, .payment-table th {
+      background: #3498db;
+      color: #fff;
+      font-size: 13px;
+    }
+    .user-table td, .loan-table td, .payment-table td {
+      font-size: 12px;
+    }
+    .user-table tr:hover, .loan-table tr:hover, .payment-table tr:hover {
+      background: #f5f6fa;
+    }
+    .copy-btn, .select-btn {
+      margin-left: 5px;
+      background: #2ecc71;
+      padding: 2px 4px;
+      border: none;
+      border-radius: 3px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .copy-btn:hover, .select-btn:hover {
+      background: #27ae60;
+    }
+    #searchMemberNumber {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #1a252f;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 11px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+    @media (min-width: 768px) {
+      h1 { font-size: 26px; }
+      .card button { font-size: 13px; padding: 6px; }
+      .form-group label { font-size: 14px; }
+      .form-group input, .form-group textarea, .form-group select { font-size: 14px; padding: 8px; }
+      .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .user-table th, .user-table td, .loan-table th, .loan-table td, .payment-table th, .payment-table td { font-size: 14px; padding: 10px; }
+    }
   </style>
 </head>
 <body>
@@ -50,12 +195,12 @@
   <div class="dashboard-grid" id="dashboardGrid">
     <div class="card">
       <h3>Manage Loans</h3>
-      <button onclick="showForm('loanForm')">Add Loan</button>
+      <button onclick="showForm('createLoanForm')">Create Loan</button>
       <button onclick="showForm('editLoanForm')">Edit Loan</button>
     </div>
     <div class="card">
-      <h3>Loan Payments</h3>
-      <button onclick="showForm('paymentForm')">Add Payment</button>
+      <h3>Loan Repayment</h3>
+      <button onclick="showForm('repaymentForm')">Add Repayment</button>
     </div>
     <div class="card">
       <h3>Back to Dashboard</h3>
@@ -75,26 +220,33 @@
     <button onclick="adminLogin()">Login</button>
   </div>
 
-  <!-- Loan Form -->
-  <div id="loanForm" class="form-section">
-    <h3>Add/Edit Loan</h3>
+  <!-- Create Loan Form -->
+  <div id="createLoanForm" class="form-section">
+    <h3>Create New Loan</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="loanUserId" placeholder="Enter user ID" oninput="loadUserLoans()">
+      <label>Member Number:</label>
+      <input type="text" id="searchMemberNumberCreate" placeholder="Search by Member Number..." onkeyup="searchUsers('create')">
     </div>
     <div class="form-group">
-      <label>Balance:</label><input type="number" id="loanBalance" placeholder="Enter balance">
+      <label>User ID:</label><input type="text" id="createLoanUserId" readonly>
     </div>
     <div class="form-group">
-      <label>Guarantors:</label><input type="text" id="loanGuarantors" placeholder="Enter guarantors (comma-separated)">
+      <label>Loan Amount:</label><input type="number" id="createLoanAmount" placeholder="Enter loan amount">
     </div>
     <div class="form-group">
-      <label>Interest (%):</label><input type="number" id="loanInterest" placeholder="Enter interest">
+      <label>Interest (%):</label><input type="number" id="createLoanInterest" placeholder="Enter interest rate">
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="loanNumber" placeholder="Enter loan number">
+      <label>Number of Installments:</label><input type="number" id="createLoanInstallments" placeholder="Enter number of installments">
     </div>
     <div class="form-group">
-      <label>Start Date:</label><input type="date" id="loanStartDate">
+      <label>Loan Start Date:</label><input type="date" id="createLoanStartDate" value="">
+    </div>
+    <div class="form-group">
+      <label>Guarantor 1:</label><input type="text" id="createLoanGuarantor1" placeholder="Enter guarantor name">
+    </div>
+    <div class="form-group">
+      <label>Guarantor 2:</label><input type="text" id="createLoanGuarantor2" placeholder="Enter guarantor name">
     </div>
     <button onclick="saveLoan()">Submit</button>
   </div>
@@ -103,55 +255,73 @@
   <div id="editLoanForm" class="form-section">
     <h3>Edit Loan</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="editLoanId" placeholder="Enter user ID" readonly>
+      <label>Member Number:</label>
+      <input type="text" id="searchMemberNumberEdit" placeholder="Search by Member Number..." onkeyup="searchUsers('edit')">
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="editLoanNumber" placeholder="Enter loan number" readonly>
+      <label>User ID:</label><input type="text" id="editLoanUserId" readonly>
     </div>
     <div class="form-group">
-      <label>Balance:</label><input type="number" id="editLoanBalance" placeholder="Enter balance">
+      <label>Loan Number:</label><input type="text" id="editLoanNumber" readonly>
     </div>
     <div class="form-group">
-      <label>Guarantors:</label><input type="text" id="editLoanGuarantors" placeholder="Enter guarantors (comma-separated)">
+      <label>Outstanding Principal:</label><input type="number" id="editLoanPrincipal" placeholder="Enter outstanding principal">
     </div>
     <div class="form-group">
-      <label>Interest (%):</label><input type="number" id="editLoanInterest" placeholder="Enter interest">
+      <label>Interest Due:</label><input type="number" id="editLoanInterestDue" placeholder="Enter interest due">
     </div>
     <div class="form-group">
-      <label>Start Date:</label><input type="date" id="editLoanStartDate">
+      <label>Interest (%):</label><input type="number" id="editLoanInterest" placeholder="Enter interest rate">
+    </div>
+    <div class="form-group">
+      <label>Guarantor 1:</label><input type="text" id="editLoanGuarantor1" placeholder="Enter guarantor name">
+    </div>
+    <div class="form-group">
+      <label>Guarantor 2:</label><input type="text" id="editLoanGuarantor2" placeholder="Enter guarantor name">
     </div>
     <button onclick="updateLoan()">Update</button>
   </div>
 
-  <!-- Payment Form -->
-  <div id="paymentForm" class="form-section">
-    <h3>Add Loan Payment</h3>
+  <!-- Repayment Entry Form -->
+  <div id="repaymentForm" class="form-section">
+    <h3>Add Loan Repayment</h3>
     <div class="form-group">
-      <label>User ID:</label><input type="text" id="paymentUserId" placeholder="Enter user ID" readonly>
+      <label>Member Number:</label>
+      <input type="text" id="searchMemberNumberRepay" placeholder="Search by Member Number..." onkeyup="searchUsers('repay')">
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><select id="paymentLoanNumber" onchange="loadLoanBalance()">
+      <label>User ID:</label><input type="text" id="repayLoanUserId" readonly>
+    </div>
+    <div class="form-group">
+      <label>Loan Number:</label>
+      <select id="repayLoanNumber" onchange="loadLoanDetails()">
         <option value="">Select Loan Number</option>
       </select>
     </div>
     <div class="form-group">
-      <label>Amount:</label><input type="number" id="paymentAmount" placeholder="Enter amount">
+      <label>Entry Date:</label><input type="date" id="repayDate" value="">
     </div>
     <div class="form-group">
-      <label>Date:</label><input type="date" id="paymentDate">
+      <label>Principal Paid:</label><input type="number" id="repayPrincipal" placeholder="Enter principal paid">
     </div>
     <div class="form-group">
-      <label>Current Balance:</label><input type="number" id="currentBalance" readonly>
+      <label>Interest Paid:</label><input type="number" id="repayInterest" placeholder="Enter interest paid">
     </div>
     <div class="form-group">
-      <label>New Balance:</label><input type="number" id="newBalance" readonly>
+      <label>New Outstanding Balance:</label><input type="number" id="repayNewBalance" readonly>
     </div>
-    <button onclick="addPayment()">Submit</button>
+    <div class="form-group">
+      <label>Interest Due:</label><input type="number" id="repayInterestDue" readonly>
+    </div>
+    <div class="form-group">
+      <label>Receipt Number:</label><input type="text" id="repayReceiptNumber" placeholder="Enter receipt number">
+    </div>
+    <button onclick="addRepayment()">Submit</button>
   </div>
 
-  <input type="text" id="searchMemberNumber" placeholder="Search by Member Number..." onkeyup="searchUsers()">
   <div class="user-list" id="userList"></div>
   <div class="loan-list" id="loanList"></div>
+  <div class="payment-list" id="paymentList"></div>
 
   <button id="logoutBtn">Logout</button>
   <p id="error"></p>
@@ -185,6 +355,10 @@
   window.showForm = function(formId) {
     document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
     if (formId) document.getElementById(formId).classList.add('active');
+    if (formId === 'repaymentForm') {
+      document.getElementById('repayDate').value = new Date().toISOString().split('T')[0];
+      loadLoanDetails();
+    }
   };
 
   onAuthStateChanged(auth, async (user) => {
@@ -194,11 +368,9 @@
     const loginSection = document.getElementById('loginSection');
     const dashboardGrid = document.getElementById('dashboardGrid');
 
-    console.log('Auth state changed, user:', user ? user.uid : 'null');
     if (user) {
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-        console.log('User doc exists:', userDoc.exists(), 'Data:', userDoc.data());
         if (userDoc.exists() && userDoc.data().isAdmin) {
           adminInfoEl.innerText = `Welcome, Admin ${userDoc.data().name || 'Admin'}`;
           loginSection.style.display = 'none';
@@ -206,7 +378,7 @@
           await loadUsers();
         } else {
           adminInfoEl.innerText = 'Access denied: Not an admin';
-          errorEl.innerText = 'You are not authorized to access this page! Check if isAdmin is true in Firestore.';
+          errorEl.innerText = 'You are not authorized to access this page!';
           dashboardGrid.style.display = 'none';
           loginSection.classList.add('active');
         }
@@ -229,35 +401,35 @@
     const errorEl = document.getElementById('error');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('Admin login successful for:', email);
     } catch (error) {
-      console.error('Login error:', error);
       errorEl.innerText = 'Login failed: ' + error.message;
     }
   };
 
-  async function loadUsers() {
+  async function loadUsers(type = '') {
     const userListEl = document.getElementById('userList');
+    const searchId = type === 'create' ? 'searchMemberNumberCreate' : type === 'edit' ? 'searchMemberNumberEdit' : 'searchMemberNumberRepay';
+    const searchInput = document.getElementById(searchId);
     try {
       const usersSnapshot = await getDocs(collection(db, 'users'));
       let tableHtml = `
         <table class="user-table">
-          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <thead><tr><th>User ID</th><th>Name</th><th>Member Number</th><th>Action</th></tr></thead>
           <tbody>
       `;
       usersSnapshot.forEach(doc => {
         const data = doc.data();
-        tableHtml += `
-          <tr>
-            <td>${doc.id}</td>
-            <td>${data.name || 'N/A'}</td>
-            <td>${data.email || 'N/A'}</td>
-            <td>${data.memberNumber || 'N/A'}</td>
-            <td>
-              <button class="select-btn" onclick="selectUser('${doc.id}')">Select</button>
-            </td>
-          </tr>
-        `;
+        const memberNumber = data.memberNumber || 'N/A';
+        if (!searchInput.value || memberNumber.toLowerCase().includes(searchInput.value.toLowerCase())) {
+          tableHtml += `
+            <tr>
+              <td>${doc.id}</td>
+              <td>${data.name || 'N/A'}</td>
+              <td>${memberNumber}</td>
+              <td><button class="select-btn" onclick="selectUser('${doc.id}', '${type}')">Select</button></td>
+            </tr>
+          `;
+        }
       });
       tableHtml += '</tbody></table>';
       userListEl.innerHTML = tableHtml;
@@ -266,77 +438,54 @@
     }
   }
 
-  window.searchUsers = async function() {
-    const memberNumber = document.getElementById('searchMemberNumber').value.toLowerCase();
-    const userListEl = document.getElementById('userList');
-    try {
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      let tableHtml = `
-        <table class="user-table">
-          <thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
-          <tbody>
-      `;
-      usersSnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.memberNumber && data.memberNumber.toLowerCase().includes(memberNumber)) {
-          tableHtml += `
-            <tr>
-              <td>${doc.id}</td>
-              <td>${data.name || 'N/A'}</td>
-              <td>${data.email || 'N/A'}</td>
-              <td>${data.memberNumber || 'N/A'}</td>
-              <td>
-                <button class="select-btn" onclick="selectUser('${doc.id}')">Select</button>
-              </td>
-            </tr>
-          `;
-        }
-      });
-      tableHtml += '</tbody></table>';
-      userListEl.innerHTML = tableHtml;
-    } catch (error) {
-      console.error('Error searching users:', error);
-    }
+  window.searchUsers = function(type) {
+    loadUsers(type);
   };
 
-  window.selectUser = async function(userId) {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (userDoc.exists()) {
-        document.getElementById('loanUserId').value = userId;
-        document.getElementById('editLoanId').value = userId;
-        document.getElementById('paymentUserId').value = userId;
-        await loadUserLoans();
-      } else {
-        document.getElementById('error').innerText = 'User not found!';
+  window.selectUser = async function(userId, type) {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (type === 'create') {
+        document.getElementById('createLoanUserId').value = userId;
+        showForm('createLoanForm');
+      } else if (type === 'edit') {
+        document.getElementById('editLoanUserId').value = userId;
+        await loadUserLoans('edit');
+        showForm('editLoanForm');
+      } else if (type === 'repay') {
+        document.getElementById('repayLoanUserId').value = userId;
+        await loadUserLoans('repay');
+        showForm('repaymentForm');
       }
-    } catch (error) {
-      document.getElementById('error').innerText = 'Error loading user data: ' + error.message;
+    } else {
+      document.getElementById('error').innerText = 'User not found!';
     }
   };
 
-  async function loadUserLoans() {
-    const userId = document.getElementById('loanUserId').value;
+  async function loadUserLoans(type = '') {
+    const userId = type === 'edit' ? document.getElementById('editLoanUserId').value : document.getElementById('repayLoanUserId').value;
     const loanListEl = document.getElementById('loanList');
-    const paymentLoanNumber = document.getElementById('paymentLoanNumber');
+    const repayLoanNumber = document.getElementById('repayLoanNumber');
     if (userId) {
       try {
         const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
-        let tableHtml = '<h3>Existing Loans</h3><table class="loan-table"><thead><tr><th>Loan Number</th><th>Balance</th><th>Action</th></tr></thead><tbody>';
-        paymentLoanNumber.innerHTML = '<option value="">Select Loan Number</option>';
+        let tableHtml = '<h3>Existing Loans</h3><table class="loan-table"><thead><tr><th>Loan Number</th><th>Amount</th><th>Balance</th><th>Action</th></tr></thead><tbody>';
+        repayLoanNumber.innerHTML = '<option value="">Select Loan Number</option>';
         if (loansSnapshot.empty) {
-          tableHtml += '<tr><td colspan="3">No loans found. <button onclick="showForm(\'loanForm\')">Create New Loan</button></td></tr>';
+          tableHtml += '<tr><td colspan="4">No loans found.</td></tr>';
         } else {
           loansSnapshot.forEach(doc => {
             const data = doc.data();
             tableHtml += `
               <tr>
                 <td>${data.loanNumber}</td>
+                <td>₹${data.amount || 0}</td>
                 <td>₹${data.balance || 0}</td>
-                <td><button class="select-btn" onclick="selectLoan('${doc.id}', '${data.loanNumber}', ${data.balance || 0})">Select</button></td>
+                <td><button class="select-btn" onclick="selectLoan('${doc.id}', '${data.loanNumber}', ${data.amount || 0}, ${data.balance || 0}, ${data.interest || 0}, '${data.startDate || ''}')">Select</button></td>
               </tr>
             `;
-            paymentLoanNumber.innerHTML += `<option value="${data.loanNumber}">${data.loanNumber}</option>`;
+            if (type === 'repay') repayLoanNumber.innerHTML += `<option value="${data.loanNumber}">${data.loanNumber}</option>`;
           });
         }
         tableHtml += '</tbody></table>';
@@ -347,27 +496,27 @@
     }
   }
 
-  window.selectLoan = async function(loanId, loanNumber, balance) {
-    document.getElementById('editLoanId').value = document.getElementById('loanUserId').value;
-    document.getElementById('editLoanNumber').value = loanNumber;
-    document.getElementById('editLoanBalance').value = balance;
-    const loanDoc = await getDoc(doc(db, 'loans', loanId));
-    if (loanDoc.exists()) {
-      const data = loanDoc.data();
-      document.getElementById('editLoanGuarantors').value = data.guarantors ? data.guarantors.join(', ') : '';
-      document.getElementById('editLoanInterest').value = data.interest || 0;
-      document.getElementById('editLoanStartDate').value = data.startDate || '';
+  window.selectLoan = async function(loanId, loanNumber, amount, balance, interest, startDate) {
+    if (document.getElementById('editLoanUserId') && document.getElementById('editLoanUserId').value) {
+      document.getElementById('editLoanNumber').value = loanNumber;
+      document.getElementById('editLoanPrincipal').value = balance;
+      document.getElementById('editLoanInterestDue').value = 0; // To be calculated
+      document.getElementById('editLoanInterest').value = interest;
+      showForm('editLoanForm');
+    } else if (document.getElementById('repayLoanUserId') && document.getElementById('repayLoanUserId').value) {
+      document.getElementById('repayLoanNumber').value = loanNumber;
+      loadLoanDetails();
     }
-    showForm('editLoanForm');
   };
 
   window.saveLoan = async function() {
-    const userId = document.getElementById('loanUserId').value;
-    const balance = parseFloat(document.getElementById('loanBalance').value) || 0;
-    const guarantors = document.getElementById('loanGuarantors').value.split(',').map(g => g.trim());
-    const interest = parseFloat(document.getElementById('loanInterest').value) || 0;
-    const loanNumber = document.getElementById('loanNumber').value;
-    const startDate = document.getElementById('loanStartDate').value;
+    const userId = document.getElementById('createLoanUserId').value;
+    const amount = parseFloat(document.getElementById('createLoanAmount').value) || 0;
+    const interest = parseFloat(document.getElementById('createLoanInterest').value) || 0;
+    const installments = parseInt(document.getElementById('createLoanInstallments').value) || 0;
+    const startDate = document.getElementById('createLoanStartDate').value;
+    const guarantor1 = document.getElementById('createLoanGuarantor1').value;
+    const guarantor2 = document.getElementById('createLoanGuarantor2').value;
     const errorEl = document.getElementById('error');
 
     if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
@@ -375,30 +524,33 @@
       return;
     }
 
+    if (!userId || !amount || !interest || !installments || !startDate || !guarantor1 || !guarantor2) {
+      errorEl.innerText = 'All fields are required!';
+      return;
+    }
+
     try {
-      const loanDocRef = doc(db, 'loans', `${userId}_${loanNumber}`);
-      const loanDoc = await getDoc(loanDocRef);
-      if (loanDoc.exists()) {
-        await updateDoc(loanDocRef, { balance, guarantors, interest, startDate, lastUpdated: new Date().toISOString() });
-        alert('Loan updated successfully!');
-      } else {
-        await setDoc(loanDocRef, { userId, balance, guarantors, interest, loanNumber, startDate, lastUpdated: new Date().toISOString() });
-        alert('Loan added successfully!');
-      }
+      const loanNumber = `LN-${Date.now()}`;
+      await setDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
+        userId, loanNumber, amount, balance: amount, interest, installments, startDate,
+        guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
+      });
+      alert('Loan created successfully!');
       showForm(null);
-      await loadUserLoans();
+      await loadUserLoans('edit');
     } catch (error) {
-      errorEl.innerText = 'Error saving loan: ' + error.message;
+      errorEl.innerText = 'Error creating loan: ' + error.message;
     }
   };
 
   window.updateLoan = async function() {
-    const userId = document.getElementById('editLoanId').value;
+    const userId = document.getElementById('editLoanUserId').value;
     const loanNumber = document.getElementById('editLoanNumber').value;
-    const balance = parseFloat(document.getElementById('editLoanBalance').value) || 0;
-    const guarantors = document.getElementById('editLoanGuarantors').value.split(',').map(g => g.trim());
+    const principal = parseFloat(document.getElementById('editLoanPrincipal').value) || 0;
+    const interestDue = parseFloat(document.getElementById('editLoanInterestDue').value) || 0;
     const interest = parseFloat(document.getElementById('editLoanInterest').value) || 0;
-    const startDate = document.getElementById('editLoanStartDate').value;
+    const guarantor1 = document.getElementById('editLoanGuarantor1').value;
+    const guarantor2 = document.getElementById('editLoanGuarantor2').value;
     const errorEl = document.getElementById('error');
 
     if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
@@ -407,39 +559,59 @@
     }
 
     try {
-      await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance, guarantors, interest, startDate, lastUpdated: new Date().toISOString() });
+      await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
+        balance: principal, interestDue, interest, guarantors: [guarantor1, guarantor2], lastUpdated: new Date().toISOString()
+      });
       alert('Loan updated successfully!');
       showForm(null);
-      await loadUserLoans();
+      await loadUserLoans('edit');
     } catch (error) {
-      errorEl.innerText = 'Error editing loan: ' + error.message;
+      errorEl.innerText = 'Error updating loan: ' + error.message;
     }
   };
 
-  async function loadLoanBalance() {
-    const loanNumber = document.getElementById('paymentLoanNumber').value;
-    const userId = document.getElementById('paymentUserId').value;
+  async function loadLoanDetails() {
+    const loanNumber = document.getElementById('repayLoanNumber').value;
+    const userId = document.getElementById('repayLoanUserId').value;
     if (loanNumber && userId) {
       try {
         const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
         if (loanDoc.exists()) {
-          document.getElementById('currentBalance').value = loanDoc.data().balance || 0;
-          document.getElementById('newBalance').value = loanDoc.data().balance || 0;
-        } else {
-          document.getElementById('currentBalance').value = '';
-          document.getElementById('newBalance').value = '';
+          const data = loanDoc.data();
+          const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
+          const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
+          const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
+          const installmentAmount = data.amount / data.installments;
+          const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
+
+          document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
+          document.getElementById('repayInterest').value = interestDue.toFixed(2);
+          document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
+          document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
         }
       } catch (error) {
-        document.getElementById('error').innerText = 'Error loading balance: ' + error.message;
+        document.getElementById('error').innerText = 'Error loading loan details: ' + error.message;
       }
     }
   }
 
-  window.addPayment = async function() {
-    const userId = document.getElementById('paymentUserId').value;
-    const loanNumber = document.getElementById('paymentLoanNumber').value;
-    const amount = parseFloat(document.getElementById('paymentAmount').value) || 0;
-    const date = document.getElementById('paymentDate').value;
+  async function getLastPaymentDate(userId, loanNumber) {
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+    if (!paymentsSnapshot.empty) {
+      return paymentsSnapshot.docs.sort((a, b) => new Date(b.data().timestamp) - new Date(a.data().timestamp))[0].data().timestamp;
+    }
+    return null;
+  }
+
+  window.addRepayment = async function() {
+    const userId = document.getElementById('repayLoanUserId').value;
+    const loanNumber = document.getElementById('repayLoanNumber').value;
+    const date = document.getElementById('repayDate').value;
+    const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
+    const interest = parseFloat(document.getElementById('repayInterest').value) || 0;
+    const newBalance = parseFloat(document.getElementById('repayNewBalance').value) || 0;
+    const interestDue = parseFloat(document.getElementById('repayInterestDue').value) || 0;
+    const receiptNumber = document.getElementById('repayReceiptNumber').value;
     const errorEl = document.getElementById('error');
 
     if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
@@ -450,24 +622,45 @@
     try {
       const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
       if (loanDoc.exists()) {
-        const currentBalance = loanDoc.data().balance || 0;
-        const newBalance = currentBalance - amount;
-        await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, lastUpdated: new Date().toISOString() });
-        await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), { userId, loanNumber, amount, date, timestamp: new Date().toISOString() });
-        document.getElementById('newBalance').value = newBalance;
-        alert('Payment added and balance updated successfully!');
+        await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, interestDue: 0, lastUpdated: new Date().toISOString() });
+        await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
+          userId, loanNumber, date, principal, interest, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
+        });
+        alert('Repayment added successfully!');
         showForm(null);
-        // Sync with home screen
-        if (window.opener && window.opener.location.pathname.includes('home.html')) {
-          window.opener.location.reload();
-        }
+        loadLoanDetails();
+        const paymentListEl = document.getElementById('paymentList');
+        paymentListEl.innerHTML = await generatePaymentStatement(userId, loanNumber);
       } else {
         errorEl.innerText = 'Loan not found!';
       }
     } catch (error) {
-      errorEl.innerText = 'Error adding payment: ' + error.message;
+      errorEl.innerText = 'Error adding repayment: ' + error.message;
     }
   };
+
+  async function generatePaymentStatement(userId, loanNumber) {
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+    let tableHtml = '<h3>Payment Statement</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal</th><th>Interest</th><th>New Balance</th><th>Receipt #</th></tr></thead><tbody>';
+    if (paymentsSnapshot.empty) {
+      tableHtml += '<tr><td colspan="5">No payments found.</td></tr>';
+    } else {
+      paymentsSnapshot.forEach(doc => {
+        const data = doc.data();
+        tableHtml += `
+          <tr>
+            <td>${data.date || 'N/A'}</td>
+            <td>₹${data.principal || 0}</td>
+            <td>₹${data.interest || 0}</td>
+            <td>₹${data.newBalance || 0}</td>
+            <td>${data.receiptNumber || 'N/A'}</td>
+          </tr>
+        `;
+      });
+    }
+    tableHtml += '</tbody></table>';
+    return tableHtml;
+  }
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     try {
