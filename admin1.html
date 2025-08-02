@@ -89,14 +89,13 @@
       font-weight: 500;
     }
     .form-group input {
-      width: auto;
+      width: 220px;
       padding: 6px 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
       font-size: 13px;
       box-sizing: border-box;
       background: #fff;
-      max-width: 200px;
     }
     .form-group .user-info {
       display: block;
@@ -152,28 +151,6 @@
     .loan-table tr:hover, .payment-table tr:hover {
       background: #f5f6fa;
     }
-    .popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-    .popup-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-    }
     .footer {
       position: fixed;
       bottom: 0;
@@ -189,7 +166,7 @@
       h1 { font-size: 26px; }
       .card button { font-size: 13px; padding: 6px; }
       .form-group label { font-size: 14px; }
-      .form-group input { font-size: 14px; padding: 8px; max-width: 250px; }
+      .form-group input { font-size: 14px; padding: 8px; }
       .dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
       .loan-table th, .loan-table td, .payment-table th, .payment-table td { font-size: 14px; padding: 10px; }
     }
@@ -295,22 +272,31 @@
   <div id="repaymentForm" class="form-section">
     <h3>Add Loan Repayment</h3>
     <div class="form-group">
-      <label>Member Number:</label><input type="text" id="repayMemberNumber" oninput="updateUserInfo('repay')">
+      <label>Member Number:</label><input type="text" id="repayMemberNumber" oninput="updateRepaymentInfo()">
     </div>
     <div class="form-group">
       <span id="repayUserInfo" class="user-info"></span>
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="repayLoanNumber" oninput="loadLoanDetails('repay')">
+      <label>Loan Number:</label><input type="text" id="repayLoanNumber" readonly>
+    </div>
+    <div class="form-group">
+      <label>Next Principal:</label><input type="number" id="repayPrincipal" readonly>
+    </div>
+    <div class="form-group">
+      <label>Interest (Last Payment to Today):</label><input type="number" id="repayInterest" readonly>
+    </div>
+    <div class="form-group">
+      <label>Last Balance:</label><input type="number" id="repayLastBalance" readonly>
     </div>
     <div class="form-group">
       <label>Entry Date:</label><input type="date" id="repayDate" value="" oninput="calculateInterest()">
     </div>
     <div class="form-group">
-      <label>Principal Paid:</label><input type="number" id="repayPrincipal" placeholder="Enter principal paid">
+      <label>Principal Paid:</label><input type="number" id="repayPrincipalPaid">
     </div>
     <div class="form-group">
-      <label>Interest Paid:</label><input type="number" id="repayInterest" placeholder="Enter interest paid">
+      <label>Interest Paid:</label><input type="number" id="repayInterestPaid">
     </div>
     <div class="form-group">
       <label>New Outstanding Balance:</label><input type="number" id="repayNewBalance" readonly>
@@ -322,15 +308,13 @@
       <label>Receipt Number:</label><input type="text" id="repayReceiptNumber" placeholder="Enter receipt number">
     </div>
     <button onclick="addRepayment()">Submit</button>
+    <div class="payment-list" id="paymentList"></div>
   </div>
-
-  <div class="loan-list" id="loanList"></div>
-  <div class="payment-list" id="paymentList"></div>
 
   <button id="logoutBtn">Logout</button>
   <p id="error"></p>
-  <div id="popup" class="popup">This member already has an active loan!</div>
-  <div id="popupOverlay" class="popup-overlay"></div>
+  <div id="popup" class="popup" style="display: none;">This member already has an active loan!</div>
+  <div id="popupOverlay" class="popup-overlay" style="display: none;"></div>
 </div>
 
 <div class="footer">Powered by VT Soft 2025</div>
@@ -413,52 +397,22 @@
   window.updateUserInfo = async function(type) {
     const memberNumber = document.getElementById(`${type}MemberNumber`).value;
     const userInfoEl = document.getElementById(`${type}UserInfo`);
-    const popup = document.getElementById('popup');
-    const popupOverlay = document.getElementById('popupOverlay');
-
     if (memberNumber) {
       try {
         const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
         if (!usersSnapshot.empty) {
           const userDoc = usersSnapshot.docs[0];
-          const userId = userDoc.id;
           const name = userDoc.data().name || 'No Name';
           userInfoEl.textContent = `Name: ${name}`;
-          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
-          if (!loansSnapshot.empty) {
-            popup.style.display = 'block';
-            popupOverlay.style.display = 'block';
-            if (type === 'create') {
-              document.getElementById('createLoanNumber').focus();
-            } else if (type === 'edit') {
-              document.getElementById('editLoanNumber').focus();
-            } else if (type === 'repay') {
-              document.getElementById('repayLoanNumber').focus();
-            }
-          } else {
-            popup.style.display = 'none';
-            popupOverlay.style.display = 'none';
-          }
-          if (type === 'edit') {
-            loadLoanDetails('edit');
-          } else if (type === 'repay') {
-            loadLoanDetails('repay');
-          }
         } else {
           userInfoEl.textContent = 'User not found';
-          popup.style.display = 'none';
-          popupOverlay.style.display = 'none';
         }
       } catch (error) {
         userInfoEl.textContent = 'Error fetching user info';
         console.error('Error fetching user info:', error);
-        popup.style.display = 'none';
-        popupOverlay.style.display = 'none';
       }
     } else {
       userInfoEl.textContent = '';
-      popup.style.display = 'none';
-      popupOverlay.style.display = 'none';
     }
   };
 
@@ -480,30 +434,6 @@
               document.getElementById('editLoanInterest').value = data.interest || 0;
               document.getElementById('editLoanGuarantor1').value = data.guarantors[0] || '';
               document.getElementById('editLoanGuarantor2').value = data.guarantors[1] || '';
-            } else if (type === 'repay') {
-              const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
-              const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
-              const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
-              const installmentAmount = data.amount / data.installments;
-              const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
-
-              document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
-              document.getElementById('repayInterest').value = interestDue.toFixed(2);
-              document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
-              document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
-            }
-          } else {
-            if (type === 'edit') {
-              document.getElementById('editLoanPrincipal').value = '';
-              document.getElementById('editLoanInterestDue').value = '';
-              document.getElementById('editLoanInterest').value = '';
-              document.getElementById('editLoanGuarantor1').value = '';
-              document.getElementById('editLoanGuarantor2').value = '';
-            } else if (type === 'repay') {
-              document.getElementById('repayPrincipal').value = '';
-              document.getElementById('repayInterest').value = '';
-              document.getElementById('repayInterestDue').value = '';
-              document.getElementById('repayNewBalance').value = '';
             }
           }
         }
@@ -586,29 +516,103 @@
     }
   };
 
-  async function calculateInterest() {
-    const loanNumber = document.getElementById('repayLoanNumber').value;
+  async function updateRepaymentInfo() {
     const memberNumber = document.getElementById('repayMemberNumber').value;
-    const repayDate = document.getElementById('repayDate').value;
-    if (loanNumber && memberNumber && repayDate) {
+    const userInfoEl = document.getElementById('repayUserInfo');
+    const loanNumberEl = document.getElementById('repayLoanNumber');
+    const principalEl = document.getElementById('repayPrincipal');
+    const interestEl = document.getElementById('repayInterest');
+    const lastBalanceEl = document.getElementById('repayLastBalance');
+    const paymentListEl = document.getElementById('paymentList');
+
+    if (memberNumber) {
       try {
         const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
         if (!usersSnapshot.empty) {
           const userDoc = usersSnapshot.docs[0];
           const userId = userDoc.id;
-          const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
-          if (loanDoc.exists()) {
-            const data = loanDoc.data();
-            const lastPaymentDate = await getLastPaymentDate(userId, loanNumber);
-            const daysDiff = Math.floor((new Date(repayDate) - new Date(lastPaymentDate || data.startDate)) / (1000 * 60 * 60 * 24));
-            const interestDue = (data.balance * data.interest * daysDiff) / (100 * 365);
-            const installmentAmount = data.amount / data.installments;
-            const principalDue = installmentAmount + (data.balance > data.amount ? data.balance - data.amount : 0);
+          const name = userDoc.data().name || 'No Name';
+          userInfoEl.textContent = `Name: ${name}`;
 
-            document.getElementById('repayPrincipal').value = principalDue.toFixed(2);
-            document.getElementById('repayInterest').value = interestDue.toFixed(2);
-            document.getElementById('repayInterestDue').value = interestDue.toFixed(2);
-            document.getElementById('repayNewBalance').value = (data.balance - principalDue).toFixed(2);
+          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          if (!loansSnapshot.empty) {
+            const loanDoc = loansSnapshot.docs[0]; // Assuming single active loan
+            const loanData = loanDoc.data();
+            const loanId = loanDoc.id.split('_')[1];
+            loanNumberEl.value = loanId;
+
+            const lastPaymentDate = await getLastPaymentDate(userId, loanId);
+            const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || loanData.startDate)) / (1000 * 60 * 60 * 24));
+            const nextPrincipal = loanData.amount / loanData.installments;
+            const interestDue = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
+
+            principalEl.value = nextPrincipal.toFixed(2);
+            interestEl.value = interestDue.toFixed(2);
+            lastBalanceEl.value = loanData.balance.toFixed(2);
+
+            // Update payment list
+            paymentListEl.innerHTML = await generatePaymentStatement(userId, loanId);
+          } else {
+            loanNumberEl.value = '';
+            principalEl.value = '';
+            interestEl.value = '';
+            lastBalanceEl.value = '';
+            paymentListEl.innerHTML = '<p>No loans found for this member.</p>';
+          }
+        } else {
+          userInfoEl.textContent = 'User not found';
+          loanNumberEl.value = '';
+          principalEl.value = '';
+          interestEl.value = '';
+          lastBalanceEl.value = '';
+          paymentListEl.innerHTML = '';
+        }
+      } catch (error) {
+        userInfoEl.textContent = 'Error fetching user info';
+        console.error('Error fetching repayment info:', error);
+        loanNumberEl.value = '';
+        principalEl.value = '';
+        interestEl.value = '';
+        lastBalanceEl.value = '';
+        paymentListEl.innerHTML = '';
+      }
+    } else {
+      userInfoEl.textContent = '';
+      loanNumberEl.value = '';
+      principalEl.value = '';
+      interestEl.value = '';
+      lastBalanceEl.value = '';
+      paymentListEl.innerHTML = '';
+    }
+  }
+
+  async function calculateInterest() {
+    const memberNumber = document.getElementById('repayMemberNumber').value;
+    const repayDate = document.getElementById('repayDate').value;
+    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
+    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
+    const newBalanceEl = document.getElementById('repayNewBalance');
+    const interestDueEl = document.getElementById('repayInterestDue');
+
+    if (memberNumber && repayDate) {
+      try {
+        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          const userId = userDoc.id;
+          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          if (!loansSnapshot.empty) {
+            const loanDoc = loansSnapshot.docs[0];
+            const loanData = loanDoc.data();
+            const loanId = loanDoc.id.split('_')[1];
+            const lastPaymentDate = await getLastPaymentDate(userId, loanId);
+            const daysDiff = Math.floor((new Date(repayDate) - new Date(lastPaymentDate || loanData.startDate)) / (1000 * 60 * 60 * 24));
+            const interestDue = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
+            const lastBalance = parseFloat(document.getElementById('repayLastBalance').value) || loanData.balance;
+            const nextPrincipal = parseFloat(document.getElementById('repayPrincipal').value) || (loanData.amount / loanData.installments);
+
+            interestDueEl.value = interestDue.toFixed(2);
+            newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
           }
         }
       } catch (error) {
@@ -625,12 +629,35 @@
     return null;
   }
 
+  async function generatePaymentStatement(userId, loanNumber) {
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+    let tableHtml = '<h3>Last Transactions</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal Paid</th><th>Interest Paid</th><th>New Balance</th><th>Receipt #</th></tr></thead><tbody>';
+    if (paymentsSnapshot.empty) {
+      tableHtml += '<tr><td colspan="5">No transactions found.</td></tr>';
+    } else {
+      paymentsSnapshot.forEach(doc => {
+        const data = doc.data();
+        tableHtml += `
+          <tr>
+            <td>${data.date || 'N/A'}</td>
+            <td>₹${data.principal || 0}</td>
+            <td>₹${data.interest || 0}</td>
+            <td>₹${data.newBalance || 0}</td>
+            <td>${data.receiptNumber || 'N/A'}</td>
+          </tr>
+        `;
+      });
+    }
+    tableHtml += '</tbody></table>';
+    return tableHtml;
+  }
+
   window.addRepayment = async function() {
     const memberNumber = document.getElementById('repayMemberNumber').value;
     const loanNumber = document.getElementById('repayLoanNumber').value;
     const date = document.getElementById('repayDate').value;
-    const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
-    const interest = parseFloat(document.getElementById('repayInterest').value) || 0;
+    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
+    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
     const newBalance = parseFloat(document.getElementById('repayNewBalance').value) || 0;
     const interestDue = parseFloat(document.getElementById('repayInterestDue').value) || 0;
     const receiptNumber = document.getElementById('repayReceiptNumber').value;
@@ -650,13 +677,11 @@
         if (loanDoc.exists()) {
           await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, interestDue: 0, lastUpdated: new Date().toISOString() });
           await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
-            userId, loanNumber, date, principal, interest, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
+            userId, loanNumber, date, principal: principalPaid, interest: interestPaid, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
           });
           alert('Repayment added successfully!');
           showForm(null);
-          loadLoanDetails('repay');
-          const paymentListEl = document.getElementById('paymentList');
-          paymentListEl.innerHTML = await generatePaymentStatement(userId, loanNumber);
+          updateRepaymentInfo(); // Refresh form and table
         } else {
           errorEl.innerText = 'Loan not found!';
         }
@@ -668,29 +693,6 @@
     }
   };
 
-  async function generatePaymentStatement(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
-    let tableHtml = '<h3>Payment Statement</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal</th><th>Interest</th><th>New Balance</th><th>Receipt #</th></tr></thead><tbody>';
-    if (paymentsSnapshot.empty) {
-      tableHtml += '<tr><td colspan="5">No payments found.</td></tr>';
-    } else {
-      paymentsSnapshot.forEach(doc => {
-        const data = doc.data();
-        tableHtml += `
-          <tr>
-            <td>${data.date || 'N/A'}</td>
-            <td>₹${data.principal || 0}</td>
-            <td>₹${data.interest || 0}</td>
-            <td>₹${data.newBalance || 0}</td>
-            <td>${data.receiptNumber || 'N/A'}</td>
-          </tr>
-        `;
-      });
-    }
-    tableHtml += '</tbody></table>';
-    return tableHtml;
-  }
-
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     try {
       await signOut(auth);
@@ -698,11 +700,6 @@
     } catch (error) {
       document.getElementById('error').innerText = 'Error logging out: ' + error.message;
     }
-  });
-
-  document.getElementById('popupOverlay').addEventListener('click', () => {
-    document.getElementById('popup').style.display = 'none';
-    document.getElementById('popupOverlay').style.display = 'none';
   });
 </script>
 </body>
