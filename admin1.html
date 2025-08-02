@@ -96,7 +96,7 @@
       font-size: 13px;
       box-sizing: border-box;
       background: #fff;
-      max-width: 200px; /* Reduced width */
+      max-width: 200px;
     }
     .form-group .search-bar {
       width: 150px;
@@ -155,6 +155,28 @@
     }
     .loan-table tr:hover, .payment-table tr:hover {
       background: #f5f6fa;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
     }
     .footer {
       position: fixed;
@@ -215,7 +237,7 @@
     <h3>Create New Loan</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <select id="createMemberNumber" onchange="updateUserName('create')">
+      <select id="createMemberNumber" onchange="updateUserInfo('create')">
         <option value="">Select Member</option>
       </select>
       <input type="text" id="createMemberSearch" class="search-bar" placeholder="Search Member Number" oninput="filterUsers('create')">
@@ -250,7 +272,7 @@
     <h3>Edit Loan</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <select id="editMemberNumber" onchange="updateUserName('edit')">
+      <select id="editMemberNumber" onchange="updateUserInfo('edit')">
         <option value="">Select Member</option>
       </select>
       <input type="text" id="editMemberSearch" class="search-bar" placeholder="Search Member Number" oninput="filterUsers('edit')">
@@ -285,7 +307,7 @@
     <h3>Add Loan Repayment</h3>
     <div class="form-group">
       <label>Member Number:</label>
-      <select id="repayMemberNumber" onchange="updateUserName('repay')">
+      <select id="repayMemberNumber" onchange="updateUserInfo('repay')">
         <option value="">Select Member</option>
       </select>
       <input type="text" id="repayMemberSearch" class="search-bar" placeholder="Search Member Number" oninput="filterUsers('repay')">
@@ -323,6 +345,8 @@
 
   <button id="logoutBtn">Logout</button>
   <p id="error"></p>
+  <div id="popup" class="popup">This member already has an active loan!</div>
+  <div id="popupOverlay" class="popup-overlay"></div>
 </div>
 
 <div class="footer">Powered by VT Soft 2025</div>
@@ -362,7 +386,6 @@
 
   onAuthStateChanged(auth, async (user) => {
     const adminInfoEl = document.getElementById('adminInfo');
-    const userListEl = document.getElementById('userList');
     const errorEl = document.getElementById('error');
     const loginSection = document.getElementById('loginSection');
     const dashboardGrid = document.getElementById('dashboardGrid');
@@ -417,44 +440,76 @@
           const data = doc.data();
           const memberNumber = data.memberNumber || 'N/A';
           const option = document.createElement('option');
-          option.value = memberNumber;
+          option.value = `${memberNumber} - ${data.name || 'No Name'}`;
           option.textContent = `${memberNumber} - ${data.name || 'No Name'}`;
           select.appendChild(option);
         });
       });
-      if (formId) updateUserName(formId.replace('Form', ''));
+      if (formId) updateUserInfo(formId.replace('Form', ''));
     } catch (error) {
       console.error('Error loading users:', error);
     }
   }
 
   window.filterUsers = function(type) {
-    const searchInput = document.getElementById(`${type}MemberSearch`).value.toLowerCase();
+    const searchInput = document.getElementById(`${type}MemberSearch`);
     const select = document.getElementById(`${type}MemberNumber`);
     const options = select.getElementsByTagName('option');
+    const searchValue = searchInput.value.toLowerCase();
+    searchInput.value = searchValue; // Ensure typed value is visible
     for (let i = 1; i < options.length; i++) {
       const text = options[i].textContent.toLowerCase();
-      options[i].style.display = text.includes(searchInput) ? '' : 'none';
+      options[i].style.display = text.includes(searchValue) ? '' : 'none';
     }
-    updateUserName(type);
+    updateUserInfo(type);
   };
 
-  window.updateUserName = function(type) {
+  window.updateUserInfo = async function(type) {
     const select = document.getElementById(`${type}MemberNumber`);
     const searchInput = document.getElementById(`${type}MemberSearch`);
     const userNameEl = document.getElementById(`${type}UserName`);
+    const popup = document.getElementById('popup');
+    const popupOverlay = document.getElementById('popupOverlay');
+
     if (select.value) {
       const [memberNumber, name] = select.value.split(' - ');
       userNameEl.textContent = name ? `(${name})` : '';
       searchInput.value = memberNumber || '';
+      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
+      if (!usersSnapshot.empty) {
+        const userDoc = usersSnapshot.docs[0];
+        const userId = userDoc.id;
+        const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+        if (!loansSnapshot.empty) {
+          popup.style.display = 'block';
+          popupOverlay.style.display = 'block';
+        } else {
+          popup.style.display = 'none';
+          popupOverlay.style.display = 'none';
+        }
+      }
+      if (type === 'create') {
+        await loadUserLoans('edit');
+      } else if (type === 'edit') {
+        await loadUserLoans('edit');
+      } else if (type === 'repay') {
+        await loadUserLoans('repay');
+      }
     } else {
       userNameEl.textContent = '';
       searchInput.value = '';
+      popup.style.display = 'none';
+      popupOverlay.style.display = 'none';
     }
   };
 
+  document.getElementById('popupOverlay').addEventListener('click', () => {
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('popupOverlay').style.display = 'none';
+  });
+
   async function loadUserLoans(type = '') {
-    const memberNumber = type === 'edit' ? document.getElementById('editMemberNumber').value : document.getElementById('repayMemberNumber').value;
+    const memberNumber = type === 'edit' ? document.getElementById('editMemberNumber').value.split(' - ')[0] : document.getElementById('repayMemberNumber').value.split(' - ')[0];
     const loanListEl = document.getElementById('loanList');
     const editLoanSelect = document.getElementById('editLoanNumber');
     const repayLoanSelect = document.getElementById('repayLoanNumber');
