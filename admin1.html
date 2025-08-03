@@ -322,7 +322,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
@@ -548,33 +548,33 @@
             const loanDoc = loansSnapshot.docs[0]; // Assuming single active loan
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
-            
+
             // Auto-fill loan details
-            loanNumberEl.value = loanId;
-            lastBalanceEl.value = loanData.balance.toFixed(2);
-            
+            loanNumberEl.value = loanId || '';
+            lastBalanceEl.value = loanData.balance ? loanData.balance.toFixed(2) : '0.00';
+
             // Calculate principal installment
-            const principalInstallment = (loanData.amount / loanData.installments).toFixed(2);
+            const principalInstallment = loanData.amount && loanData.installments ? (loanData.amount / loanData.installments).toFixed(2) : '0.00';
             principalEl.value = principalInstallment;
-            
+
             // Get last payment date
             const lastPaymentDate = await getLastPaymentDate(userId, loanId);
             const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
             const today = new Date();
-            
+
             // Calculate days difference
             const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-            
-            // Calculate interest
-            const interestAmount = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
+
+            // Calculate interest only if interest rate and balance are available
+            const interestAmount = loanData.interest && loanData.balance ? (loanData.balance * loanData.interest * daysDiff) / (100 * 365) : 0;
             interestEl.value = interestAmount.toFixed(2);
-            
+
             // Set today's date
             repayDateEl.value = today.toISOString().split('T')[0];
-            
+
             // Update payment list
             paymentListEl.innerHTML = await generatePaymentStatement(userId, loanId);
-            
+
             // Calculate new balance and interest due
             calculateInterest();
           } else {
@@ -632,16 +632,16 @@
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
             const lastPaymentDate = await getLastPaymentDate(userId, loanId);
-            
+
             // Calculate days difference
             const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
             const endDate = new Date(repayDate);
             const daysDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-            
+
             // Calculate interest
-            const interestDue = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
-            const lastBalance = parseFloat(lastBalanceEl.value) || loanData.balance;
-            
+            const interestDue = loanData.interest && loanData.balance ? (loanData.balance * loanData.interest * daysDiff) / (100 * 365) : 0;
+            const lastBalance = parseFloat(lastBalanceEl.value) || loanData.balance || 0;
+
             // Update fields
             interestDueEl.value = interestDue.toFixed(2);
             newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
@@ -658,17 +658,17 @@
     const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
     const lastBalance = parseFloat(document.getElementById('repayLastBalance').value) || 0;
     const newBalanceEl = document.getElementById('repayNewBalance');
-    
+
     newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
   };
 
   async function getLastPaymentDate(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), 
-      where('userId', '==', userId), 
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'),
+      where('userId', '==', userId),
       where('loanNumber', '==', loanNumber),
       orderBy('timestamp', 'desc'),
       limit(1)));
-    
+
     if (!paymentsSnapshot.empty) {
       return paymentsSnapshot.docs[0].data().timestamp;
     }
@@ -676,18 +676,18 @@
   }
 
   async function generatePaymentStatement(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), 
-      where('userId', '==', userId), 
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'),
+      where('userId', '==', userId),
       where('loanNumber', '==', loanNumber),
       orderBy('timestamp', 'desc')));
-    
+
     let payments = [];
     paymentsSnapshot.forEach(doc => {
       payments.push({ id: doc.id, ...doc.data() });
     });
-    
+
     let tableHtml = '<h3>Last Transactions</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal Paid</th><th>Interest Paid</th><th>New Balance</th><th>Receipt #</th></tr></thead><tbody>';
-    
+
     if (payments.length === 0) {
       tableHtml += '<tr><td colspan="5">No transactions found.</td></tr>';
     } else {
@@ -736,28 +736,28 @@
         const userDoc = usersSnapshot.docs[0];
         const userId = userDoc.id;
         const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
-        
+
         if (loanDoc.exists()) {
           // Update loan with new balance and reset interest due
-          await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { 
-            balance: newBalance, 
-            interestDue: 0, 
-            lastUpdated: new Date().toISOString() 
+          await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
+            balance: newBalance,
+            interestDue: 0,
+            lastUpdated: new Date().toISOString()
           });
-          
+
           // Add payment record
           await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
-            userId, 
-            loanNumber, 
-            date, 
-            principal: principalPaid, 
-            interest: interestPaid, 
-            newBalance, 
-            interestDue, 
-            receiptNumber, 
+            userId,
+            loanNumber,
+            date,
+            principal: principalPaid,
+            interest: interestPaid,
+            newBalance,
+            interestDue,
+            receiptNumber,
             timestamp: new Date().toISOString()
           });
-          
+
           alert('Repayment added successfully!');
           showForm(null);
           updateRepaymentInfo(); // Refresh form and table
