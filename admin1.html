@@ -269,7 +269,7 @@
   </div>
 
   <!-- Repayment Entry Form -->
-  <div id="repaymentForm" class="form-section">
+  <div id="repaymentForm" class="form-section active">
     <h3>Add Loan Repayment</h3>
     <div class="form-group">
       <label>Member Number:</label><input type="text" id="repayMemberNumber" oninput="updateRepaymentInfo()">
@@ -278,31 +278,31 @@
       <span id="repayUserInfo" class="user-info"></span>
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="repayLoanNumber" readonly>
+      <label>Loan Number:</label><input type="text" id="repayLoanNumber">
     </div>
     <div class="form-group">
-      <label>Next Principal:</label><input type="number" id="repayPrincipal" readonly>
+      <label>Next Principal:</label><input type="number" id="repayPrincipal">
     </div>
     <div class="form-group">
-      <label>Interest (Last Payment to Today):</label><input type="number" id="repayInterest" readonly>
+      <label>Interest (Last Payment to Today):</label><input type="number" id="repayInterest">
     </div>
     <div class="form-group">
-      <label>Last Balance:</label><input type="number" id="repayLastBalance" readonly>
+      <label>Last Balance:</label><input type="number" id="repayLastBalance">
     </div>
     <div class="form-group">
-      <label>Entry Date:</label><input type="date" id="repayDate" value="" oninput="calculateInterest()">
+      <label>Entry Date:</label><input type="date" id="repayDate" onchange="calculateInterest()">
     </div>
     <div class="form-group">
-      <label>Principal Paid:</label><input type="number" id="repayPrincipalPaid">
+      <label>Principal Paid:</label><input type="number" id="repayPrincipalPaid" oninput="updateNewBalance()">
     </div>
     <div class="form-group">
-      <label>Interest Paid:</label><input type="number" id="repayInterestPaid">
+      <label>Interest Paid:</label><input type="number" id="repayInterestPaid" oninput="updateNewBalance()">
     </div>
     <div class="form-group">
-      <label>New Outstanding Balance:</label><input type="number" id="repayNewBalance" readonly>
+      <label>New Outstanding Balance:</label><input type="number" id="repayNewBalance">
     </div>
     <div class="form-group">
-      <label>Interest Due:</label><input type="number" id="repayInterestDue" readonly>
+      <label>Interest Due:</label><input type="number" id="repayInterestDue">
     </div>
     <div class="form-group">
       <label>Receipt Number:</label><input type="text" id="repayReceiptNumber" placeholder="Enter receipt number">
@@ -322,13 +322,13 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDX_xJLR_FnVg3e_v-e7ZBnaBGAyMVyj1s",
     authDomain: "probanker-2bce7.firebaseapp.com",
     projectId: "probanker-2bce7",
-    storageBucket: "probanker-2bce7.firebasestorage.app",
+    storageBucket: "probanker-2bce7.appspot.com",
     messagingSenderId: "27106244956",
     appId: "1:27106244956:web:59792c9dc94aa8e5232999",
     measurementId: "G-31138VCDFZ"
@@ -341,6 +341,12 @@
   setPersistence(auth, browserSessionPersistence)
     .then(() => console.log('Persistence set to session'))
     .catch((error) => console.error('Error setting persistence:', error));
+
+  // Set today's date as default in repayment form
+  document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('repayDate').value = today;
+  });
 
   window.showForm = function(formId) {
     document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
@@ -516,13 +522,15 @@
     }
   };
 
-  async function updateRepaymentInfo() {
+  // Enhanced repayment functions
+  window.updateRepaymentInfo = async function() {
     const memberNumber = document.getElementById('repayMemberNumber').value;
     const userInfoEl = document.getElementById('repayUserInfo');
     const loanNumberEl = document.getElementById('repayLoanNumber');
     const principalEl = document.getElementById('repayPrincipal');
     const interestEl = document.getElementById('repayInterest');
     const lastBalanceEl = document.getElementById('repayLastBalance');
+    const repayDateEl = document.getElementById('repayDate');
     const paymentListEl = document.getElementById('paymentList');
 
     if (memberNumber) {
@@ -534,24 +542,41 @@
           const name = userDoc.data().name || 'No Name';
           userInfoEl.textContent = `Name: ${name}`;
 
+          // Get active loan for this user
           const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
           if (!loansSnapshot.empty) {
             const loanDoc = loansSnapshot.docs[0]; // Assuming single active loan
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
+            
+            // Auto-fill loan details
             loanNumberEl.value = loanId;
-
-            const lastPaymentDate = await getLastPaymentDate(userId, loanId);
-            const daysDiff = Math.floor((new Date() - new Date(lastPaymentDate || loanData.startDate)) / (1000 * 60 * 60 * 24));
-            const nextPrincipal = loanData.amount / loanData.installments;
-            const interestDue = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
-
-            principalEl.value = nextPrincipal.toFixed(2);
-            interestEl.value = interestDue.toFixed(2);
             lastBalanceEl.value = loanData.balance.toFixed(2);
-
+            
+            // Calculate principal installment
+            const principalInstallment = (loanData.amount / loanData.installments).toFixed(2);
+            principalEl.value = principalInstallment;
+            
+            // Get last payment date
+            const lastPaymentDate = await getLastPaymentDate(userId, loanId);
+            const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
+            const today = new Date();
+            
+            // Calculate days difference
+            const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            
+            // Calculate interest
+            const interestAmount = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
+            interestEl.value = interestAmount.toFixed(2);
+            
+            // Set today's date
+            repayDateEl.value = today.toISOString().split('T')[0];
+            
             // Update payment list
             paymentListEl.innerHTML = await generatePaymentStatement(userId, loanId);
+            
+            // Calculate new balance and interest due
+            calculateInterest();
           } else {
             loanNumberEl.value = '';
             principalEl.value = '';
@@ -584,15 +609,16 @@
       lastBalanceEl.value = '';
       paymentListEl.innerHTML = '';
     }
-  }
+  };
 
-  async function calculateInterest() {
+  window.calculateInterest = async function() {
     const memberNumber = document.getElementById('repayMemberNumber').value;
     const repayDate = document.getElementById('repayDate').value;
     const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
     const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
     const newBalanceEl = document.getElementById('repayNewBalance');
     const interestDueEl = document.getElementById('repayInterestDue');
+    const lastBalanceEl = document.getElementById('repayLastBalance');
 
     if (memberNumber && repayDate) {
       try {
@@ -606,11 +632,17 @@
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
             const lastPaymentDate = await getLastPaymentDate(userId, loanId);
-            const daysDiff = Math.floor((new Date(repayDate) - new Date(lastPaymentDate || loanData.startDate)) / (1000 * 60 * 60 * 24));
+            
+            // Calculate days difference
+            const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
+            const endDate = new Date(repayDate);
+            const daysDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+            
+            // Calculate interest
             const interestDue = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
-            const lastBalance = parseFloat(document.getElementById('repayLastBalance').value) || loanData.balance;
-            const nextPrincipal = parseFloat(document.getElementById('repayPrincipal').value) || (loanData.amount / loanData.installments);
-
+            const lastBalance = parseFloat(lastBalanceEl.value) || loanData.balance;
+            
+            // Update fields
             interestDueEl.value = interestDue.toFixed(2);
             newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
           }
@@ -619,31 +651,56 @@
         document.getElementById('error').innerText = 'Error calculating interest: ' + error.message;
       }
     }
-  }
+  };
+
+  window.updateNewBalance = function() {
+    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
+    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
+    const lastBalance = parseFloat(document.getElementById('repayLastBalance').value) || 0;
+    const newBalanceEl = document.getElementById('repayNewBalance');
+    
+    newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
+  };
 
   async function getLastPaymentDate(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), 
+      where('userId', '==', userId), 
+      where('loanNumber', '==', loanNumber),
+      orderBy('timestamp', 'desc'),
+      limit(1)));
+    
     if (!paymentsSnapshot.empty) {
-      return paymentsSnapshot.docs.sort((a, b) => new Date(b.data().timestamp) - new Date(a.data().timestamp))[0].data().timestamp;
+      return paymentsSnapshot.docs[0].data().timestamp;
     }
     return null;
   }
 
   async function generatePaymentStatement(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'), 
+      where('userId', '==', userId), 
+      where('loanNumber', '==', loanNumber),
+      orderBy('timestamp', 'desc')));
+    
+    let payments = [];
+    paymentsSnapshot.forEach(doc => {
+      payments.push({ id: doc.id, ...doc.data() });
+    });
+    
     let tableHtml = '<h3>Last Transactions</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal Paid</th><th>Interest Paid</th><th>New Balance</th><th>Receipt #</th></tr></thead><tbody>';
-    if (paymentsSnapshot.empty) {
+    
+    if (payments.length === 0) {
       tableHtml += '<tr><td colspan="5">No transactions found.</td></tr>';
     } else {
-      paymentsSnapshot.forEach(doc => {
-        const data = doc.data();
+      payments.forEach(payment => {
+        const paymentDate = payment.date ? new Date(payment.date) : new Date(payment.timestamp);
+        const formattedDate = paymentDate.toLocaleDateString('en-IN');
         tableHtml += `
           <tr>
-            <td>${data.date || 'N/A'}</td>
-            <td>₹${data.principal || 0}</td>
-            <td>₹${data.interest || 0}</td>
-            <td>₹${data.newBalance || 0}</td>
-            <td>${data.receiptNumber || 'N/A'}</td>
+            <td>${formattedDate}</td>
+            <td>₹${payment.principal?.toFixed(2) || '0.00'}</td>
+            <td>₹${payment.interest?.toFixed(2) || '0.00'}</td>
+            <td>₹${payment.newBalance?.toFixed(2) || '0.00'}</td>
+            <td>${payment.receiptNumber || 'N/A'}</td>
           </tr>
         `;
       });
@@ -668,17 +725,39 @@
       return;
     }
 
+    if (!date || (!principalPaid && !interestPaid)) {
+      errorEl.innerText = 'Date and at least one payment amount is required!';
+      return;
+    }
+
     try {
       const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
       if (!usersSnapshot.empty) {
         const userDoc = usersSnapshot.docs[0];
         const userId = userDoc.id;
         const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
+        
         if (loanDoc.exists()) {
-          await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { balance: newBalance, interestDue: 0, lastUpdated: new Date().toISOString() });
-          await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
-            userId, loanNumber, date, principal: principalPaid, interest: interestPaid, newBalance, interestDue, receiptNumber, timestamp: new Date().toISOString()
+          // Update loan with new balance and reset interest due
+          await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), { 
+            balance: newBalance, 
+            interestDue: 0, 
+            lastUpdated: new Date().toISOString() 
           });
+          
+          // Add payment record
+          await setDoc(doc(db, 'payments', `${userId}_${loanNumber}_${Date.now()}`), {
+            userId, 
+            loanNumber, 
+            date, 
+            principal: principalPaid, 
+            interest: interestPaid, 
+            newBalance, 
+            interestDue, 
+            receiptNumber, 
+            timestamp: new Date().toISOString()
+          });
+          
           alert('Repayment added successfully!');
           showForm(null);
           updateRepaymentInfo(); // Refresh form and table
@@ -690,6 +769,7 @@
       }
     } catch (error) {
       errorEl.innerText = 'Error adding repayment: ' + error.message;
+      console.error('Repayment error:', error);
     }
   };
 
