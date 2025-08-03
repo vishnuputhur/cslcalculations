@@ -543,10 +543,15 @@
           const name = userDoc.data().name || 'No Name';
           userInfoEl.textContent = `Name: ${name}`;
 
-          // Get active loan for this user
-          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          // Get active loan for this user with specific loan number if entered
+          let loansSnapshot;
+          if (loanNumberEl.value) {
+            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId), where('loanNumber', '==', loanNumberEl.value)));
+          } else {
+            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          }
           if (!loansSnapshot.empty) {
-            const loanDoc = loansSnapshot.docs[0]; // Assuming single active loan
+            const loanDoc = loansSnapshot.docs[0]; // Use first loan if multiple
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
 
@@ -642,7 +647,13 @@
         if (!usersSnapshot.empty) {
           const userDoc = usersSnapshot.docs[0];
           const userId = userDoc.id;
-          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          const loanNumber = document.getElementById('repayLoanNumber').value;
+          let loansSnapshot;
+          if (loanNumber) {
+            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
+          } else {
+            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          }
           if (!loansSnapshot.empty) {
             const loanDoc = loansSnapshot.docs[0];
             const loanData = loanDoc.data();
