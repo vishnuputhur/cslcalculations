@@ -416,6 +416,7 @@
       } catch (error) {
         userInfoEl.textContent = 'Error fetching user info';
         console.error('Error fetching user info:', error);
+        document.getElementById('error').innerText = 'Error fetching user info: ' + error.message;
       }
     } else {
       userInfoEl.textContent = '';
@@ -604,7 +605,12 @@
       } catch (error) {
         userInfoEl.textContent = 'Error fetching user info';
         console.error('Error fetching repayment info:', error);
-        document.getElementById('error').innerText = 'Error loading loan data: ' + error.message;
+        document.getElementById('error').innerText = 'Error fetching user info: ' + error.message;
+        if (error.code === 'permission-denied') {
+          document.getElementById('error').innerText += ' (Check Firebase security rules or permissions)';
+        } else if (error.code === 'unavailable') {
+          document.getElementById('error').innerText += ' (Network issue, check your connection)';
+        }
         loanNumberEl.value = '';
         principalEl.value = '';
         interestEl.value = '';
