@@ -289,30 +289,30 @@
       <span id="repayUserInfo" class="user-info"></span>
     </div>
     <div class="form-group">
-      <label>Loan Number:</label><input type="text" id="repayLoanNumber">
+      <label>Loan Number:</label><input type="text" id="repayLoanNumber" readonly>
     </div>
     <div class="form-group">
-      <label>Interest (Last Payment to Today):</label><input type="number" id="repayInterest">
+      <label>Entry Date:</label><input type="date" id="repayDate" value="">
     </div>
     <div class="form-group">
-      <label>Entry Date:</label><input type="date" id="repayDate" onchange="calculateInterest()">
+      <label>Principal:</label><input type="number" id="repayPrincipal" oninput="updateCurrentBalance()">
     </div>
     <div class="form-group">
-      <label>Principal Paid:</label><input type="number" id="repayPrincipalPaid" oninput="updateNewBalance()">
-    </div>
-    <div class="form-group">
-      <label>Interest Paid:</label><input type="number" id="repayInterestPaid" oninput="updateNewBalance()">
-    </div>
-    <div class="form-group">
-      <label>New Outstanding Balance:</label><input type="number" id="repayNewBalance">
-    </div>
-    <div class="form-group">
-      <label>Interest Due:</label><input type="number" id="repayInterestDue">
+      <label>Interest:</label><input type="number" id="repayInterest">
     </div>
     <div class="form-group">
       <label>Receipt Number:</label><input type="text" id="repayReceiptNumber" placeholder="Enter receipt number">
     </div>
-    <button onclick="addRepayment()">Submit</button>
+    <div class="form-group">
+      <label>Interest Due (if any):</label><input type="number" id="repayInterestDue">
+    </div>
+    <div class="form-group">
+      <label>Principal Due (if any):</label><input type="number" id="repayPrincipalDue">
+    </div>
+    <div class="form-group">
+      <label>Current Balance:</label><input type="number" id="repayCurrentBalance" readonly>
+    </div>
+    <button id="addRepayment" onclick="addRepayment()">Submit</button>
     <div class="payment-list" id="paymentList"></div>
   </div>
 
@@ -358,7 +358,6 @@
     if (formId) document.getElementById(formId).classList.add('active');
     if (formId === 'repaymentForm') {
       document.getElementById('repayDate').value = new Date().toISOString().split('T')[0];
-      calculateInterest();
     }
   };
 
@@ -528,18 +527,13 @@
     }
   };
 
-  // Enhanced repayment functions with Interest Due tracking
+  // Repayment info with manual entry
   window.updateRepaymentInfo = async function() {
     const memberNumber = document.getElementById('repayMemberNumber').value;
     const userInfoEl = document.getElementById('repayUserInfo');
     const loanNumberEl = document.getElementById('repayLoanNumber');
-    const interestEl = document.getElementById('repayInterest');
-    const repayDateEl = document.getElementById('repayDate');
-    const principalPaidEl = document.getElementById('repayPrincipalPaid');
-    const interestPaidEl = document.getElementById('repayInterestPaid');
-    const newBalanceEl = document.getElementById('repayNewBalance');
-    const interestDueEl = document.getElementById('repayInterestDue');
     const paymentListEl = document.getElementById('paymentList');
+    const currentBalanceEl = document.getElementById('repayCurrentBalance');
 
     if (memberNumber) {
       try {
@@ -555,44 +549,18 @@
             const loanDoc = loansSnapshot.docs[0];
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
-
-            if (loanData && loanData.amount && loanData.startDate && loanData.interest && loanData.balance !== undefined) {
-              loanNumberEl.value = loanId || '';
-              const lastPaymentDate = await getLastPaymentDate(userId, loanId);
-              const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
-              const today = new Date();
-              const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-              const interestAmount = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
-              interestEl.value = interestAmount.toFixed(2);
-              repayDateEl.value = today.toISOString().split('T')[0];
-              principalPaidEl.value = loanData.installments ? (loanData.amount / loanData.installments).toFixed(2) : '0.00';
-              interestDueEl.value = loanData.interestDue ? loanData.interestDue.toFixed(2) : '0.00';
-              newBalanceEl.value = loanData.balance.toFixed(2);
-              paymentListEl.innerHTML = await generatePaymentStatement(userId, loanId);
-              calculateInterest();
-            } else {
-              loanNumberEl.value = loanId || '';
-              interestEl.value = '0.00';
-              principalPaidEl.value = '0.00';
-              interestDueEl.value = '0.00';
-              newBalanceEl.value = loanData.balance ? loanData.balance.toFixed(2) : '0.00';
-              paymentListEl.innerHTML = '<p>Incomplete loan data. Please ensure amount, start date, interest, and balance are set.</p>';
-            }
+            loanNumberEl.value = loanId || '';
+            currentBalanceEl.value = loanData.balance ? loanData.balance.toFixed(2) : '0.00';
+            paymentListEl.innerHTML = await generatePaymentStatement(userId, loanId);
           } else {
             loanNumberEl.value = '';
-            interestEl.value = '';
-            principalPaidEl.value = '';
-            interestDueEl.value = '';
-            newBalanceEl.value = '';
+            currentBalanceEl.value = '0.00';
             paymentListEl.innerHTML = '<p>No loans found for this member.</p>';
           }
         } else {
           userInfoEl.textContent = 'User not found';
           loanNumberEl.value = '';
-          interestEl.value = '';
-          principalPaidEl.value = '';
-          interestDueEl.value = '';
-          newBalanceEl.value = '';
+          currentBalanceEl.value = '';
           paymentListEl.innerHTML = '';
         }
       } catch (error) {
@@ -605,98 +573,23 @@
           document.getElementById('error').innerText += ' (Network issue, check your connection)';
         }
         loanNumberEl.value = '';
-        interestEl.value = '';
-        principalPaidEl.value = '';
-        interestDueEl.value = '';
-        newBalanceEl.value = '';
+        currentBalanceEl.value = '';
         paymentListEl.innerHTML = '';
       }
     } else {
       userInfoEl.textContent = '';
       loanNumberEl.value = '';
-      interestEl.value = '';
-      principalPaidEl.value = '';
-      interestDueEl.value = '';
-      newBalanceEl.value = '';
+      currentBalanceEl.value = '';
       paymentListEl.innerHTML = '';
     }
   };
 
-  window.calculateInterest = async function() {
-    const memberNumber = document.getElementById('repayMemberNumber').value;
-    const repayDate = document.getElementById('repayDate').value;
-    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
-    const interestDueEl = document.getElementById('repayInterestDue');
-    const newBalanceEl = document.getElementById('repayNewBalance');
-    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
-
-    if (memberNumber && repayDate) {
-      try {
-        const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
-        if (!usersSnapshot.empty) {
-          const userDoc = usersSnapshot.docs[0];
-          const userId = userDoc.id;
-          const loanNumber = document.getElementById('repayLoanNumber').value;
-          let loansSnapshot;
-          if (loanNumber) {
-            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId), where('loanNumber', '==', loanNumber)));
-          } else {
-            loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
-          }
-          if (!loansSnapshot.empty) {
-            const loanDoc = loansSnapshot.docs[0];
-            const loanData = loanDoc.data();
-            const loanId = loanDoc.id.split('_')[1];
-            const lastPaymentDate = await getLastPaymentDate(userId, loanId);
-            const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
-            const endDate = new Date(repayDate);
-            const daysDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-            let interestDue = loanData.interestDue || 0;
-            const currentInterest = (loanData.balance * loanData.interest * daysDiff) / (100 * 365);
-
-            if (interestPaid < currentInterest) {
-              interestDue += (currentInterest - interestPaid);
-            } else {
-              interestDue = 0; // Reset if fully paid
-            }
-
-            interestDueEl.value = interestDue.toFixed(2);
-            const lastBalance = parseFloat(document.getElementById('repayNewBalance').value) || loanData.balance || 0;
-            newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
-
-            // Update loan with new interest due
-            await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
-              interestDue: interestDue,
-              balance: parseFloat(newBalanceEl.value),
-              lastUpdated: new Date().toISOString()
-            });
-          }
-        }
-      } catch (error) {
-        document.getElementById('error').innerText = 'Error calculating interest: ' + error.message;
-      }
-    }
+  window.updateCurrentBalance = function() {
+    const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
+    const lastBalance = parseFloat(document.getElementById('repayCurrentBalance').value) || 0;
+    const currentBalanceEl = document.getElementById('repayCurrentBalance');
+    currentBalanceEl.value = (lastBalance - principal).toFixed(2);
   };
-
-  window.updateNewBalance = function() {
-    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
-    const lastBalance = parseFloat(document.getElementById('repayNewBalance').value) || 0;
-    const newBalanceEl = document.getElementById('repayNewBalance');
-    newBalanceEl.value = (lastBalance - principalPaid).toFixed(2);
-  };
-
-  async function getLastPaymentDate(userId, loanNumber) {
-    const paymentsSnapshot = await getDocs(query(collection(db, 'payments'),
-      where('userId', '==', userId),
-      where('loanNumber', '==', loanNumber),
-      orderBy('timestamp', 'desc'),
-      limit(1)));
-
-    if (!paymentsSnapshot.empty) {
-      return paymentsSnapshot.docs[0].data().timestamp;
-    }
-    return null;
-  }
 
   async function generatePaymentStatement(userId, loanNumber) {
     const paymentsSnapshot = await getDocs(query(collection(db, 'payments'),
@@ -709,10 +602,10 @@
       payments.push({ id: doc.id, ...doc.data() });
     });
 
-    let tableHtml = '<h3>Last Transactions</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal Paid</th><th>Interest Paid</th><th>New Balance</th><th>Interest Due</th><th>Receipt #</th><th>Action</th></tr></thead><tbody>';
+    let tableHtml = '<h3>Last Transactions</h3><table class="payment-table"><thead><tr><th>Date</th><th>Principal</th><th>Interest</th><th>Current Balance</th><th>Interest Due</th><th>Principal Due</th><th>Receipt #</th><th>Action</th></tr></thead><tbody>';
 
     if (payments.length === 0) {
-      tableHtml += '<tr><td colspan="7">No transactions found.</td></tr>';
+      tableHtml += '<tr><td colspan="8">No transactions found.</td></tr>';
     } else {
       payments.forEach(payment => {
         const paymentDate = payment.date ? new Date(payment.date) : new Date(payment.timestamp);
@@ -724,6 +617,7 @@
             <td>₹${payment.interest?.toFixed(2) || '0.00'}</td>
             <td>₹${payment.newBalance?.toFixed(2) || '0.00'}</td>
             <td>₹${payment.interestDue?.toFixed(2) || '0.00'}</td>
+            <td>₹${payment.principalDue?.toFixed(2) || '0.00'}</td>
             <td>${payment.receiptNumber || 'N/A'}</td>
             <td><button class="edit-btn" onclick="editPayment('${payment.id}', '${userId}', '${loanNumber}')">Edit</button></td>
           </tr>
@@ -738,11 +632,12 @@
     const memberNumber = document.getElementById('repayMemberNumber').value;
     const loanNumber = document.getElementById('repayLoanNumber').value;
     const date = document.getElementById('repayDate').value;
-    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
-    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
-    const newBalance = parseFloat(document.getElementById('repayNewBalance').value) || 0;
+    const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
+    const interest = parseFloat(document.getElementById('repayInterest').value) || 0;
     const interestDue = parseFloat(document.getElementById('repayInterestDue').value) || 0;
+    const principalDue = parseFloat(document.getElementById('repayPrincipalDue').value) || 0;
     const receiptNumber = document.getElementById('repayReceiptNumber').value;
+    const currentBalance = parseFloat(document.getElementById('repayCurrentBalance').value) || 0;
     const errorEl = document.getElementById('error');
 
     if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
@@ -750,8 +645,8 @@
       return;
     }
 
-    if (!date || (!principalPaid && !interestPaid)) {
-      errorEl.innerText = 'Date and at least one payment amount is required!';
+    if (!date || !receiptNumber) {
+      errorEl.innerText = 'Date and Receipt Number are required!';
       return;
     }
 
@@ -764,7 +659,7 @@
 
         if (loanDoc.exists()) {
           await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
-            balance: newBalance,
+            balance: currentBalance,
             interestDue: interestDue,
             lastUpdated: new Date().toISOString()
           });
@@ -773,10 +668,11 @@
             userId,
             loanNumber,
             date,
-            principal: principalPaid,
-            interest: interestPaid,
-            newBalance,
+            principal,
+            interest,
+            newBalance: currentBalance,
             interestDue,
+            principalDue,
             receiptNumber,
             timestamp: new Date().toISOString()
           });
@@ -805,11 +701,12 @@
         document.getElementById('repayMemberNumber').value = '';
         document.getElementById('repayLoanNumber').value = paymentData.loanNumber;
         document.getElementById('repayDate').value = paymentData.date;
-        document.getElementById('repayPrincipalPaid').value = paymentData.principal || 0;
-        document.getElementById('repayInterestPaid').value = paymentData.interest || 0;
-        document.getElementById('repayNewBalance').value = paymentData.newBalance || 0;
+        document.getElementById('repayPrincipal').value = paymentData.principal || 0;
+        document.getElementById('repayInterest').value = paymentData.interest || 0;
         document.getElementById('repayInterestDue').value = paymentData.interestDue || 0;
+        document.getElementById('repayPrincipalDue').value = paymentData.principalDue || 0;
         document.getElementById('repayReceiptNumber').value = paymentData.receiptNumber || '';
+        document.getElementById('repayCurrentBalance').value = paymentData.newBalance || 0;
         showForm('repaymentForm');
         document.getElementById('addRepayment').textContent = 'Update';
         document.getElementById('addRepayment').onclick = async function() {
@@ -823,25 +720,27 @@
 
   async function updatePayment(paymentId, userId, loanNumber) {
     const date = document.getElementById('repayDate').value;
-    const principalPaid = parseFloat(document.getElementById('repayPrincipalPaid').value) || 0;
-    const interestPaid = parseFloat(document.getElementById('repayInterestPaid').value) || 0;
-    const newBalance = parseFloat(document.getElementById('repayNewBalance').value) || 0;
+    const principal = parseFloat(document.getElementById('repayPrincipal').value) || 0;
+    const interest = parseFloat(document.getElementById('repayInterest').value) || 0;
     const interestDue = parseFloat(document.getElementById('repayInterestDue').value) || 0;
+    const principalDue = parseFloat(document.getElementById('repayPrincipalDue').value) || 0;
     const receiptNumber = document.getElementById('repayReceiptNumber').value;
+    const currentBalance = parseFloat(document.getElementById('repayCurrentBalance').value) || 0;
     const errorEl = document.getElementById('error');
 
-    if (!date || (!principalPaid && !interestPaid)) {
-      errorEl.innerText = 'Date and at least one payment amount is required!';
+    if (!date || !receiptNumber) {
+      errorEl.innerText = 'Date and Receipt Number are required!';
       return;
     }
 
     try {
       await updateDoc(doc(db, 'payments', paymentId), {
         date,
-        principal: principalPaid,
-        interest: interestPaid,
-        newBalance,
+        principal,
+        interest,
+        newBalance: currentBalance,
         interestDue,
+        principalDue,
         receiptNumber,
         timestamp: new Date().toISOString()
       });
@@ -849,7 +748,7 @@
       const loanDoc = await getDoc(doc(db, 'loans', `${userId}_${loanNumber}`));
       if (loanDoc.exists()) {
         await updateDoc(doc(db, 'loans', `${userId}_${loanNumber}`), {
-          balance: newBalance,
+          balance: currentBalance,
           interestDue: interestDue,
           lastUpdated: new Date().toISOString()
         });
