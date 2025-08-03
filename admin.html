@@ -255,23 +255,31 @@
       const usersSnapshot = await getDocs(collection(db, 'users'));
       let tableHtml = `
         <table class="user-table">
-          <thead><tr><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Member Number</th><th>Loan Balance</th><th>Action</th></tr></thead>
           <tbody>
       `;
-      usersSnapshot.forEach(doc => {
+      for (const doc of usersSnapshot.docs) {
         const data = doc.data();
+        const userId = doc.id;
+        let loanBalance = 0;
+        const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+        if (!loansSnapshot.empty) {
+          const loanDoc = loansSnapshot.docs[0]; // Assuming one active loan per user
+          loanBalance = loanDoc.data().balance || 0;
+        }
         tableHtml += `
           <tr>
             <td>${data.name || 'N/A'}</td>
             <td>${data.email || 'N/A'}</td>
             <td>${data.memberNumber || 'N/A'}</td>
+            <td>₹${loanBalance.toFixed(2)}</td>
             <td>
               <button class="copy-btn" onclick="copyToClipboard('${data.memberNumber}')">Copy ID</button>
               <button class="select-btn" onclick="selectUser('${data.memberNumber}')">Select</button>
             </td>
           </tr>
         `;
-      });
+      }
       tableHtml += '</tbody></table>';
       userListEl.innerHTML = tableHtml;
     } catch (error) {
@@ -286,17 +294,25 @@
       const usersSnapshot = await getDocs(collection(db, 'users'));
       let tableHtml = `
         <table class="user-table">
-          <thead><tr><th>Name</th><th>Email</th><th>Member Number</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Member Number</th><th>Loan Balance</th><th>Action</th></tr></thead>
           <tbody>
       `;
-      usersSnapshot.forEach(doc => {
+      for (const doc of usersSnapshot.docs) {
         const data = doc.data();
         if (data.memberNumber && data.memberNumber.toLowerCase().includes(memberNumber)) {
+          const userId = doc.id;
+          let loanBalance = 0;
+          const loansSnapshot = await getDocs(query(collection(db, 'loans'), where('userId', '==', userId)));
+          if (!loansSnapshot.empty) {
+            const loanDoc = loansSnapshot.docs[0]; // Assuming one active loan per user
+            loanBalance = loanDoc.data().balance || 0;
+          }
           tableHtml += `
             <tr>
               <td>${data.name || 'N/A'}</td>
               <td>${data.email || 'N/A'}</td>
               <td>${data.memberNumber || 'N/A'}</td>
+              <td>₹${loanBalance.toFixed(2)}</td>
               <td>
                 <button class="copy-btn" onclick="copyToClipboard('${data.memberNumber}')">Copy ID</button>
                 <button class="select-btn" onclick="selectUser('${data.memberNumber}')">Select</button>
@@ -304,7 +320,7 @@
             </tr>
           `;
         }
-      });
+      }
       tableHtml += '</tbody></table>';
       userListEl.innerHTML = tableHtml;
     } catch (error) {
@@ -361,11 +377,6 @@
         }
         window.editMessageUserId = userDoc.id; // Store User ID internally
         showForm('editMessageForm');
-
-        document.getElementById('editShareUserId').value = data.memberNumber || '';
-        document.getElementById('editShareAmount').value = data.shareAmount || 0;
-        window.editShareUserId = userDoc.id; // Store User ID internally
-        showForm('editShareForm');
       } else {
         document.getElementById('error').innerText = 'User not found!';
       }
@@ -397,6 +408,11 @@
       return;
     }
 
+    if (!email || !password || !name || !memberNumber || !cslCode || !shareAmount || !address || !pincode || !phone) {
+      errorEl.innerText = 'All fields are required!';
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
@@ -404,8 +420,8 @@
         email, name, memberNumber, cslCode, shareAmount: parseFloat(shareAmount) || 0, address, pincode, phone, isAdmin: false
       });
       alert('Member added successfully!');
-      showForm(null);
-      await loadUsers();
+      showForm(null); // Refresh form
+      await loadUsers(); // Reload user list
     } catch (error) {
       console.error('Add member error:', error);
       errorEl.innerText = 'Error adding member: ' + error.message;
@@ -434,8 +450,8 @@
         const userDoc = usersSnapshot.docs[0];
         await updateDoc(doc(db, 'users', userDoc.id), { email, name, memberNumber, cslCode, shareAmount: parseFloat(shareAmount) || 0, address, pincode, phone });
         alert('Member updated successfully!');
-        showForm(null);
-        await loadUsers();
+        showForm(null); // Refresh form
+        await loadUsers(); // Reload user list
       } else {
         errorEl.innerText = 'User not found with this Member Number!';
       }
@@ -467,7 +483,7 @@
         const userId = userDoc.id;
         await setDoc(doc(db, 'messages', `${userId}_${Date.now()}`), { userId, title, content, createdAt: new Date().toISOString() });
         alert('Message sent to user!');
-        showForm(null);
+        showForm(null); // Refresh form
       } else {
         errorEl.innerText = 'User not found with this Member Number!';
       }
@@ -502,7 +518,7 @@
           const latestMsg = messages.docs.sort((a, b) => new Date(b.data().createdAt) - new Date(a.data().createdAt))[0];
           await updateDoc(doc(db, 'messages', latestMsg.id), { title, content, createdAt: new Date().toISOString() });
           alert('Message updated successfully!');
-          showForm(null);
+          showForm(null); // Refresh form
         } else {
           errorEl.innerText = 'No message found for this user!';
         }
@@ -511,56 +527,6 @@
       }
     } catch (error) {
       errorEl.innerText = 'Error editing message: ' + error.message;
-    }
-  };
-
-  window.addShare = async function() {
-    const memberNumber = document.getElementById('shareUserId').value;
-    const amount = parseFloat(document.getElementById('shareAmount').value) || 0;
-    const errorEl = document.getElementById('error');
-
-    if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
-      errorEl.innerText = 'Admin access required!';
-      return;
-    }
-
-    try {
-      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
-      if (!usersSnapshot.empty) {
-        const userDoc = usersSnapshot.docs[0];
-        await updateDoc(doc(db, 'users', userDoc.id), { shareAmount: amount, lastUpdated: new Date().toISOString() });
-        alert('Share added!');
-        showForm(null);
-      } else {
-        errorEl.innerText = 'User not found with this Member Number!';
-      }
-    } catch (error) {
-      errorEl.innerText = 'Error adding share: ' + error.message;
-    }
-  };
-
-  window.editShare = async function() {
-    const memberNumber = document.getElementById('editShareUserId').value;
-    const amount = parseFloat(document.getElementById('editShareAmount').value) || 0;
-    const errorEl = document.getElementById('error');
-
-    if (!auth.currentUser || !(await getDoc(doc(db, 'users', auth.currentUser.uid))).data().isAdmin) {
-      errorEl.innerText = 'Admin access required!';
-      return;
-    }
-
-    try {
-      const usersSnapshot = await getDocs(query(collection(db, 'users'), where('memberNumber', '==', memberNumber)));
-      if (!usersSnapshot.empty) {
-        const userDoc = usersSnapshot.docs[0];
-        await updateDoc(doc(db, 'users', userDoc.id), { shareAmount: amount, lastUpdated: new Date().toISOString() });
-        alert('Share updated!');
-        showForm(null);
-      } else {
-        errorEl.innerText = 'User not found with this Member Number!';
-      }
-    } catch (error) {
-      errorEl.innerText = 'Error editing share: ' + error.message;
     }
   };
 
