@@ -549,16 +549,17 @@
             const loanData = loanDoc.data();
             const loanId = loanDoc.id.split('_')[1];
 
-            if (loanData && loanData.amount && loanData.installments && loanData.interest && loanData.balance) {
+            // Validate required loan data
+            if (loanData && loanData.amount && loanData.startDate && loanData.interest && loanData.balance !== undefined) {
               // Auto-fill loan details
               loanNumberEl.value = loanId || '';
               lastBalanceEl.value = loanData.balance.toFixed(2);
 
               // Calculate principal installment
-              const principalInstallment = (loanData.amount / loanData.installments).toFixed(2);
+              const principalInstallment = loanData.installments ? (loanData.amount / loanData.installments).toFixed(2) : '0.00';
               principalEl.value = principalInstallment;
 
-              // Get last payment date
+              // Get last payment date or use loan start date
               const lastPaymentDate = await getLastPaymentDate(userId, loanId);
               const startDate = lastPaymentDate ? new Date(lastPaymentDate) : new Date(loanData.startDate);
               const today = new Date();
@@ -583,7 +584,7 @@
               principalEl.value = '0.00';
               interestEl.value = '0.00';
               lastBalanceEl.value = loanData.balance ? loanData.balance.toFixed(2) : '0.00';
-              paymentListEl.innerHTML = '<p>Incomplete loan data. Please update loan details.</p>';
+              paymentListEl.innerHTML = '<p>Incomplete loan data. Please ensure amount, start date, interest, and balance are set.</p>';
             }
           } else {
             loanNumberEl.value = '';
