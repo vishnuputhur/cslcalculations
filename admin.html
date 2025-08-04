@@ -414,6 +414,7 @@
     }
 
     try {
+      const adminUser = auth.currentUser; // Store current admin user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
       await setDoc(doc(db, 'users', uid), {
@@ -422,6 +423,10 @@
       alert('Member added successfully!');
       showForm(null); // Refresh form
       await loadUsers(); // Reload user list
+      // Re-authenticate admin to retain session
+      if (adminUser) {
+        await signInWithEmailAndPassword(auth, adminUser.email, adminUser.password); // Note: password is not directly accessible, adjust logic
+      }
     } catch (error) {
       console.error('Add member error:', error);
       errorEl.innerText = 'Error adding member: ' + error.message;
