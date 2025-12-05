@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>CSL Calendar 2025</title>
-    <!-- Google tag (gtag.js) -->
+    <title>CSL Calendar 2026</title>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -13,135 +12,409 @@
         gtag('config', 'G-21G1BS7S3S');
     </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary: #2196F3;
+            --accent: #FF4081;
+            --light-accent: #FF80AB;
+            --green: #4CAF50;
+            --light-green: #81C784;
+            --gray: #f5f5f5;
+            --dark-gray: #757575;
+            --white: #ffffff;
+            --today-bg: #FFF3E0;
+            --border: #e0e0e0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --hover-shadow: rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            box-sizing: border-box;
         }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--white);
+            color: #333;
+            font-size: 14px;
+            line-height: 1.3;
+            -webkit-font-smoothing: antialiased;
+        }
+        
         .header {
             position: fixed;
             top: 0;
             width: 100%;
-            background: #007bff;
-            color: white;
-            padding: 10px;
+            background: linear-gradient(135deg, var(--primary), #1976D2);
+            color: var(--white);
+            padding: 10px 16px;
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 600;
             z-index: 1000;
+            box-shadow: 0 2px 8px var(--shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+        
         .footer {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: #007bff;
-            color: white;
-            padding: 5px;
+            background: rgba(255,255,255,0.95);
+            color: var(--dark-gray);
+            padding: 8px;
             text-align: center;
             z-index: 1000;
+            font-size: 11px;
+            font-weight: 500;
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
+        
         .calendar-container {
-            margin-top: 60px;
-            padding-bottom: 60px; /* Footer avoid overlap */
+            margin-top: 50px;
+            padding-bottom: 40px;
+            padding: 0 6px 6px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
+        
         .month {
-            margin: 20px 0 5px 0;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
+            margin: 12px 0 4px 0;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
+            color: var(--primary);
+            border-radius: 10px;
             position: sticky;
-            top: 60px;
+            top: 50px;
             z-index: 900;
-        }
-        .week-header {
-            display: flex;
-            background: #e0e0e0;
-            padding: 5px;
-            font-weight: bold;
-            position: sticky;
-            top: 110px;
-            z-index: 800;
-        }
-        .week-header div, .day {
-            width: 14%;
+            font-size: 16px;
+            font-weight: 600;
             text-align: center;
+            border-left: 3px solid var(--primary);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 1px 6px rgba(33, 150, 243, 0.1);
         }
+        
+        .week-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: rgba(245, 245, 245, 0.9);
+            padding: 8px 2px;
+            font-weight: 600;
+            position: sticky;
+            top: 95px;
+            z-index: 800;
+            color: var(--dark-gray);
+            font-size: 12px;
+            text-align: center;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            margin-bottom: 2px;
+            border: 1px solid rgba(224, 224, 224, 0.6);
+        }
+        
         .week {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 2px;
         }
+        
         .day {
-            padding: 10px;
-            border: 1px solid #ddd;
-            margin: 2px;
-            background: white;
+            padding: 10px 2px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             position: relative;
+            border-radius: 8px;
+            min-height: 46px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 14px;
+            border: 1px solid rgba(224, 224, 224, 0.6);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
+        
+        .day:hover {
+            background: rgba(33, 150, 243, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px var(--hover-shadow);
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+        
         .day.green-week {
-            background: #b9f542;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.12), rgba(129, 199, 132, 0.08));
+            border-color: rgba(76, 175, 80, 0.2);
         }
+        
+        .day.green-week:hover {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.15));
+        }
+        
         .holiday {
-            color: red;
+            color: #FF4081 !important;
+            background: rgba(255, 64, 129, 0.08) !important;
+            border-color: rgba(255, 64, 129, 0.2) !important;
         }
+        
+        .holiday:hover {
+            background: rgba(255, 64, 129, 0.15) !important;
+            border-color: rgba(255, 64, 129, 0.3) !important;
+        }
+        
         .today {
-            background: yellow !important;
-            font-weight: bold;
+            background: linear-gradient(135deg, rgba(255, 183, 77, 0.2), rgba(255, 204, 128, 0.15)) !important;
+            color: #E65100 !important;
+            border: 2px solid #FF9800 !important;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.2);
         }
+        
+        .sunday {
+            color: #FF4081;
+            background: rgba(255, 64, 129, 0.05);
+        }
+        
+        .empty-day {
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            cursor: default;
+        }
+        
+        .empty-day:hover {
+            transform: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+        
+        .day-number {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            transition: transform 0.2s ease;
+        }
+        
+        .day:hover .day-number {
+            transform: scale(1.05);
+        }
+        
+        .note-indicator {
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-top: 3px;
+            opacity: 0.8;
+            box-shadow: 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+        
         .popup {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
+            background: rgba(255, 255, 255, 0.98);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             z-index: 2000;
-        }
-        .note-preview {
-            font-size: 9px;
+            width: 90%;
+            max-width: 300px;
             color: #333;
-            margin-top: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: popupAppear 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes popupAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .popup h3 {
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+        }
+        
+        .popup textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            font-size: 13px;
+            resize: vertical;
+            margin: 10px 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 70px;
+            transition: all 0.2s ease;
+        }
+        
+        .popup textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+        
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .popup button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 13px;
+            flex: 1;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, var(--primary), #1976D2);
+            color: var(--white);
+            box-shadow: 0 3px 6px rgba(33, 150, 243, 0.3);
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(33, 150, 243, 0.4);
+        }
+        
+        .close-btn {
+            background: rgba(117, 117, 117, 0.1);
+            color: var(--dark-gray);
+            border: 1px solid rgba(117, 117, 117, 0.3);
+        }
+        
+        .close-btn:hover {
+            background: rgba(117, 117, 117, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .date-display {
+            font-size: 12px;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+            padding: 3px 6px;
+            background: rgba(245, 245, 245, 0.9);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1500;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+        
+        @media (max-width: 768px) {
+            .day {
+                padding: 8px 1px;
+                min-height: 42px;
+                font-size: 13px;
+                border-radius: 6px;
+            }
+            
+            .day-number {
+                font-size: 15px;
+            }
+            
+            .week-header {
+                font-size: 11px;
+                padding: 6px 1px;
+                top: 90px;
+            }
+            
+            .month {
+                font-size: 15px;
+                padding: 8px 10px;
+                top: 48px;
+            }
+            
+            .header {
+                padding: 8px;
+                font-size: 16px;
+            }
+            
+            .footer {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            .calendar-container {
+                max-width: 100%;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body onload="scrollToToday()">
-    <div class="header">CSL Calendar 2025</div>
+    <div class="header">CSL Calendar 2026</div>
+    <div class="overlay" id="overlay"></div>
     <div class="calendar-container" id="calendar-container"></div>
     <div class="popup" id="holiday-popup"></div>
-    <div class="footer">VT@Soft | Version 1.0 | 2025</div>
+    <div class="footer">VT@Soft | Version 2.0 | © 2026</div>
 
     <script>
         const holidays = {
-            "2025-03-31": "Id-ul-Fitr (Ramzan)",
-            "2025-04-14": "Vishu / Dr. BR Ambedkar Jayanthi",
-            "2025-04-18": "Good Friday",
-            "2025-05-01": "May Day",
-            "2025-06-06": "Bakrid",
-            "2025-08-15": "Independence Day",
-            "2025-09-04": "First Onam",
-            "2025-09-05": "Thiruvonam",
-            "2025-09-06": "Third Onam",
-            "2025-10-02": "Gandhi Jayanthi / Vijayadasami",
-            "2025-10-20": "Deepavali",
-            "2025-12-25": "Christmas"
+            // 2025 December Holiday
+            "2025-12-25": "Christmas Day",
+            // 2026 Holidays
+            "2026-01-26": "Republic Day",
+            "2026-03-20": "Id-ul-Fitr (Ramzan)",
+            "2026-04-03": "Good Friday",
+            "2026-04-15": "Vishu",
+            "2026-05-01": "May Day",
+            "2026-05-27": "Id-ul-Ad'ha (Bakrid)",
+            "2026-08-15": "Independence Day",
+            "2026-08-26": "Thiruvonam",
+            "2026-08-28": "Fourth Onam",
+            "2026-10-02": "Gandhi Jayanthi",
+            "2026-10-21": "Vijayadasami",
+            "2026-12-25": "Christmas",
+            // 2027 January Holiday
+            "2027-01-26": "Republic Day"
         };
-
-        const weekends = [
-            "2025-01-11", "2025-01-25", "2025-02-08", "2025-02-22",
-            "2025-03-08", "2025-03-22", "2025-04-12", "2025-04-26",
-            "2025-05-10", "2025-05-24", "2025-06-14", "2025-06-28",
-            "2025-07-12", "2025-07-26", "2025-08-09", "2025-08-23",
-            "2025-09-13", "2025-09-27", "2025-10-11", "2025-10-25",
-            "2025-11-08", "2025-11-22", "2025-12-13", "2025-12-27"
-        ];
 
         const today = new Date();
 
@@ -153,100 +426,154 @@
             return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
         }
 
+        // Function to get all 2nd and 4th Saturdays for a specific year and month
+        function getSpecialSaturdays(year, monthIndex) {
+            const specialSats = [];
+            const saturdays = [];
+            // Find all Saturdays in the given month
+            for (let day = 1; day <= 31; day++) {
+                const date = new Date(year, monthIndex, day);
+                if (date.getMonth() !== monthIndex) break;
+                if (date.getDay() === 6) {
+                    saturdays.push(day);
+                }
+            }
+            // Add the 2nd and 4th Saturdays if they exist
+            if (saturdays.length >= 2) specialSats.push(saturdays[1]);
+            if (saturdays.length >= 4) specialSats.push(saturdays[3]);
+            return specialSats;
+        }
+
         function generateCalendar() {
             let calendarHTML = '';
+            const displayMonths = [
+                { year: 2025, month: 11, label: "December 2025" },
+                { year: 2026, month: 0, label: "January 2026" },
+                { year: 2026, month: 1, label: "February 2026" },
+                { year: 2026, month: 2, label: "March 2026" },
+                { year: 2026, month: 3, label: "April 2026" },
+                { year: 2026, month: 4, label: "May 2026" },
+                { year: 2026, month: 5, label: "June 2026" },
+                { year: 2026, month: 6, label: "July 2026" },
+                { year: 2026, month: 7, label: "August 2026" },
+                { year: 2026, month: 8, label: "September 2026" },
+                { year: 2026, month: 9, label: "October 2026" },
+                { year: 2026, month: 10, label: "November 2026" },
+                { year: 2026, month: 11, label: "December 2026" },
+                { year: 2027, month: 0, label: "January 2027" }
+            ];
 
-            for (let month = 0; month < 12; month++) {
-                const firstDay = new Date(2025, month, 1).getDay();
-                const daysInMonth = new Date(2025, month + 1, 0).getDate();
-                const monthName = new Date(2025, month).toLocaleString('default', { month: 'long' });
+            displayMonths.forEach(({year, month, label}) => {
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const specialSaturdays = getSpecialSaturdays(year, month);
 
                 calendarHTML += `
-                    <div class="month" id="month-${month}">${monthName} 2025</div>
+                    <div class="month" id="month-${year}-${month}">${label}</div>
                     <div class="week-header">
-                        <div>Sun</div><div>Mon</div><div>Tue</div>
-                        <div>Wed</div><div>Thu</div><div>Fri</div>
-                        <div>Sat</div>
+                        <div class="sunday">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                     </div>
                 `;
 
                 let date = 1;
-
                 for (let i = 0; i < 6; i++) {
                     if (date > daysInMonth) break;
-
                     calendarHTML += `<div class="week">`;
-
                     for (let j = 0; j < 7; j++) {
                         if ((i === 0 && j < firstDay) || date > daysInMonth) {
-                            calendarHTML += '<div class="day"></div>';
+                            calendarHTML += '<div class="day empty-day"></div>';
                         } else {
-                            const currentDate = new Date(2025, month, date);
-                            const dateStr = `2025-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                            const currentDate = new Date(year, month, date);
+                            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                             const isoWeek = getISOWeek(currentDate);
                             const isGreenWeek = isoWeek % 2 === 0 && j !== 0;
+                            const isSunday = j === 0;
+                            const isSpecialSaturday = (j === 6 && specialSaturdays.includes(date));
 
                             let classes = 'day';
                             if (isGreenWeek) classes += ' green-week';
-                            if (j === 0 || holidays[dateStr] || weekends.includes(dateStr)) {
+                            if (isSunday) classes += ' sunday';
+                            if (holidays[dateStr] || isSpecialSaturday) {
                                 classes += ' holiday';
                             }
-                            if (today.getFullYear() === 2025 && today.getMonth() === month && today.getDate() === date) {
+                            if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === date) {
                                 classes += ' today';
                             }
 
                             const savedNote = localStorage.getItem("note_" + dateStr);
-                            const notePreview = savedNote ? `<div class="note-preview">${savedNote.split(' ')[0]}</div>` : '';
+                            const noteIndicator = savedNote ? '<div class="note-indicator"></div>' : '';
 
-                            calendarHTML += `<div class="${classes}" onclick="showHoliday('${dateStr}')">${date}${notePreview}</div>`;
+                            calendarHTML += `
+                                <div class="${classes}" onclick="showHoliday('${dateStr}')">
+                                    <div class="day-number">${date}</div>
+                                    ${noteIndicator}
+                                </div>`;
                             date++;
                         }
                     }
-
                     calendarHTML += '</div>';
                 }
-            }
-
+            });
             document.getElementById('calendar-container').innerHTML = calendarHTML;
         }
 
         function showHoliday(dateStr) {
             const popup = document.getElementById('holiday-popup');
+            const overlay = document.getElementById('overlay');
             const note = localStorage.getItem("note_" + dateStr) || "";
-            const holiday = holidays[dateStr] ? `<h3>${holidays[dateStr]}</h3>` : '';
+            const holidayText = holidays[dateStr] || "Add Note";
             popup.innerHTML = `
-                ${holiday}
-                <textarea id="note-input" placeholder="Add note..." rows="2" style="width:100%;">${note}</textarea>
-                <br>
-                <button onclick="saveNote('${dateStr}')">Save</button>
-                <button onclick="document.getElementById('holiday-popup').style.display='none'">Close</button>
+                <h3>${holidayText}</h3>
+                <div class="date-display">${dateStr}</div>
+                <textarea id="note-input" placeholder="Add your note here..." rows="3">${note}</textarea>
+                <div class="popup-buttons">
+                    <button class="save-btn" onclick="saveNote('${dateStr}')">SAVE</button>
+                    <button class="close-btn" onclick="closePopup()">CLOSE</button>
+                </div>
             `;
             popup.style.display = 'block';
+            overlay.style.display = 'block';
         }
 
         function saveNote(dateStr) {
             const note = document.getElementById("note-input").value.trim();
             localStorage.setItem("note_" + dateStr, note);
-            document.getElementById("holiday-popup").style.display = "none";
+            closePopup();
             generateCalendar();
+        }
+
+        function closePopup() {
+            document.getElementById("holiday-popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
         }
 
         function scrollToToday() {
             generateCalendar();
+            const currentYear = today.getFullYear();
             const currentMonth = today.getMonth();
-            const monthElement = document.getElementById(`month-${currentMonth}`);
+            const monthElement = document.getElementById(`month-${currentYear}-${currentMonth}`);
+
             if (monthElement) {
-                window.scrollTo({
-                    top: monthElement.offsetTop - 150,
-                    behavior: 'smooth'
-                });
+                setTimeout(() => {
+                    const elementRect = monthElement.getBoundingClientRect();
+                    const absoluteElementTop = elementRect.top + window.pageYOffset;
+                    const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+                    window.scrollTo({
+                        top: middle,
+                        behavior: 'smooth'
+                    });
+                }, 100);
             }
         }
 
         document.addEventListener('click', function (e) {
-            if (!e.target.closest('.popup') && !e.target.classList.contains('day')) {
-                document.getElementById('holiday-popup').style.display = 'none';
+            if (e.target.classList.contains('overlay')) {
+                closePopup();
             }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePopup();
         });
     </script>
 </body>
