@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install CSL Attendance</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1e3a8a; --bg: #f0f7ff; }
+        body { font-family: 'Poppins', sans-serif; text-align: center; background: var(--bg); color: #333; padding: 50px 20px; min-height: 100vh; margin: 0; box-sizing: border-box; }
+        .install-card { background: white; border-radius: 25px; padding: 40px 20px; max-width: 400px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .logo { width: 100px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #1e3a8a; }
+        .badge { font-size: 0.65rem; background: #dbeafe; padding: 4px 12px; border-radius: 20px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; }
+        .btn-install { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; border: none; padding: 14px 40px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; margin-top: 15px; transition: 0.3s; box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); }
+        .btn-install:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(30, 58, 138, 0.3); }
+        .skip-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .footer-tag { margin-top: 30px; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="install-card">
+        <span class="badge">Professional Tool</span>
+        <br><br>
+        <img src="atn-icon-192.png" class="logo" alt="Attendance Logo">
+        <h2 style="margin-bottom: 5px; color: #1e3a8a;">CSL Attendance</h2>
+        <p style="font-size: 0.85rem; color: #64748b; line-height: 1.5; padding: 0 10px;">
+            Effortlessly record punching times, track leaves, and manage your shipyard work schedule.
+        </p>
+        
+        <button id="installBtn" class="btn-install" style="display: none;">Install App</button>
+        <div id="waitMsg" style="color: #94a3b8; font-size: 13px; margin-top: 15px;">Preparing installation...</div>
+        
+        <a href="atn.html" class="skip-link">Open Web Version →</a>
+        <div class="footer-tag">Powered by VTSoft | Made in India</div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        const waitMsg = document.getElementById('waitMsg');
+
+        if ('serviceWorker' in navigator) { 
+            navigator.serviceWorker.register('./sw.js'); 
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+            waitMsg.style.display = 'none';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    window.location.href = 'atn.html';
+                }
+            }
+        });
+
+        // Redirect if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            window.location.href = 'atn.html';
+        }
+    </script>
+</body>
+</html>
