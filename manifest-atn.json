@@ -1,9 +1,8 @@
 {
-  "id": "/csl-attendance",
+  "id": "/csl-atn-2026",
   "name": "CSL Attendance Register",
   "short_name": "Attendance",
   "start_url": "atn.html",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#1E3A5F",
   "theme_color": "#1E3A5F",
