@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest-atn.json">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-21G1BS7S3S');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Register 2025-2026</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        body {
+            background-color: #1E3A5F;
+            font-family: 'Poppins', sans-serif;
+            color: #F5E6C4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-img {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 99;
+        }
+
+        .sub-title {
+            font-size: 18px;
+            margin-top: 60px;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #F5E6C4;
+            color: #1E3A5F;
+            width: 87%;
+            max-width: 350px;
+            padding: 15px;
+            margin: 5px auto;
+            border-radius: 8px;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+
+        .tab-btn {
+            width: 45%;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            background-color: #1E3A5F;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .tab-btn.active {
+            background-color: #8B1E3F;
+        }
+
+        .month-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: #1E3A5F;
+            color: white;
+            border-radius: 5px;
+            position: sticky;
+            top: 150px;
+            z-index: 900;
+            font-size: 14px;
+        }
+
+        .month-nav-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+        .week-header {
+            display: flex;
+            background: #e0e0e0;
+            padding: 5px;
+            font-weight: bold;
+            position: sticky;
+            top: 190px;
+            z-index: 800;
+            font-size: 12px;
+        }
+
+        .week-header div, .day {
+            width: 14%;
+            text-align: center;
+        }
+
+        .week {
+            display: flex;
+        }
+
+        .day {
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin: 1px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            position: relative;
+        }
+
+        .day.holiday {
+            color: red;
+        }
+
+        .day.today {
+            border: 2px solid blue;
+            border-radius: 50%;
+            box-sizing: border-box;
+        }
+
+        .day.present-in {
+            background: #FFFF99 !important;
+            color: black;
+        }
+
+        .day.present-full {
+            background: #90EE90 !important;
+            color: black;
+        }
+
+        .leave-cl {
+            background: #ADD8E6 !important;
+            color: white;
+        }
+
+        .leave-el {
+            background: #C04070 !important;
+            color: white;
+        }
+
+        .leave-hpl {
+            background: #FFA07A !important;
+            color: white;
+        }
+
+        .leave-special {
+            background: #FFC0CB !important;
+            color: white;
+        }
+
+        .half-day-cl {
+            background: linear-gradient(to right, #90EE90 50%, #ADD8E6 50%) !important;
+            color: white;
+        }
+
+        .half-day-el {
+            background: linear-gradient(to right, #90EE90 50%, #C04070 50%) !important;
+            color: white;
+        }
+
+        .half-day-hpl {
+            background: linear-gradient(to right, #90EE90 50%, #FFA07A 50%) !important;
+            color: white;
+        }
+
+        .half-day-special {
+            background: linear-gradient(to right, #90EE90 50%, #FFC0CB 50%) !important;
+            color: white;
+        }
+
+        .day.present-in.holiday, .day.present-full.holiday {
+            color: red;
+        }
+
+        .ot-display {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 8px;
+            color: #1E3A5F;
+            font-weight: normal;
+        }
+
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #F5E6C4;
+            color: #1E3A5F;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .settings-row label {
+            margin-right: 5px;
+            font-weight: bold;
+            color: #1E3A5F;
+            font-size: 12px;
+            width: 50px;
+            text-align: right;
+        }
+
+        .settings-row input, .settings-row select {
+            width: 120px;
+            padding: 5px;
+            font-size: 12px;
+            margin: 0;
+            border: 1px solid #1E3A5F;
+            border-radius: 4px;
+            background: #FAF8E3;
+        }
+
+        .btn {
+            padding: 8px;
+            margin: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            color: white;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .save-btn {
+            background-color: #1E3A5F;
+        }
+
+        .clear-btn {
+            background-color: #8B1E3F;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #1E3A5F;
+            background: #FAF8E3;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .footer {
+            font-size: 14px;
+            padding: 4.5px;
+            background-color: #0F2A44;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .bottom-padding {
+            height: 40px;
+        }
+
+        .leave-msg {
+            color: red;
+            font-size: 10px;
+            margin: 5px 0;
+        }
+
+        .ot-remaining {
+            color: red;
+            font-size: 10px;
+        }
+
+        .sync-container {
+            position: fixed;
+            bottom: 35px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 99;
+        }
+
+        .sync-btn {
+            background-color: #4CAF50;
+            padding: 6px 15px;
+            font-size: 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sync-btn:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        .sync-status {
+            font-size: 10px;
+            margin-top: 3px;
+            color: white;
+        }
+
+        .cloud-btn {
+            background-color: #2196F3;
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        /* Custom Message Modal */
+        .custom-message-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .message-content {
+            background: #F5E6C4;
+            color: #1E3A5F;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .message-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .ok-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body onload="initApp()">
+    <a href="index.html">
+        <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
+    </a>
+
+    <div class="sub-title">Attendance Register 2025-2026</div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('calendar')">Calendar</button>
+            <button class="tab-btn" onclick="showTab('settings')">Settings</button>
+        </div>
+
+        <div id="calendar-tab">
+            <div class="calendar-container" id="calendar-container"></div>
+            <button class="btn save-btn" onclick="generateMonthlyPDF()">Monthly Details PDF</button>
+            <div class="result" id="summary-box"></div>
+        </div>
+
+        <div id="settings-tab" style="display: none;">
+            <form id="settingsForm">
+                <div class="settings-row">
+                    <label for="empName">Name:</label>
+                    <input type="text" id="empName" required>
+                </div>
+                <div class="settings-row">
+                    <label for="empCode">Code:</label>
+                    <input type="text" id="empCode" required>
+                </div>
+                <div class="settings-row">
+                    <label for="clBalance">CL:</label>
+                    <input type="number" id="clBalance" step="0.5" required>
+                </div>
+                <div class="settings-row">
+                    <label for="elBalance">EL:</label>
+                    <input type="number" id="elBalance" step="0.5" required>
+                </div>
+                <div class="settings-row">
+                    <label for="hplBalance">HPL:</label>
+                    <input type="number" id="hplBalance" step="0.5" required>
+                </div>
+                <div class="settings-row">
+                    <label for="specialLeave">Special:</label>
+                    <input type="number" id="specialLeave" max="3" required>
+                </div>
+                <div>
+                    <button type="button" class="btn save-btn" onclick="saveSettings()">Save</button>
+                    <button type="reset" class="btn clear-btn">Clear</button>
+                </div>
+                <div style="margin-top:15px;">
+                    <button type="button" class="cloud-btn" onclick="showConfirm('loadCloud')">Load from Cloud</button>
+                    <button type="button" class="cloud-btn" onclick="showConfirm('saveCloud')">Save to Cloud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="custom-modal" id="attendance-popup"></div>
+    
+    <div class="custom-modal" id="userRegisterModal">
+        <div class="modal-content">
+            <div class="modal-header">Please Register First</div>
+            <p style="font-size:12px;margin-bottom:15px;">Enter your name and code to continue</p>
+            <div class="settings-row">
+                <label for="regName">Name:</label>
+                <input type="text" id="regName" placeholder="Enter your name" required>
+            </div>
+            <div class="settings-row">
+                <label for="regCode">Code:</label>
+                <input type="text" id="regCode" placeholder="Enter code number" required>
+            </div>
+            <div style="margin-top:15px;">
+                <button class="btn save-btn" onclick="registerUser()">Register & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-message-modal" id="confirmModal">
+        <div class="message-content">
+            <div class="modal-header" id="confirmTitle">Confirm</div>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="message-buttons">
+                <button class="ok-btn" id="confirmOkBtn">OK</button>
+                <button class="cancel-btn" onclick="closeConfirmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-message-modal" id="alertModal">
+        <div class="message-content">
+            <div class="modal-header" id="alertTitle">Message</div>
+            <p id="alertMessage"></p>
+            <div class="message-buttons">
+                <button class="ok-btn" onclick="closeAlertModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sync-container">
+        <button class="sync-btn" id="syncBtn" onclick="autoSync()">Auto Sync</button>
+        <div class="sync-status" id="syncStatus">Offline</div>
+    </div>
+
+    <div class="bottom-padding"></div>
+    <div class="footer">Powered by VT@Soft © 2026 | Version 3.0</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCjWVI1hB3sbu0JiA4viW1BK81xbMML-U",
+            authDomain: "csl-calculations.firebaseapp.com",
+            projectId: "csl-calculations",
+            storageBucket: "csl-calculations.firebasestorage.app",
+            messagingSenderId: "887219643486",
+            appId: "1:887219643486:web:0cb001f2c72039a00240cf"
+        };
+
+        let db;
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+        } catch (err) {
+            console.log("Firebase error:", err);
+        }
+
+        const holidays2025 = {
+            "2025-08-15": "Independence Day",
+            "2025-09-04": "First Onam",
+            "2025-09-05": "Thiruvonam",
+            "2025-09-06": "Third Onam",
+            "2025-10-02": "Gandhi Jayanthi / Vijayadasami",
+            "2025-10-20": "Deepavali",
+            "2025-12-25": "Christmas"
+        };
+
+        const holidays2026 = {
+            "2026-01-26": "Republic Day",
+            "2026-03-20": "Id-ul-Fitr (Ramzan)",
+            "2026-04-03": "Good Friday",
+            "2026-04-15": "Vishu",
+            "2026-05-01": "May Day",
+            "2026-05-27": "Id-ul-Ad'ha (Bakrid)",
+            "2026-08-15": "Independence Day",
+            "2026-08-26": "Thiruvonam",
+            "2026-08-28": "Fourth Onam Sree Narayana Ayyankali Jayanthi",
+            "2026-10-02": "Gandhi Jayanthi",
+            "2026-10-21": "Vijayadasami",
+            "2026-12-25": "Christmas"
+        };
+
+        const shiftTimes = {
+            "A2": { start: "07:00", end: "15:20", grace: "07:05" },
+            "B2": { start: "13:40", end: "22:00", grace: "13:45" },
+            "C2": { start: "06:00", end: "14:00", grace: "06:05" },
+            "C1": { start: "08:00", end: "16:20", grace: "08:05" }
+        };
+
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth();
+        
+        let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {};
+        let employeeData = JSON.parse(localStorage.getItem('employeeData')) || {
+            name: '', code: '', 
+            clTotal: 0, elTotal: 0, hplTotal: 0, specialTotal: 3, 
+            lastUpdate: "2025-12-01",
+            settingsUpdated: false, userId: '', lastSync: 0
+        };
+        
+        // 🔥 FIX 1 — Backward compatibility patch
+        if (employeeData.cl !== undefined) {
+            employeeData.clTotal = employeeData.cl || 0;
+            delete employeeData.cl;
+        }
+        if (employeeData.el !== undefined) {
+            employeeData.elTotal = employeeData.el || 0;
+            delete employeeData.el;
+        }
+        if (employeeData.hpl !== undefined) {
+            employeeData.hplTotal = employeeData.hpl || 0;
+            delete employeeData.hpl;
+        }
+        if (employeeData.special !== undefined) {
+            employeeData.specialTotal = employeeData.special || 0;
+            delete employeeData.special;
+        }
+
+        // Safety defaults
+        employeeData.clTotal = employeeData.clTotal || 0;
+        employeeData.elTotal = employeeData.elTotal || 0;
+        employeeData.hplTotal = employeeData.hplTotal || 0;
+        employeeData.specialTotal = employeeData.specialTotal || 0;
+        employeeData.lastUpdate = employeeData.lastUpdate || "2025-12-01";
+
+        // Save migrated data back
+        localStorage.setItem('employeeData', JSON.stringify(employeeData));
+        
+        let syncInProgress = false;
+        let lastSyncTime = parseInt(localStorage.getItem('lastSyncTime')) || 0;
+        let pendingAction = null;
+
+        // ✅ STEP 1: Calculate USED leaves from attendanceData (ആ മാസത്തെ മാത്രം)
+        function calculateUsedLeavesForCurrentMonth() {
+            let used = { cl: 0, el: 0, hpl: 0, special: 0 };
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+
+            for (let dateStr in attendanceData) {
+                if (!dateStr.startsWith(monthKey)) continue;
+                
+                const d = attendanceData[dateStr];
+                if (!d.leave) continue;
+
+                const deduction = d.halfDay === 'Yes' ? 0.5 : 1;
+                const lt = (d.leave || '').toUpperCase().trim();
+                
+                if (lt === 'CL') used.cl += deduction;
+                else if (lt === 'EL') used.el += deduction;
+              else if (lt === 'HPL') used.hpl += (deduction * 2);
+                else if (lt === 'SPECIAL' || lt === 'SPL' || lt === 'SPECIAL LEAVE') used.special += deduction;
+            }
+            return used;
+        }
+
+        // ✅ STEP 2: Calculate balance from THIS MONTH onwards (നിലവിലെ മാസം മുതൽ)
+        function calculateBalanceFromCurrentMonth() {
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            let remainingBalance = {
+                cl: parseFloat(employeeData.clTotal) || 0,
+                el: parseFloat(employeeData.elTotal) || 0,
+                hpl: parseFloat(employeeData.hplTotal) || 0,
+                special: parseInt(employeeData.specialTotal) || 0
+            };
+
+           
+            for (let dateStr in attendanceData) {
+                const date = new Date(dateStr);
+                const recordMonthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                
+                
+                if (recordMonthYear < monthKey) {
+                    const d = attendanceData[dateStr];
+                    if (!d.leave) continue;
+
+                    const deduction = d.halfDay === 'Yes' ? 0.5 : 1;
+                    const lt = (d.leave || '').toUpperCase().trim();
+                    
+                    if (lt === 'CL') remainingBalance.cl = Math.max(0, remainingBalance.cl - deduction);
+                    else if (lt === 'EL') remainingBalance.el = Math.max(0, remainingBalance.el - deduction);
+                    else if (lt === 'HPL') remainingBalance.hpl = Math.max(0, remainingBalance.hpl - deduction);
+                    else if (lt === 'SPECIAL' || lt === 'SPL') remainingBalance.special = Math.max(0, remainingBalance.special - deduction);
+                }
+            }
+            
+            return remainingBalance;
+        }
+
+        // ✅ STEP 3: Get REAL balance for current month only
+        function getLeaveBalanceForCurrentMonth() {
+            const startingBalance = calculateBalanceFromCurrentMonth();
+            const usedThisMonth = calculateUsedLeavesForCurrentMonth();
+
+            return {
+                cl: Math.max(0, startingBalance.cl - usedThisMonth.cl),
+                el: Math.max(0, startingBalance.el - usedThisMonth.el),
+                hpl: Math.max(0, startingBalance.hpl - usedThisMonth.hpl),
+                special: Math.max(0, startingBalance.special - usedThisMonth.special)
+            };
+        }
+
+        // Custom Alert Function
+        function showAlert(message, title = "Message") {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('alertModal').style.display = 'flex';
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').style.display = 'none';
+        }
+
+        // Custom Confirm Function
+        function showConfirm(action) {
+            pendingAction = action;
+            
+            if (action === 'loadCloud') {
+                document.getElementById('confirmTitle').textContent = "Load from Cloud";
+                document.getElementById('confirmMessage').textContent = "Load all data from cloud? This will replace your local data.";
+            } else if (action === 'saveCloud') {
+                document.getElementById('confirmTitle').textContent = "Save to Cloud";
+                document.getElementById('confirmMessage').textContent = "Save all data to cloud? This will overwrite your cloud data.";
+            } else if (action === 'saveSettings') {
+                document.getElementById('confirmTitle').textContent = "Save Settings";
+                document.getElementById('confirmMessage').textContent = "Save settings changes?";
+            }
+            
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            pendingAction = null;
+        }
+
+        // ✅ FIX: Confirm button handler
+        document.getElementById('confirmOkBtn').onclick = function() {
+            if (pendingAction === 'loadCloud') {
+                loadFromCloud();
+            } else if (pendingAction === 'saveCloud') {
+                saveToCloud();
+            } else if (pendingAction === 'saveSettings') {
+                saveSettingsConfirmed();
+            }
+            closeConfirmModal();
+            pendingAction = null;
+        };
+
+        function packDayData(dayData) {
+            if (!dayData) return "";
+            const parts = [
+                dayData.shift || "",
+                dayData.inPunch || "",
+                dayData.outPunch || "",
+                dayData.ot || "0",
+                dayData.leave || "",
+                dayData.halfDay || "No"
+            ];
+            return parts.join("|");
+        }
+
+        function unpackDayData(packedString) {
+            if (!packedString) return null;
+            const parts = packedString.split("|");
+            return {
+                shift: parts[0] || "",
+                inPunch: parts[1] || "",
+                outPunch: parts[2] || "",
+                ot: parseFloat(parts[3]) || 0,
+                leave: parts[4] || "",
+                halfDay: parts[5] || "No"
+            };
+        }
+
+        function packMonthData(attendanceData, year, month) {
+            const packed = {};
+            const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+            
+            for (const dateStr in attendanceData) {
+                if (dateStr.startsWith(monthStr)) {
+                    packed[dateStr] = packDayData(attendanceData[dateStr]);
+                }
+            }
+            return packed;
+        }
+
+        function unpackMonthData(packedMonthData) {
+            const unpacked = {};
+            for (const dateStr in packedMonthData) {
+                const dayData = unpackDayData(packedMonthData[dateStr]);
+                if (dayData) {
+                    unpacked[dateStr] = dayData;
+                }
+            }
+            return unpacked;
+        }
+
+        // AUTO SYNC FUNCTION
+        async function autoSyncCurrentMonth() {
+            if (!db || !employeeData.userId) {
+                updateSyncStatus('Firebase not ready');
+                return false;
+            }
+            
+            const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const lastAutoSync = localStorage.getItem(`lastAutoSync_${monthKey}`);
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+            
+            // 1 മണിക്കൂറിൽ ഒരിക്കൽ മാത്രം auto-sync
+            if (lastAutoSync && (now - parseInt(lastAutoSync) < oneHour)) {
+                return false;
+            }
+            
+            try {
+                updateSyncStatus('Auto-syncing...');
+                
+                // Cloud ൽ നിന്ന് ഡാറ്റ ലോഡ് ചെയ്യുക
+                const docRef = db.collection("attendance_records")
+                    .doc(employeeData.userId)
+                    .collection("months")
+                    .doc(monthKey);
+                    
+                const doc = await docRef.get();
+                
+                let cloudDataLoaded = false;
+                
+                if (doc.exists) {
+                    const remoteData = doc.data();
+                    const remoteTimestamp = remoteData.lastUpdated || 0;
+                    
+                    // Local timestamp കണ്ടെത്തുക
+                    let localTimestamp = 0;
+                    for (const dateStr in attendanceData) {
+                        if (dateStr.startsWith(monthKey)) {
+                            localTimestamp = Math.max(localTimestamp, remoteTimestamp);
+                        }
+                    }
+                    
+                    // Cloud ൽ പുതിയതാണെങ്കിൽ മാത്രം update ചെയ്യുക
+                    if (remoteTimestamp > localTimestamp) {
+                        const packedMonthData = remoteData.monthData || {};
+                        const unpackedData = unpackMonthData(packedMonthData);
+                        
+                        for (const dateStr in unpackedData) {
+                            attendanceData[dateStr] = unpackedData[dateStr];
+                        }
+                        
+                        localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+                        cloudDataLoaded = true;
+                    }
+                }
+                
+                // Local changes cloud ൽ save ചെയ്യുക
+                await saveCurrentMonthToCloud();
+                localStorage.setItem(`lastAutoSync_${monthKey}`, now.toString());
+                
+                updateSyncStatus('Auto-synced');
+                if (cloudDataLoaded) {
+                    showMonth(currentMonth); // കലണ്ടർ refresh ചെയ്യുക
+                }
+                
+                return true;
+            } catch (error) {
+                updateSyncStatus('Auto-sync failed');
+                return false;
+            }
+        }
+
+        async function initApp() {
+            if (!employeeData.name || !employeeData.code) {
+                showUserRegisterModal();
+                return;
+            }
+
+            if (!employeeData.userId) {
+                employeeData.userId = generateUserId(employeeData.name, employeeData.code);
+                localStorage.setItem('employeeData', JSON.stringify(employeeData));
+            }
+
+            // ✅ FIX: EL auto increment
+            const currentDate = new Date();
+            const lastUpdateDate = new Date(employeeData.lastUpdate || "2025-12-01");
+            const monthsElapsed = (currentDate.getFullYear() - lastUpdateDate.getFullYear()) * 12 + 
+                                  (currentDate.getMonth() - lastUpdateDate.getMonth());
+
+            if (monthsElapsed > 0) {
+                employeeData.elTotal += (monthsElapsed * 2.5);
+                employeeData.lastUpdate = currentDate.toISOString().split('T')[0];
+                localStorage.setItem('employeeData', JSON.stringify(employeeData));
+            }
+
+            // Auto-sync ചെയ്യുക
+            try {
+                await autoSyncCurrentMonth();
+            } catch (err) {
+                console.log("Auto-sync failed on init:", err);
+            }
+            
+            loadSettings();
+            showMonth(currentMonth);
+            updateSyncStatus('Ready');
+        }
+
+        function showUserRegisterModal() {
+            document.getElementById('userRegisterModal').style.display = 'flex';
+        }
+
+        function registerUser() {
+            const name = document.getElementById('regName').value.trim();
+            const code = document.getElementById('regCode').value.trim();
+            
+            if (!name || !code) {
+                showAlert("Please enter both name and code", "Registration Error");
+                return;
+            }
+            
+            employeeData.name = name;
+            employeeData.code = code;
+            employeeData.userId = generateUserId(name, code);
+            employeeData.settingsUpdated = true;
+            
+            localStorage.setItem('employeeData', JSON.stringify(employeeData));
+            document.getElementById('userRegisterModal').style.display = 'none';
+            
+            loadSettings();
+            showMonth(currentMonth);
+            updateSyncStatus('Registered');
+        }
+
+        function generateUserId(name, code) {
+            const firstThreeLetters = name.substring(0, 3).toLowerCase().replace(/\s/g, '');
+            const cleanCode = code.replace(/\s/g, '');
+            return `${firstThreeLetters}_${cleanCode}`;
+        }
+
+        async function saveCurrentMonthToCloud() {
+            if (!db || !employeeData.userId) {
+                updateSyncStatus('Firebase not ready');
+                return;
+            }
+            
+            if (syncInProgress) {
+                return;
+            }
+            
+            syncInProgress = true;
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn) syncBtn.disabled = true;
+            
+            try {
+                updateSyncStatus('Saving...');
+                const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+                
+                const timestamp = Date.now();
+                const packedMonthData = packMonthData(attendanceData, currentYear, currentMonth);
+                
+                const dataToSave = {
+                    userId: employeeData.userId,
+                    month: monthKey,
+                    monthData: packedMonthData,
+                    lastUpdated: timestamp
+                };
+                
+                await db.collection("attendance_records")
+                    .doc(employeeData.userId)
+                    .collection("months")
+                    .doc(monthKey)
+                    .set(dataToSave);
+                
+                lastSyncTime = timestamp;
+                localStorage.setItem('lastSyncTime', timestamp);
+                
+                updateSyncStatus('Saved to cloud');
+                setTimeout(() => updateSyncStatus('Ready'), 2000);
+                
+            } catch (error) {
+                let errorMsg = 'Save failed';
+                if (error.code) errorMsg += ' (' + error.code + ')';
+                updateSyncStatus(errorMsg);
+            } finally {
+                syncInProgress = false;
+                if (syncBtn) syncBtn.disabled = false;
+            }
+        }
+
+        async function loadFromCloud() {
+            if (!db || !employeeData.userId) {
+                showAlert("Firebase not ready", "Cloud Error");
+                return;
+            }
+            
+            try {
+                updateSyncStatus('Loading all...');
+                
+                const monthsRef = db.collection("attendance_records")
+                    .doc(employeeData.userId)
+                    .collection("months");
+                    
+                const snapshot = await monthsRef.get();
+                
+                if (snapshot.empty) {
+                    updateSyncStatus('No cloud data');
+                    showAlert("No data found in cloud", "Cloud Error");
+                    return;
+                }
+                
+                let latestTimestamp = 0;
+                let loadedCount = 0;
+                
+                snapshot.forEach(doc => {
+                    const monthData = doc.data();
+                    const packedMonthData = monthData.monthData || {};
+                    const unpackedData = unpackMonthData(packedMonthData);
+                    
+                    for (const dateStr in unpackedData) {
+                        attendanceData[dateStr] = unpackedData[dateStr];
+                    }
+                    
+                    if (monthData.lastUpdated > latestTimestamp) {
+                        latestTimestamp = monthData.lastUpdated;
+                    }
+                    
+                    loadedCount++;
+                });
+                
+                localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+                lastSyncTime = latestTimestamp;
+                localStorage.setItem('lastSyncTime', latestTimestamp);
+                
+                showMonth(currentMonth);
+                updateSyncStatus(`Loaded ${loadedCount} months`);
+                setTimeout(() => updateSyncStatus('Ready'), 2000);
+                showAlert(`Successfully loaded ${loadedCount} months from cloud`, "Cloud Success");
+                
+            } catch (error) {
+                updateSyncStatus('Load failed');
+                showAlert("Failed to load from cloud: " + error.message, "Cloud Error");
+            }
+        }
+
+        async function saveToCloud() {
+            if (!db || !employeeData.userId) {
+                showAlert("Firebase not ready", "Cloud Error");
+                return;
+            }
+            
+            syncInProgress = true;
+            const syncBtn = document.getElementById('syncBtn');
+            if (syncBtn) syncBtn.disabled = true;
+            
+            try {
+                updateSyncStatus('Saving all...');
+                
+                const monthMap = {};
+                for (const dateStr in attendanceData) {
+                    const monthKey = dateStr.substring(0, 7);
+                    if (!monthMap[monthKey]) {
+                        monthMap[monthKey] = {};
+                    }
+                    monthMap[monthKey][dateStr] = attendanceData[dateStr];
+                }
+                
+                const timestamp = Date.now();
+                let savedCount = 0;
+                
+                for (const monthKey in monthMap) {
+                    const packedMonthData = {};
+                    for (const dateStr in monthMap[monthKey]) {
+                        packedMonthData[dateStr] = packDayData(monthMap[monthKey][dateStr]);
+                    }
+                    
+                    const dataToSave = {
+                        userId: employeeData.userId,
+                        month: monthKey,
+                        monthData: packedMonthData,
+                        lastUpdated: timestamp
+                    };
+                    
+                    await db.collection("attendance_records")
+                        .doc(employeeData.userId)
+                        .collection("months")
+                        .doc(monthKey)
+                        .set(dataToSave);
+                    
+                    savedCount++;
+                }
+                
+                lastSyncTime = timestamp;
+                localStorage.setItem('lastSyncTime', timestamp);
+                
+                updateSyncStatus(`Saved ${savedCount} months`);
+                setTimeout(() => updateSyncStatus('Ready'), 2000);
+                showAlert(`Successfully saved ${savedCount} months to cloud`, "Cloud Success");
+                
+            } catch (error) {
+                updateSyncStatus('Save failed');
+                showAlert("Failed to save to cloud: " + error.message, "Cloud Error");
+            } finally {
+                syncInProgress = false;
+                if (syncBtn) syncBtn.disabled = false;
+            }
+        }
+
+        async function autoSync() {
+            if (!db || !employeeData.userId) {
+                showAlert("Cloud sync not available", "Sync Error");
+                return;
+            }
+            
+            if (syncInProgress) return;
+            
+            syncInProgress = true;
+            updateSyncStatus('Syncing...');
+            
+            try {
+                // Current month മാത്രം sync ചെയ്യുക
+                await autoSyncCurrentMonth();
+                
+                updateSyncStatus('Synced successfully');
+                setTimeout(() => updateSyncStatus('Ready'), 2000);
+                
+            } catch (error) {
+                updateSyncStatus('Sync failed');
+                showAlert("Sync failed: " + error.message, "Sync Error");
+            } finally {
+                syncInProgress = false;
+            }
+        }
+
+        function updateSyncStatus(status) {
+            const statusElem = document.getElementById('syncStatus');
+            if (statusElem) {
+                statusElem.textContent = status || 'Offline';
+                
+                if (status === 'Ready' || status === 'Synced successfully' || status === 'Auto-synced') {
+                    statusElem.style.color = '#4CAF50';
+                } else if (status.includes('...') || status === 'Syncing...' || status === 'Auto-syncing...') {
+                    statusElem.style.color = '#FF9800';
+                } else if (status.includes('failed') || status.includes('Failed')) {
+                    statusElem.style.color = '#f44336';
+                } else {
+                    statusElem.style.color = '#ffffff';
+                }
+            }
+        }
+
+        function getWeekendDates(year) {
+            const weekends = [];
+            for (let month = 0; month < 12; month++) {
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                let secondSat = null;
+                let fourthSat = null;
+                let satCount = 0;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    if (date.getDay() === 6) {
+                        satCount++;
+                        if (satCount === 2) secondSat = day;
+                        if (satCount === 4) fourthSat = day;
+                    }
+                }
+                
+                if (secondSat) {
+                    weekends.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(secondSat).padStart(2, '0')}`);
+                }
+                if (fourthSat) {
+                    weekends.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(fourthSat).padStart(2, '0')}`);
+                }
+            }
+            return weekends;
+        }
+
+        const weekends2025 = getWeekendDates(2025);
+        const weekends2026 = getWeekendDates(2026);
+
+        function getHolidaysForYear(year) {
+            return year === 2025 ? holidays2025 : holidays2026;
+        }
+
+        function getWeekendsForYear(year) {
+            return year === 2025 ? weekends2025 : weekends2026;
+        }
+
+        function isHoliday(dateStr, dayOfWeek, date) {
+            if (dayOfWeek === 0) return true;
+            const holidays = getHolidaysForYear(currentYear);
+            const weekends = getWeekendsForYear(currentYear);
+            return holidays[dateStr] || weekends.includes(dateStr);
+        }
+
+        function formatTimeFromHours(decimalHours) {
+            if (!decimalHours || isNaN(decimalHours)) return '';
+            const hours = Math.floor(decimalHours);
+            const minutes = Math.round((decimalHours - hours) * 60);
+            return `${hours}.${String(minutes).padStart(2, '0')}`;
+        }
+
+        // ✅ FIX: OT enter ചെയ്യുമ്പോൾ 2 എന്ന് ടൈപ്പ് ചെയ്താൽ automatic ആയി 2:00 ആക്കുന്നു
+        function parseTimeToHours(timeStr) {
+            if (!timeStr) return 0;
+            
+            // Remove any spaces
+            timeStr = timeStr.trim();
+            
+            // If it's just a number (like "2"), treat it as hours
+            if (/^\d+$/.test(timeStr)) {
+                return parseFloat(timeStr);
+            }
+            
+            // Replace colon with dot for decimal calculation
+            timeStr = timeStr.replace(':', '.');
+            const [hours, minutes] = timeStr.split('.').map(Number);
+            
+            if (isNaN(hours)) return 0;
+            if (isNaN(minutes)) return hours;
+            
+            return hours + (minutes / 60);
+        }
+
+        function showMonth(month) {
+            let newYear = currentYear;
+            let newMonth = month;
+            
+            if (month < 0) {
+                newMonth = 11;
+                newYear = currentYear - 1;
+            } else if (month > 11) {
+                newMonth = 0;
+                newYear = currentYear + 1;
+            } else {
+                newMonth = month;
+            }
+            
+            if (newYear < 2025) newYear = 2025;
+            if (newYear > 2026) newYear = 2026;
+            
+            currentYear = newYear;
+            currentMonth = newMonth;
+            
+            let calendarHTML = '';
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const monthName = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' });
+
+            calendarHTML += `
+                <div class="month-container" id="month-${currentMonth}">
+                    <button class="month-nav-btn" onclick="showMonth(currentMonth - 1)">&larr;</button>
+                    <span>${monthName} ${currentYear}</span>
+                    <button class="month-nav-btn" onclick="showMonth(currentMonth + 1)">&rarr;</button>
+                </div>
+                <div class="week-header">
+                    <div>Sun</div><div>Mon</div><div>Tue</div>
+                    <div>Wed</div><div>Thu</div><div>Fri</div>
+                    <div>Sat</div>
+                </div>
+            `;
+
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                if (date > daysInMonth) break;
+                calendarHTML += `<div class="week">`;
+                for (let j = 0; j < 7; j++) {
+                    if ((i === 0 && j < firstDay) || date > daysInMonth) {
+                        calendarHTML += '<div class="day"></div>';
+                    } else {
+                        const currentDate = new Date(currentYear, currentMonth, date);
+                        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                        let classes = 'day';
+                        if (isHoliday(dateStr, j, currentDate)) classes += ' holiday';
+                        if (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === date) {
+                            classes += ' today';
+                        }
+                        if (attendanceData[dateStr]) {
+                            if (attendanceData[dateStr].leave) {
+                                const leaveType = attendanceData[dateStr].leave.toLowerCase();
+                                if (attendanceData[dateStr].halfDay === 'Yes') {
+                                    classes += ` half-day half-day-${leaveType}`;
+                                } else {
+                                    classes += ` leave leave-${leaveType}`;
+                                }
+                            } else if (attendanceData[dateStr].inPunch && attendanceData[dateStr].outPunch) {
+                                classes += ' present-full';
+                            } else if (attendanceData[dateStr].inPunch) {
+                                classes += ' present-in';
+                            }
+                        }
+                        const otDisplay = attendanceData[dateStr]?.ot && attendanceData[dateStr].ot != 0 ? `<span class="ot-display">${formatTimeFromHours(attendanceData[dateStr].ot)}h</span>` : '';
+                        calendarHTML += `<div class="${classes}" onclick="showAttendancePopup('${dateStr}')">${date}${otDisplay}</div>`;
+                        date++;
+                    }
+                }
+                calendarHTML += '</div>';
+            }
+            document.getElementById('calendar-container').innerHTML = calendarHTML;
+            updateSummaryBox();
+            window.scrollTo({ top: document.getElementById('calendar-container').offsetTop - 130, behavior: 'smooth' });
+        }
+
+        function updateSummaryBox() {
+            let totalOT = 0, quarterlyOT = 0, nextMonthTotalOT = 0;
+            let presentDays = 0;
+            
+            const prevMonth = (currentMonth === 0 ? 11 : currentMonth - 1);
+            const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+            
+            const otStartDate = new Date(prevYear, prevMonth, 20);
+            const otEndDate = new Date(currentYear, currentMonth, 20);
+            
+            const nextMonthStart = new Date(currentYear, currentMonth, 20);
+            const nextMonthEnd = new Date(currentYear, currentMonth + 1, 20);
+            
+            const quarter = Math.floor(currentMonth / 3);
+            const quarterStartMonth = quarter * 3;
+            const quarterEndMonth = quarterStartMonth + 2;
+            const quarterStart = new Date(currentYear, quarterStartMonth - 1, 20);
+            const quarterEnd = new Date(currentYear, quarterEndMonth, 20);
+
+            let hasNextMonthEntries = false;
+
+            for (let dateStr in attendanceData) {
+                const date = new Date(dateStr);
+                
+                if (date >= otStartDate && date < otEndDate) {
+                    if (attendanceData[dateStr].ot) totalOT += parseFloat(attendanceData[dateStr].ot) || 0;
+                }
+                
+                if (date >= quarterStart && date < quarterEnd) {
+                    if (attendanceData[dateStr].ot) quarterlyOT += parseFloat(attendanceData[dateStr].ot) || 0;
+                }
+                
+                if (date >= nextMonthStart && date < nextMonthEnd) {
+                    if (attendanceData[dateStr].ot) {
+                        nextMonthTotalOT += parseFloat(attendanceData[dateStr].ot) || 0;
+                        hasNextMonthEntries = true;
+                    }
+                }
+                
+                if (date.getFullYear() === currentYear && date.getMonth() === currentMonth) {
+                    if (attendanceData[dateStr].inPunch && attendanceData[dateStr].outPunch && !isHoliday(dateStr)) {
+                        presentDays += 1;
+                    }
+                }
+            }
+            
+            // ✅ FIX: Summary box - ആ മാസത്തെ ലീവ് മാത്രം കാണിക്കുക
+            const usedThisMonth = calculateUsedLeavesForCurrentMonth();
+            const balThisMonth = getLeaveBalanceForCurrentMonth();
+            
+            const otRemaining = 75 - quarterlyOT;
+            const otRemainingDisplay = otRemaining >= 0 ? `(-${otRemaining.toFixed(2)}hr)` : `(+${Math.abs(otRemaining).toFixed(2)}hr)`;
+            
+            let summaryHTML = `
+                <p>Total OT: ${formatTimeFromHours(totalOT)} hrs</p>
+                <p>Quarterly OT: ${formatTimeFromHours(quarterlyOT)} hrs <span class="ot-remaining">${otRemainingDisplay}</span></p>
+            `;
+            
+            if (hasNextMonthEntries) {
+                summaryHTML += `<p>Next Month Total OT: ${formatTimeFromHours(nextMonthTotalOT)} hrs</p>`;
+            }
+            
+            // ✅ FIX: ആ മാസത്തെ ലീവ് ബാലൻസ് മാത്രം കാണിക്കുക (Used (Balance))
+            const clUsed = isNaN(usedThisMonth.cl) ? 0 : usedThisMonth.cl;
+            const elUsed = isNaN(usedThisMonth.el) ? 0 : usedThisMonth.el;
+            const hplUsed = isNaN(usedThisMonth.hpl) ? 0 : usedThisMonth.hpl;
+            const specialUsed = isNaN(usedThisMonth.special) ? 0 : usedThisMonth.special;
+            
+            const clBalance = isNaN(balThisMonth.cl) ? 0 : balThisMonth.cl;
+            const elBalance = isNaN(balThisMonth.el) ? 0 : balThisMonth.el;
+            const hplBalance = isNaN(balThisMonth.hpl) ? 0 : balThisMonth.hpl;
+            const specialBalance = isNaN(balThisMonth.special) ? 0 : balThisMonth.special;
+            
+            summaryHTML += `
+                <p>CL: ${clUsed.toFixed(1)} (${clBalance.toFixed(1)})</p>
+                <p>EL: ${elUsed.toFixed(1)} (${elBalance.toFixed(1)})</p>
+                <p>HPL: ${hplUsed.toFixed(1)} (${hplBalance.toFixed(1)})</p>
+                <p>Special: ${specialUsed} (${specialBalance})</p>
+                <p>Total Present Days: ${presentDays}</p>
+            `;
+            
+            document.getElementById('summary-box').innerHTML = summaryHTML;
+        }
+
+        function applyHolidayLeaveRule() {
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const prevDate = new Date(currentYear, currentMonth, d - 1);
+                const nextDate = new Date(currentYear, currentMonth, d + 1);
+                const prevDateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`;
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                
+                if (isHoliday(dateStr) && attendanceData[prevDateStr] && attendanceData[nextDateStr]) {
+                    const prevData = attendanceData[prevDateStr];
+                    const nextData = attendanceData[nextDateStr];
+                    if (prevData.leave === nextData.leave && (prevData.leave === 'EL' || prevData.leave === 'HPL') && prevData.halfDay !== 'Yes' && nextData.halfDay !== 'Yes') {
+                        attendanceData[dateStr] = { ...attendanceData[dateStr], leave: prevData.leave, halfDay: 'No' };
+                    }
+                }
+            }
+            localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+        }
+
+        function showAttendancePopup(dateStr) {
+            const data = attendanceData[dateStr] || {};
+            const defaultTimes = shiftTimes[data.shift] || { start: '', end: '' };
+            
+            // ✅ FIX: ആ മാസത്തെ ബാലൻസ് മാത്രം ഉപയോഗിക്കുക
+            const bal = getLeaveBalanceForCurrentMonth();
+            
+            // ✅ FIX: Existing leave എഡിറ്റ് ചെയ്യുമ്പോൾ restore ചെയ്യുക
+            let adjustedBal = {...bal};
+            if (data.leave) {
+                const lt = data.leave.toUpperCase();
+                let restore = data.halfDay === 'Yes' ? 0.5 : 1;
+                if (lt === 'HPL') restore *= 2;
+
+                if (lt === 'CL') adjustedBal.cl += restore;
+                else if (lt === 'EL') adjustedBal.el += restore;
+                else if (lt === 'HPL') adjustedBal.hpl += restore;
+                else if (lt === 'SPECIAL') adjustedBal.special += restore;
+            }
+            
+            // Ensure numbers are valid
+            const clBalance = isNaN(adjustedBal.cl) ? 0 : adjustedBal.cl;
+            const elBalance = isNaN(adjustedBal.el) ? 0 : adjustedBal.el;
+            const hplBalance = isNaN(adjustedBal.hpl) ? 0 : adjustedBal.hpl;
+            const specialBalance = isNaN(adjustedBal.special) ? 0 : adjustedBal.special;
+            
+            let popupHTML = `
+                <div class="modal-content">
+                    <h3 style="font-size: 14px; margin: 5px 0;">${dateStr}</h3>
+                    <div class="settings-row">
+                        <label for="shift">Shift:</label>
+                        <select id="shift" onchange="setDefaultTimes()">
+                            <option value="" ${!data.shift ? 'selected' : ''}>None</option>
+                            <option value="A2" ${data.shift === 'A2' ? 'selected' : ''}>A2</option>
+                            <option value="B2" ${data.shift === 'B2' ? 'selected' : ''}>B2</option>
+                            <option value="C2" ${data.shift === 'C2' ? 'selected' : ''}>C2</option>
+                            <option value="C1" ${data.shift === 'C1' ? 'selected' : ''}>C1</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label for="inPunch">In:</label>
+                        <input type="time" id="inPunch" value="${data.inPunch || defaultTimes.start}">
+                    </div>
+                    <div class="settings-row">
+                        <label for="outPunch">Out:</label>
+                        <input type="time" id="outPunch" value="${data.outPunch || defaultTimes.end}">
+                    </div>
+                    <div class="settings-row">
+                        <label for="ot">OT:</label>
+                        <input type="text" id="ot" value="${data.ot ? formatTimeFromHours(data.ot) : ''}" placeholder="HH:MM">
+                    </div>
+                    <div class="settings-row">
+                        <label for="leave">Leave:</label>
+                        <select id="leave" onchange="updateHalfDayOptions()">
+                            <option value="" ${!data.leave ? 'selected' : ''}>None</option>
+                            <option value="CL" ${data.leave === 'CL' ? 'selected' : ''} ${clBalance <= 0 ? 'disabled' : ''}>CL (${clBalance.toFixed(1)})</option>
+                            <option value="EL" ${data.leave === 'EL' ? 'selected' : ''} ${elBalance <= 0 ? 'disabled' : ''}>EL (${elBalance.toFixed(1)})</option>
+                            <option value="HPL" ${data.leave === 'HPL' ? 'selected' : ''} ${hplBalance <= 0 ? 'disabled' : ''}>HPL (${hplBalance.toFixed(1)})</option>
+                            <option value="Special" ${data.leave === 'Special' ? 'selected' : ''} ${specialBalance <= 0 ? 'disabled' : ''}>Special (${specialBalance})</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <label for="halfDay">Half Day:</label>
+                        <select id="halfDay">
+                            <option value="No" ${data.halfDay !== 'Yes' ? 'selected' : ''}>No</option>
+                            <option value="Yes" ${data.halfDay === 'Yes' ? 'selected' : ''}>Yes</option>
+                        </select>
+                    </div>
+            `;
+            if (!employeeData.settingsUpdated) {
+                popupHTML += `<p class="leave-msg">Please update leave balance in settings tab</p>`;
+            }
+            popupHTML += `
+                    <div>
+                        <button class="btn save-btn" onclick="saveAttendance('${dateStr}')">Save</button>
+                        <button class="btn clear-btn" onclick="closeAttendancePopup()">Close</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('attendance-popup').innerHTML = popupHTML;
+            document.getElementById('attendance-popup').style.display = 'flex';
+            updateHalfDayOptions();
+        }
+
+        function closeAttendancePopup() {
+            document.getElementById('attendance-popup').style.display = 'none';
+        }
+
+        function updateHalfDayOptions() {
+            const leave = document.getElementById('leave').value;
+            const halfDaySelect = document.getElementById('halfDay');
+            if (leave === 'EL' || leave === 'Special') {
+                halfDaySelect.value = 'No';
+                halfDaySelect.disabled = true;
+            } else {
+                halfDaySelect.disabled = false;
+            }
+        }
+
+        function setDefaultTimes() {
+            const shift = document.getElementById('shift').value;
+            const inPunch = document.getElementById('inPunch');
+            const outPunch = document.getElementById('outPunch');
+            if (shift && shiftTimes[shift]) {
+                inPunch.value = inPunch.value || shiftTimes[shift].start;
+                outPunch.value = outPunch.value || shiftTimes[shift].end;
+            } else {
+                if (!inPunch.value) inPunch.value = '';
+                if (!outPunch.value) outPunch.value = '';
+            }
+        }
+
+        function saveAttendance(dateStr) {
+            const inPunch = document.getElementById('inPunch').value;
+            const outPunch = document.getElementById('outPunch').value;
+            const otInput = document.getElementById('ot').value;
+            const leave = document.getElementById('leave').value;
+            const halfDay = document.getElementById('halfDay').value;
+            const shift = document.getElementById('shift').value;
+
+            // ✅ FIX: OT input process - "2" എന്ന് ടൈപ്പ് ചെയ്താൽ "2:00" ആയി convert
+            let ot = parseTimeToHours(otInput);
+            
+            // ✅ FIX: Balance check using current month balance only
+            const bal = getLeaveBalanceForCurrentMonth();
+            
+            if (leave && leave !== '') {
+                let deduction = halfDay === 'Yes' ? 0.5 : 1;
+                if (leave === 'HPL') deduction *= 2;
+                
+                // Check if enough balance
+                const checkBalance = (type, required) => {
+                    const balance = type === 'CL' ? bal.cl : 
+                                   type === 'EL' ? bal.el : 
+                                   type === 'HPL' ? bal.hpl : 
+                                   bal.special;
+                    return (balance || 0) >= required;
+                };
+                
+                // ✅ FIX: Existing leave restore ചെയ്യുക
+                const existingData = attendanceData[dateStr] || {};
+                if (existingData.leave) {
+                    const existingLeave = existingData.leave.toUpperCase();
+                    let existingDeduction = existingData.halfDay === 'Yes' ? 0.5 : 1;
+                    if (existingLeave === 'HPL') existingDeduction *= 2;
+                    
+                    // Existing leave അഡ്ജസ്റ്റ് ചെയ്യുക
+                    if (existingLeave === leave) {
+                        // Same leave type - only check net difference
+                        if (deduction > existingDeduction) {
+                            const needed = deduction - existingDeduction;
+                            if (!checkBalance(leave, needed)) {
+                                showAlert(`Insufficient ${leave} balance for this change!`, "Leave Error");
+                                return;
+                            }
+                        }
+                    } else {
+                        // Different leave type - check new leave
+                        if (!checkBalance(leave, deduction)) {
+                            showAlert(`Insufficient ${leave} balance!`, "Leave Error");
+                            return;
+                        }
+                    }
+                } else if (!checkBalance(leave, deduction)) {
+                    showAlert(`Insufficient ${leave} balance!`, "Leave Error");
+                    return;
+                }
+            }
+
+            // Save attendance data
+            attendanceData[dateStr] = { inPunch, outPunch, ot, leave, halfDay, shift };
+            
+            // Save to local storage
+            localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+            
+            closeAttendancePopup();
+            applyHolidayLeaveRule();
+            showMonth(currentMonth);
+            
+            updateSyncStatus('Changes pending');
+            
+            // Auto-sync ചെയ്യുക
+            setTimeout(() => {
+                autoSyncCurrentMonth();
+            }, 1000);
+            
+            // ✅ FIX: Summary box പുതുക്കുക
+            updateSummaryBox();
+        }
+
+        // ✅ FIX: ടാബുകൾ മാറുമ്പോൾ ഡാറ്റ പുതുക്കുന്നു
+        function showTab(tab) {
+            document.getElementById('calendar-tab').style.display = tab === 'calendar' ? 'block' : 'none';
+            document.getElementById('settings-tab').style.display = tab === 'settings' ? 'block' : 'none';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[onclick="showTab('${tab}')"]`).classList.add('active');
+            
+            // കലണ്ടർ ടാബിലേക്ക് വരുമ്പോൾ വിവരങ്ങൾ പുതുക്കുന്നു
+            if (tab === 'calendar') {
+                updateSummaryBox();
+            }
+        }
+
+        function saveSettings() {
+            showConfirm('saveSettings');
+        }
+
+        function saveSettingsConfirmed() {
+            // ✅ FIX: Settings Save - TOTAL only
+            employeeData.name = document.getElementById('empName').value;
+            employeeData.code = document.getElementById('empCode').value;
+            employeeData.clTotal = parseFloat(document.getElementById('clBalance').value) || 0;
+            employeeData.elTotal = parseFloat(document.getElementById('elBalance').value) || 0;
+            employeeData.hplTotal = parseFloat(document.getElementById('hplBalance').value) || 0;
+            employeeData.specialTotal = parseInt(document.getElementById('specialLeave').value) || 0;
+            employeeData.settingsUpdated = true;
+            
+            if (!employeeData.userId) {
+                employeeData.userId = generateUserId(employeeData.name, employeeData.code);
+            }
+            
+            localStorage.setItem('employeeData', JSON.stringify(employeeData));
+            showAlert('Settings saved successfully!', "Success");
+            loadSettings();
+            
+            // ✅ FIX: സെറ്റിംഗ്സ് സേവ് ചെയ്യുമ്പോൾ കലണ്ടർ പുതുക്കുന്നു
+            updateSummaryBox();
+            
+            updateSyncStatus('Changes pending');
+        }
+
+        function loadSettings() {
+            document.getElementById('empName').value = employeeData.name || '';
+            document.getElementById('empCode').value = employeeData.code || '';
+            document.getElementById('clBalance').value = (employeeData.clTotal || 0).toFixed(1);
+            document.getElementById('elBalance').value = (employeeData.elTotal || 0).toFixed(1);
+            document.getElementById('hplBalance').value = (employeeData.hplTotal || 0).toFixed(1);
+            document.getElementById('specialLeave').value = employeeData.specialTotal || 0;
+        }
+
+        function generateMonthlyPDF() {
+            try {
+                const monthName = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' });
+                let tableData = [];
+                let totalLeave = 0, totalOT = 0, totalPresent = 0;
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const data = attendanceData[dateStr] || {};
+                    const dateObj = new Date(currentYear, currentMonth, d);
+                    const isHol = isHoliday(dateStr, dateObj.getDay(), dateObj);
+                    const leaveStr = data.leave ? `${data.leave}${data.halfDay === 'Yes' ? ' (Half)' : ''}` : (isHol ? 'Holiday' : '');
+                    const leaveType = data.leave ? data.leave.toLowerCase() : '';
+
+                    if (data.leave) {
+                        const deduction = data.halfDay === 'Yes' ? 0.5 : 1;
+                        totalLeave += deduction;
+                    } else if (data.inPunch && data.outPunch && !isHol) {
+                        totalPresent += 1;
+                    }
+                    if (data.ot) totalOT += parseFloat(data.ot) || 0;
+
+                    tableData.push({
+                        date: dateStr,
+                        shift: data.shift || '',
+                        inTime: data.inPunch || '',
+                        outTime: data.outPunch || '',
+                        leave: leaveStr,
+                        ot: data.ot ? `${formatTimeFromHours(data.ot)} hrs` : '0',
+                        isHoliday: isHol,
+                        leaveType: leaveType
+                    });
+                }
+
+                const pdfData = {
+                    name: employeeData.name || 'Unknown',
+                    code: employeeData.code || 'Unknown',
+                    month: `${monthName} ${currentYear}`,
+                    table: tableData,
+                    totalLeave: totalLeave.toFixed(1),
+                    totalOT: formatTimeFromHours(totalOT),
+                    totalPresent: totalPresent
+                };
+
+                const encodedData = encodeURIComponent(JSON.stringify(pdfData));
+                const redirectUrl = `openchrome://vishnuputhur.github.io/cslv2/atnpdf.html?data=${encodedData}`;
+                
+                window.location.href = redirectUrl;
+            } catch (error) {
+                showAlert('Failed to generate PDF: ' + error.message, "PDF Error");
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('custom-modal')) {
+                e.target.style.display = 'none';
+            }
+            if (e.target.classList.contains('custom-message-modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw-atn.js');
+  }
+</script>
+
+</body>
+</html>
