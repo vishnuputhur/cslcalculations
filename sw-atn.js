@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atn-register-v1';
+const CACHE_NAME = 'atn-register-v2';
 const ASSETS = [
   'atn.html',
   'manifest-atn.json',
