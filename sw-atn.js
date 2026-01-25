@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atn-register-v2';
+const CACHE_NAME = 'atn-v3.1'; // ഓരോ മാറ്റത്തിലും ഈ പേര് മാറ്റുക (v3.2, v3.3...)
 const ASSETS = [
   'atn.html',
   'manifest-atn.json',
@@ -6,14 +6,33 @@ const ASSETS = [
   'icon-512.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+// ഇൻസ്റ്റാൾ ചെയ്യുമ്പോൾ തന്നെ പഴയ വേർഷൻ സ്കിപ്പ് ചെയ്യാൻ
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
+// പഴയ ക്യാഷ് ഡിലീറ്റ് ചെയ്യാൻ
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
