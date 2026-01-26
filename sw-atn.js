@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atn-v3.1'; // ഓരോ മാറ്റത്തിലും ഈ പേര് മാറ്റുക (v3.2, v3.3...)
+const CACHE_NAME = 'atn-v3.2'; // ഓരോ മാറ്റത്തിലും ഈ പേര് മാറ്റുക (v3.2, v3.3...)
 const ASSETS = [
   'atn.html',
   'manifest-atn.json',
