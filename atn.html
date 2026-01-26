@@ -1698,15 +1698,7 @@
     navigator.serviceWorker.register('sw-atn.js');
   }
 </script>
-// atn.html ലെ സ്ക്രിപ്റ്റിന്റെ അവസാനം
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw-atn.js');
 
-  // പുതിയ അപ്ഡേറ്റ് വന്നാൽ പേജ് ഓട്ടോമാറ്റിക്കായി റീലോഡ് ചെയ്യാൻ
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload();
-  });
-}
 
 </body>
 </html>
