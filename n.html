@@ -27,6 +27,31 @@
       font-weight: bold;
     }
 
+    .lang-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0 5px 0;
+    }
+
+    .lang-btn {
+      background-color: #0F2A45;
+      color: #F5E6C4;
+      border: none;
+      padding: 8px 25px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .lang-btn.active {
+      background-color: #F5E6C4;
+      color: #1E3A5F;
+      border: 2px solid #ffffff;
+    }
+
     .box {
       background-color: #F5E6C4;
       color: #1E3A5F;
@@ -36,38 +61,44 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 4px 4px 12px rgba(0,0,0,0.3);
-      box-sizing: border-box; /* Prevent padding/margin overflow */
-      overflow: auto; /* Handle content overflow */
+      box-sizing: border-box;
+      overflow: auto;
     }
 
-    .box p {
+    .content {
+      display: block;
+    }
+
+    .content p {
       font-size: 15px;
       line-height: 1.7;
       text-align: left;
       font-weight: bold;
-      margin: 0; /* Remove default margins for cleaner rendering */
+      margin: 0;
     }
 
     .link-text {
       background-color: #eee;
       color: #333;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 13px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 15px;
       word-break: break-word;
-      border-radius: 6px;
+      border-radius: 8px;
       font-family: monospace;
+      border: 2px dashed #1E3A5F;
     }
 
     .copy-btn {
-      margin-top: 10px;
-      padding: 10px 16px;
-      font-size: 14px;
+      margin-top: 15px;
+      padding: 12px 24px;
+      font-size: 16px;
       background-color: #1E3A5F;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .footer {
@@ -82,7 +113,21 @@
     }
 
     .bottom-space {
-      height: 120px; /* Increased to ensure footer doesn't overlap */
+      height: 120px;
+    }
+
+    .whatsapp {
+      background-color: #25D366;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -92,44 +137,105 @@
   <img src="https://i.ibb.co/BYPxNBB/Screenshot-20250529-141452-CSL-Calculations.jpg" alt="Top Image" class="top-img">
 
   <!-- Heading outside the box -->
-  <h1>New Updates Available</h1>
+  <h1>📱 അപ്‌ഡേറ്റ് ലഭ്യമാണ് / Update Available</h1>
 
-  <div class="box">
+  <!-- Language Tabs -->
+  <div class="lang-tabs">
+    <button id="btnML" class="lang-btn active" onclick="switchLang('ml')">മലയാളം</button>
+    <button id="btnEN" class="lang-btn" onclick="switchLang('en')">English</button>
+  </div>
+
+  <!-- Malayalam Content -->
+  <div id="contentML" class="box content">
     <p>
-     ഈ ആപ്പ് storage permission അടക്കം ഒരു പെർമിഷനും സ്വീകരിക്കുന്നില്ല
-      അതിനാൽ, അപ്‌ഡേറ്റ് ചെയ്യാൻ താഴെയുള്ള ലിങ്ക് ഉപയോഗിക്കണം
-      ഈ ആപ്പ്-ൽ നിന്ന് direct download സാധ്യമല്ല.<br><br>
+     ✅ <strong>എങ്ങനെ അപ്‌ഡേറ്റ് ചെയ്യും?</strong><br><br>
 
-      <strong>ഇങ്ങനെ ചെയ്യുക:</strong><br><br>
-      1️⃣ താഴെയുള്ള ലിങ്ക് കോപ്പി ചെയ്യുക<br>
-      2️⃣ Chrome അല്ലെങ്കിൽ മറ്റൊരു browser തുറക്കുക<br>
-      3️⃣ Address bar-ൽ paste ചെയ്ത് Enter അമർത്തുക<br>
-      4️⃣ APK ഡൗൺലോഡ് ആയ ശേഷം, ഓപ്പൺ ചെയ്തു update ചെയ്യുക<br><br>
-      ✅ അതുവഴി പുതിയ വേർഷൻ ഉപയോഗിക്കാം<br><br>
-      <strong>സഹായം വേണമെങ്കിൽ:</strong><br>
-      9037383927 എന്ന നമ്പറിലേക്ക് "update" എന്ന് WhatsApp മെസേജ് അയക്കുക<br><br>
-      
+     1️⃣ താഴെയുള്ള ലിങ്ക് <strong>കോപ്പി ചെയ്യുക</strong> (Copy ബട്ടൺ ഉപയോഗിക്കുക)<br>
+     2️⃣ <strong>Chrome ബ്രൗസർ</strong> തുറക്കുക<br>
+     3️⃣ Address bar-ൽ <strong>paste ചെയ്ത് Enter</strong> അമർത്തുക<br>
+     4️⃣ ആ പേജിൽ <strong>"Install" ബട്ടൺ</strong> ടാപ്പ് ചെയ്യുക<br>
+     5️⃣ അപ്‌ഡേറ്റ് പൂർത്തിയായി ✅<br><br>
+
+     ❓ <strong>സഹായം വേണമെങ്കിൽ:</strong><br>
+     <span class="whatsapp">9037383927</span> എന്ന നമ്പറിലേക്ക് <strong>"അപ്‌ഡേറ്റ്"</strong> എന്ന് WhatsApp മെസേജ് അയക്കുക<br><br>
+
+     ⬇️ <strong>ലിങ്ക് കോപ്പി ചെയ്യുക:</strong>
     </p>
 
-    <!-- Link shown in 2 lines -->
-    <div class="link-text" id="apkLink">
-      https://cslcalculations.<br>netlify.app/csl2.apk
+    <div class="link-text" id="pwaLinkML">
+      https://cslcalculations.<br>netlify.app/install.html
     </div>
 
-    <button class="copy-btn" onclick="copyLink()">Copy to Clipboard</button>
+    <button class="copy-btn" onclick="copyLink()">
+      📋 കോപ്പി ചെയ്യുക
+    </button>
+  </div>
+
+  <!-- English Content -->
+  <div id="contentEN" class="box content hidden">
+    <p>
+     ✅ <strong>How to Update?</strong><br><br>
+
+     1️⃣ <strong>Copy</strong> the link below (use Copy button)<br>
+     2️⃣ Open <strong>Chrome browser</strong><br>
+     3️⃣ <strong>Paste</strong> it in the address bar and press <strong>Enter</strong><br>
+     4️⃣ Tap the <strong>"Install" button</strong> on that page<br>
+     5️⃣ Update completed ✅<br><br>
+
+     ❓ <strong>Need Help?</strong><br>
+     Send <strong>"Update"</strong> via WhatsApp to <span class="whatsapp">9037383927</span><br><br>
+
+     ⬇️ <strong>Copy the link:</strong>
+    </p>
+
+    <div class="link-text" id="pwaLinkEN">
+      https://cslcalculations.<br>netlify.app/install.html
+    </div>
+
+    <button class="copy-btn" onclick="copyLink()">
+      📋 Copy
+    </button>
   </div>
 
   <div class="bottom-space"></div>
 
-  <div class="footer">Powered by VT@Soft © 2025 | Version 2.0</div>
+  <div class="footer">Powered by VT@Soft © 2025 | v3.0</div>
 
   <script>
+    function switchLang(lang) {
+      const mlContent = document.getElementById('contentML');
+      const enContent = document.getElementById('contentEN');
+      const btnML = document.getElementById('btnML');
+      const btnEN = document.getElementById('btnEN');
+      
+      if (lang === 'ml') {
+        mlContent.classList.remove('hidden');
+        enContent.classList.add('hidden');
+        btnML.classList.add('active');
+        btnEN.classList.remove('active');
+      } else {
+        enContent.classList.remove('hidden');
+        mlContent.classList.add('hidden');
+        btnEN.classList.add('active');
+        btnML.classList.remove('active');
+      }
+    }
+
     function copyLink() {
-      const text = "https://cslcalculations.netlify.app/csl2.apk";
+      const text = "https://cslcalculations.netlify.app/install.html";
       navigator.clipboard.writeText(text).then(() => {
-        alert("Link copied to clipboard!");
+        // Check which language is active
+        if (document.getElementById('contentML').classList.contains('hidden')) {
+          alert("✅ Link copied! Open Chrome, paste and press Enter.");
+        } else {
+          alert("✅ ലിങ്ക് കോപ്പി ചെയ്തു! Chrome-ൽ paste ചെയ്ത് Enter അമർത്തുക.");
+        }
       }).catch(err => {
-        alert("Copy failed. Please copy manually.");
+        if (document.getElementById('contentML').classList.contains('hidden')) {
+          alert("❌ Copy failed. Please copy manually.");
+        } else {
+          alert("❌ കോപ്പി ചെയ്യാൻ സാധിച്ചില്ല. ദയവായി manual ആയി copy ചെയ്യുക.");
+        }
       });
     }
   </script>
