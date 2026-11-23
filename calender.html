@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>CSL Calendar 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CSL Calendar</title>
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-21G1BS7S3S"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -11,214 +14,280 @@
         gtag('js', new Date());
         gtag('config', 'G-21G1BS7S3S');
     </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #2196F3;
-            --accent: #FF4081;
-            --light-accent: #FF80AB;
-            --green: #4CAF50;
-            --light-green: #81C784;
-            --gray: #f5f5f5;
-            --dark-gray: #757575;
-            --white: #ffffff;
-            --today-bg: #FFF3E0;
-            --border: #e0e0e0;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --hover-shadow: rgba(0, 0, 0, 0.15);
+            --bg-main: #F8FAFC;
+            --header-bg: #0F172A;
+            --primary: #2563EB;
+            --primary-light: #EFF6FF;
+            --holiday-text: #E11D48;
+            --holiday-bg: #FFF1F2;
+            --holiday-border: #FECDD3;
+            --green-week-bg: #F0FDF4;
+            --green-week-border: #BBF7D0;
+            --today-bg: #FEF3C7;
+            --today-border: #F59E0B;
+            --today-text: #B45309;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--white);
-            color: #333;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-dark);
             font-size: 14px;
-            line-height: 1.3;
+            line-height: 1.4;
             -webkit-font-smoothing: antialiased;
         }
         
+        /* Header with Year Dropdown */
         .header {
             position: fixed;
             top: 0;
             width: 100%;
-            background: linear-gradient(135deg, var(--primary), #1976D2);
-            color: var(--white);
-            padding: 10px 16px;
-            text-align: center;
-            font-size: 18px;
+            height: 58px;
+            background: var(--header-bg);
+            color: #FFFFFF;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .today-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
-            z-index: 1000;
-            box-shadow: 0 2px 8px var(--shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .today-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Year Selector Pill */
+        .year-selector-wrapper {
+            position: relative;
+        }
+
+        .year-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: linear-gradient(135deg, #2563EB, #1D4ED8);
+            color: #FFFFFF;
+            border: none;
+            padding: 6px 28px 6px 14px;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            outline: none;
+        }
+
+        .year-selector-wrapper::after {
+            content: '▾';
+            position: absolute;
+            right: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FFFFFF;
+            font-size: 12px;
+            pointer-events: none;
         }
         
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.95);
-            color: var(--dark-gray);
-            padding: 8px;
-            text-align: center;
-            z-index: 1000;
-            font-size: 11px;
-            font-weight: 500;
-            border-top: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
+        /* Calendar Container */
         .calendar-container {
-            margin-top: 50px;
-            padding-bottom: 40px;
-            padding: 0 6px 6px;
-            max-width: 800px;
+            margin-top: 66px;
+            padding: 0 8px 70px;
+            max-width: 760px;
             margin-left: auto;
             margin-right: auto;
         }
         
-        .month {
-            margin: 12px 0 4px 0;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.05));
-            color: var(--primary);
-            border-radius: 10px;
-            position: sticky;
-            top: 50px;
-            z-index: 900;
+        .month-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 10px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 6px;
+        }
+
+        .month-title {
             font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-            border-left: 3px solid var(--primary);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 1px 6px rgba(33, 150, 243, 0.1);
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.2px;
+        }
+
+        .month-year-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 6px;
         }
         
+        /* Strict 7 equal columns */
         .week-header {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            background: rgba(245, 245, 245, 0.9);
-            padding: 8px 2px;
-            font-weight: 600;
-            position: sticky;
-            top: 95px;
-            z-index: 800;
-            color: var(--dark-gray);
-            font-size: 12px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 3px;
+            padding: 4px 0;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             text-align: center;
-            border-radius: 6px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            margin-bottom: 2px;
-            border: 1px solid rgba(224, 224, 224, 0.6);
+        }
+
+        .week-header .sun-label {
+            color: var(--holiday-text);
         }
         
         .week {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-            margin-bottom: 2px;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 3px;
+            margin-bottom: 3px;
         }
         
         .day {
-            padding: 10px 2px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
+            background: #FFFFFF;
+            color: var(--text-dark);
             cursor: pointer;
-            font-weight: 600;
             position: relative;
-            border-radius: 8px;
-            min-height: 46px;
+            border-radius: 10px;
+            height: 48px;
+            width: 100%;
+            min-width: 0;
+            padding: 5px 2px 3px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            font-size: 14px;
-            border: 1px solid rgba(224, 224, 224, 0.6);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid transparent;
+            overflow: hidden;
+            transition: transform 0.15s ease, border-color 0.15s ease;
         }
         
         .day:hover {
-            background: rgba(33, 150, 243, 0.08);
+            border-color: #CBD5E1;
             transform: translateY(-1px);
-            box-shadow: 0 3px 8px var(--hover-shadow);
-            border-color: rgba(33, 150, 243, 0.3);
         }
         
         .day.green-week {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.12), rgba(129, 199, 132, 0.08));
-            border-color: rgba(76, 175, 80, 0.2);
+            background: var(--green-week-bg);
+            border-color: var(--green-week-border);
         }
         
-        .day.green-week:hover {
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.15));
+        .day.sunday, .day.holiday {
+            color: var(--holiday-text) !important;
+            background: var(--holiday-bg) !important;
+            border-color: var(--holiday-border) !important;
         }
         
-        .holiday {
-            color: #FF4081 !important;
-            background: rgba(255, 64, 129, 0.08) !important;
-            border-color: rgba(255, 64, 129, 0.2) !important;
-        }
-        
-        .holiday:hover {
-            background: rgba(255, 64, 129, 0.15) !important;
-            border-color: rgba(255, 64, 129, 0.3) !important;
-        }
-        
-        .today {
-            background: linear-gradient(135deg, rgba(255, 183, 77, 0.2), rgba(255, 204, 128, 0.15)) !important;
-            color: #E65100 !important;
-            border: 2px solid #FF9800 !important;
-            font-weight: 700;
-            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.2);
-        }
-        
-        .sunday {
-            color: #FF4081;
-            background: rgba(255, 64, 129, 0.05);
+        .day.today {
+            background: var(--today-bg) !important;
+            color: var(--today-text) !important;
+            border: 2px solid var(--today-border) !important;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
         }
         
         .empty-day {
             background: transparent !important;
-            border: 1px solid transparent !important;
+            border: none !important;
             cursor: default;
-        }
-        
-        .empty-day:hover {
-            transform: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
+            pointer-events: none;
         }
         
         .day-number {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 2px;
-            transition: transform 0.2s ease;
+            line-height: 1.1;
+            margin-top: 2px;
         }
-        
-        .day:hover .day-number {
-            transform: scale(1.05);
+
+        .holiday-label {
+            font-size: 7.5px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-top: 3px;
+            width: 100%;
+            padding: 0 2px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -0.2px;
+            opacity: 0.9;
         }
         
         .note-indicator {
-            width: 5px;
-            height: 5px;
+            width: 4px;
+            height: 4px;
             background: var(--primary);
             border-radius: 50%;
-            margin-top: 3px;
-            opacity: 0.8;
-            box-shadow: 0 0 3px rgba(33, 150, 243, 0.3);
+            position: absolute;
+            top: 4px;
+            right: 4px;
+        }
+
+        /* Popup Modal */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 1500;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
         
         .popup {
@@ -227,178 +296,147 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.98);
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            background: #FFFFFF;
+            padding: 22px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
             z-index: 2000;
             width: 90%;
-            max-width: 300px;
-            color: #333;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            animation: popupAppear 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 340px;
+            animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        @keyframes popupAppear {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -46%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
         
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
         .popup h3 {
-            color: var(--primary);
-            margin: 0 0 10px 0;
-            font-size: 16px;
+            color: var(--text-dark);
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .popup h3.is-holiday {
+            color: var(--holiday-text);
+        }
+        
+        .date-badge {
+            font-size: 12px;
             font-weight: 600;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 12px;
         }
         
         .popup textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(33, 150, 243, 0.3);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            font-size: 13px;
-            resize: vertical;
-            margin: 10px 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-height: 70px;
-            transition: all 0.2s ease;
+            padding: 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            font-size: 14px;
+            resize: none;
+            margin-bottom: 14px;
+            font-family: inherit;
+            min-height: 85px;
+            transition: border-color 0.2s;
         }
         
         .popup textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+            background: #FFFFFF;
         }
         
         .popup-buttons {
             display: flex;
             gap: 10px;
-            justify-content: center;
         }
         
         .popup button {
-            padding: 10px 18px;
+            padding: 11px 16px;
             border: none;
-            border-radius: 6px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: inherit;
             font-size: 13px;
             flex: 1;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: transform 0.15s;
+        }
+
+        .popup button:active {
+            transform: scale(0.97);
         }
         
         .save-btn {
-            background: linear-gradient(135deg, var(--primary), #1976D2);
-            color: var(--white);
-            box-shadow: 0 3px 6px rgba(33, 150, 243, 0.3);
-        }
-        
-        .save-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 10px rgba(33, 150, 243, 0.4);
+            background: var(--primary);
+            color: #FFFFFF;
         }
         
         .close-btn {
-            background: rgba(117, 117, 117, 0.1);
-            color: var(--dark-gray);
-            border: 1px solid rgba(117, 117, 117, 0.3);
+            background: #F1F5F9;
+            color: var(--text-muted);
         }
-        
-        .close-btn:hover {
-            background: rgba(117, 117, 117, 0.2);
-            transform: translateY(-1px);
-        }
-        
-        .date-display {
-            font-size: 12px;
-            color: var(--dark-gray);
-            margin-bottom: 10px;
-            padding: 3px 6px;
-            background: rgba(245, 245, 245, 0.9);
-            border-radius: 4px;
-            display: inline-block;
-        }
-        
-        .overlay {
-            display: none;
+
+        /* Footer */
+        .footer {
             position: fixed;
-            top: 0;
-            left: 0;
+            bottom: 0;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1500;
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-        }
-        
-        @media (max-width: 768px) {
-            .day {
-                padding: 8px 1px;
-                min-height: 42px;
-                font-size: 13px;
-                border-radius: 6px;
-            }
-            
-            .day-number {
-                font-size: 15px;
-            }
-            
-            .week-header {
-                font-size: 11px;
-                padding: 6px 1px;
-                top: 90px;
-            }
-            
-            .month {
-                font-size: 15px;
-                padding: 8px 10px;
-                top: 48px;
-            }
-            
-            .header {
-                padding: 8px;
-                font-size: 16px;
-            }
-            
-            .footer {
-                font-size: 10px;
-                padding: 6px;
-            }
-            
-            .calendar-container {
-                max-width: 100%;
-            }
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--text-muted);
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+            font-size: 11px;
+            font-weight: 600;
+            border-top: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body onload="scrollToToday()">
-    <div class="header">CSL Calendar 2026</div>
-    <div class="overlay" id="overlay"></div>
+<body>
+
+    <div class="header">
+        <div class="header-title">CSL Calendar</div>
+        <div class="header-actions">
+            <button class="today-btn" onclick="jumpToToday()">Today</button>
+            <div class="year-selector-wrapper">
+                <select id="year-select" class="year-select" onchange="changeYear(this.value)" aria-label="Select Year">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closePopup()"></div>
     <div class="calendar-container" id="calendar-container"></div>
     <div class="popup" id="holiday-popup"></div>
-    <div class="footer">VT@Soft | Version 2.0 | © 2026</div>
+    <div class="footer" id="footer-text">VT@Soft | Version 3.0 | © 2026</div>
 
     <script>
+        // Declared Holidays for CSL Kochi (2026 & 2027)
         const holidays = {
-            // 2025 December Holiday
+            // 2025 Dec
             "2025-12-25": "Christmas Day",
+            
             // 2026 Holidays
             "2026-01-26": "Republic Day",
             "2026-03-20": "Id-ul-Fitr (Ramzan)",
@@ -412,11 +450,41 @@
             "2026-10-02": "Gandhi Jayanthi",
             "2026-10-21": "Vijayadasami",
             "2026-12-25": "Christmas",
-            // 2027 January Holiday
-            "2027-01-26": "Republic Day"
+
+            // 2027 Holidays (Office Order No. PERL/152/2026)
+            "2027-01-26": "Republic Day",
+            "2027-03-06": "Maha Sivarathri",
+            "2027-03-10": "Id-ul-Fitr (Ramzan)",
+            "2027-03-25": "Maundy Thursday",
+            "2027-03-26": "Good Friday",
+            "2027-04-15": "Vishu",
+            "2027-05-01": "May Day",
+            "2027-05-17": "Id-ul-Ad'ha (Bakrid)",
+            "2027-09-13": "Third Onam",
+            "2027-09-15": "Sree Narayana Guru Jayanthi",
+            "2027-10-02": "Gandhi Jayanthi",
+            "2027-10-28": "Deepavali",
+            "2027-12-25": "Christmas",
+
+            // 2028 Standard National Holidays
+            "2028-01-26": "Republic Day",
+            "2028-08-15": "Independence Day",
+            "2028-10-02": "Gandhi Jayanthi",
+            "2028-12-25": "Christmas"
         };
 
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
         const today = new Date();
+        const currentRealYear = today.getFullYear();
+
+        // Update Footer Year Automatically based on Current Date
+        document.getElementById('footer-text').textContent = `VT@Soft | Version 3.0 | © ${currentRealYear}`;
+
+        let selectedYear = [2026, 2027, 2028].includes(currentRealYear) ? currentRealYear : 2026;
 
         function getISOWeek(date) {
             const d = new Date(date);
@@ -426,11 +494,10 @@
             return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
         }
 
-        // Function to get all 2nd and 4th Saturdays for a specific year and month
+        // Returns 2nd and 4th Saturdays of a month
         function getSpecialSaturdays(year, monthIndex) {
             const specialSats = [];
             const saturdays = [];
-            // Find all Saturdays in the given month
             for (let day = 1; day <= 31; day++) {
                 const date = new Date(year, monthIndex, day);
                 if (date.getMonth() !== monthIndex) break;
@@ -438,41 +505,28 @@
                     saturdays.push(day);
                 }
             }
-            // Add the 2nd and 4th Saturdays if they exist
             if (saturdays.length >= 2) specialSats.push(saturdays[1]);
             if (saturdays.length >= 4) specialSats.push(saturdays[3]);
             return specialSats;
         }
 
-        function generateCalendar() {
+        function generateCalendar(year) {
             let calendarHTML = '';
-            const displayMonths = [
-                { year: 2025, month: 11, label: "December 2025" },
-                { year: 2026, month: 0, label: "January 2026" },
-                { year: 2026, month: 1, label: "February 2026" },
-                { year: 2026, month: 2, label: "March 2026" },
-                { year: 2026, month: 3, label: "April 2026" },
-                { year: 2026, month: 4, label: "May 2026" },
-                { year: 2026, month: 5, label: "June 2026" },
-                { year: 2026, month: 6, label: "July 2026" },
-                { year: 2026, month: 7, label: "August 2026" },
-                { year: 2026, month: 8, label: "September 2026" },
-                { year: 2026, month: 9, label: "October 2026" },
-                { year: 2026, month: 10, label: "November 2026" },
-                { year: 2026, month: 11, label: "December 2026" },
-                { year: 2027, month: 0, label: "January 2027" }
-            ];
 
-            displayMonths.forEach(({year, month, label}) => {
+            for (let month = 0; month < 12; month++) {
                 const firstDay = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const specialSaturdays = getSpecialSaturdays(year, month);
 
                 calendarHTML += `
-                    <div class="month" id="month-${year}-${month}">${label}</div>
-                    <div class="week-header">
-                        <div class="sunday">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                    </div>
+                    <div class="month-card" id="month-${year}-${month}">
+                        <div class="month-header">
+                            <span class="month-title">${monthNames[month]}</span>
+                            <span class="month-year-tag">${year}</span>
+                        </div>
+                        <div class="week-header">
+                            <div class="sun-label">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
                 `;
 
                 let date = 1;
@@ -486,26 +540,32 @@
                             const currentDate = new Date(year, month, date);
                             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                             const isoWeek = getISOWeek(currentDate);
-                            const isGreenWeek = isoWeek % 2 === 0 && j !== 0;
                             const isSunday = j === 0;
                             const isSpecialSaturday = (j === 6 && specialSaturdays.includes(date));
+                            const holidayName = holidays[dateStr];
+                            const isHoliday = Boolean(holidayName) || isSunday || isSpecialSaturday;
+                            const isGreenWeek = (isoWeek % 2 === 0) && !isHoliday;
 
                             let classes = 'day';
                             if (isGreenWeek) classes += ' green-week';
                             if (isSunday) classes += ' sunday';
-                            if (holidays[dateStr] || isSpecialSaturday) {
-                                classes += ' holiday';
-                            }
+                            if (holidayName || isSpecialSaturday) classes += ' holiday';
                             if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === date) {
                                 classes += ' today';
                             }
 
                             const savedNote = localStorage.getItem("note_" + dateStr);
                             const noteIndicator = savedNote ? '<div class="note-indicator"></div>' : '';
+                            
+                            let subLabel = '';
+                            if (holidayName) {
+                                subLabel = `<div class="holiday-label">${holidayName}</div>`;
+                            }
 
                             calendarHTML += `
-                                <div class="${classes}" onclick="showHoliday('${dateStr}')">
+                                <div class="${classes}" onclick="showHoliday('${dateStr}', ${isSpecialSaturday}, ${isSunday})">
                                     <div class="day-number">${date}</div>
+                                    ${subLabel}
                                     ${noteIndicator}
                                 </div>`;
                             date++;
@@ -513,22 +573,65 @@
                     }
                     calendarHTML += '</div>';
                 }
-            });
+                calendarHTML += `</div>`;
+            }
             document.getElementById('calendar-container').innerHTML = calendarHTML;
         }
 
-        function showHoliday(dateStr) {
+        function changeYear(year) {
+            selectedYear = parseInt(year, 10);
+            generateCalendar(selectedYear);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function jumpToToday() {
+            const targetYear = [2026, 2027, 2028].includes(currentRealYear) ? currentRealYear : 2026;
+            
+            document.getElementById('year-select').value = targetYear;
+            selectedYear = targetYear;
+            generateCalendar(selectedYear);
+
+            const monthElement = document.getElementById(`month-${targetYear}-${today.getMonth()}`);
+            if (monthElement) {
+                setTimeout(() => {
+                    const yOffset = -70;
+                    const y = monthElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }, 80);
+            }
+        }
+
+        function showHoliday(dateStr, isSpecialSaturday, isSunday) {
             const popup = document.getElementById('holiday-popup');
             const overlay = document.getElementById('overlay');
             const note = localStorage.getItem("note_" + dateStr) || "";
-            const holidayText = holidays[dateStr] || "Add Note";
+            
+            let title = holidays[dateStr];
+            let isHolidayTitle = true;
+
+            if (!title) {
+                if (isSpecialSaturday) {
+                    title = "2nd / 4th Saturday Holiday";
+                } else if (isSunday) {
+                    title = "Sunday Holiday";
+                } else {
+                    title = "Add Personal Note";
+                    isHolidayTitle = false;
+                }
+            }
+
+            const [y, m, d] = dateStr.split('-');
+            const formattedDate = `${d} ${monthNames[parseInt(m, 10) - 1]} ${y}`;
+
             popup.innerHTML = `
-                <h3>${holidayText}</h3>
-                <div class="date-display">${dateStr}</div>
-                <textarea id="note-input" placeholder="Add your note here..." rows="3">${note}</textarea>
+                <div class="popup-header">
+                    <h3 class="${isHolidayTitle ? 'is-holiday' : ''}">${title}</h3>
+                </div>
+                <div class="date-badge">${formattedDate}</div>
+                <textarea id="note-input" placeholder="Write a reminder or note for this day...">${note}</textarea>
                 <div class="popup-buttons">
-                    <button class="save-btn" onclick="saveNote('${dateStr}')">SAVE</button>
-                    <button class="close-btn" onclick="closePopup()">CLOSE</button>
+                    <button class="close-btn" onclick="closePopup()">Cancel</button>
+                    <button class="save-btn" onclick="saveNote('${dateStr}')">Save Note</button>
                 </div>
             `;
             popup.style.display = 'block';
@@ -537,9 +640,13 @@
 
         function saveNote(dateStr) {
             const note = document.getElementById("note-input").value.trim();
-            localStorage.setItem("note_" + dateStr, note);
+            if (note) {
+                localStorage.setItem("note_" + dateStr, note);
+            } else {
+                localStorage.removeItem("note_" + dateStr);
+            }
             closePopup();
-            generateCalendar();
+            generateCalendar(selectedYear);
         }
 
         function closePopup() {
@@ -547,33 +654,13 @@
             document.getElementById("overlay").style.display = "none";
         }
 
-        function scrollToToday() {
-            generateCalendar();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth();
-            const monthElement = document.getElementById(`month-${currentYear}-${currentMonth}`);
-
-            if (monthElement) {
-                setTimeout(() => {
-                    const elementRect = monthElement.getBoundingClientRect();
-                    const absoluteElementTop = elementRect.top + window.pageYOffset;
-                    const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2);
-                    window.scrollTo({
-                        top: middle,
-                        behavior: 'smooth'
-                    });
-                }, 100);
-            }
-        }
-
-        document.addEventListener('click', function (e) {
-            if (e.target.classList.contains('overlay')) {
-                closePopup();
-            }
-        });
-
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closePopup();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('year-select').value = selectedYear;
+            jumpToToday();
         });
     </script>
 </body>
